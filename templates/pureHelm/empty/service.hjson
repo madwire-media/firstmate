@@ -1,0 +1,20 @@
+{
+    type: pureHelm
+
+    branches: {
+        ~default: {
+            version: 0.1.0
+
+            // cluster: TODO: this
+            namespace: '[[service]]'
+
+            dev: {
+                namespace: '[[service]]-dev'
+            }
+
+            stage: {
+                namespace: '[[service]]-stage'
+            }
+        }
+    }
+}

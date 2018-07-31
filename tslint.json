@@ -1,0 +1,84 @@
+{
+    "defaultSeverity": "warn",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "class-name": true,
+        "comment-format": [
+            true,
+            "check-space"
+        ],
+        "indent": [
+            true,
+            "spaces"
+        ],
+        "one-line": [
+            true,
+            "check-open-brace",
+            "check-whitespace"
+        ],
+        "no-var-keyword": true,
+        "quotemark": [
+            true,
+            "single",
+            "avoid-escape"
+        ],
+        "semicolon": [
+            true,
+            "always",
+            "ignore-bound-class-methods"
+        ],
+        "whitespace": [
+            true,
+            "check-branch",
+            "check-decl",
+            "check-operator",
+            "check-module",
+            "check-separator",
+            "check-type"
+        ],
+        "typedef-whitespace": [
+            true,
+            {
+                "call-signature": "nospace",
+                "index-signature": "nospace",
+                "parameter": "nospace",
+                "property-declaration": "nospace",
+                "variable-declaration": "nospace"
+            }
+        ],
+        "no-internal-module": true,
+        "no-trailing-whitespace": true,
+        "prefer-template": true,
+        "prefer-const": true,
+        "prefer-readonly": true,
+        "prefer-for-of": true,
+        "prefer-method-signature": true,
+        "await-promise": true,
+        "promise-function-async": true,
+        "no-floating-promises": true,
+        "triple-equals": true,
+        "use-isnan": true,
+        "deprecation": true,
+        "eofline": true,
+        "trailing-comma": [
+            true,
+            {
+                "multiline": "always",
+                "singleline": "never"
+            }
+        ],
+        "arrow-return-shorthand": true,
+        "arrow-parens": true,
+        "callable-types": true,
+        "interface-name": false,
+        "no-console": false,
+        "forin": false,
+        "object-literal-sort-keys": false,
+        "no-shadowed-variable": false,
+        "only-arrow-functions": false
+    },
+    "rulesDirectory": []
+}

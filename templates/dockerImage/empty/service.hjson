@@ -1,0 +1,11 @@
+{
+    type: dockerImage
+
+    branches: {
+        ~default: {
+            version: 0.1.0
+
+            imageName: '[[service]]'
+        }
+    }
+}

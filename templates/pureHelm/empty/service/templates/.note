@@ -1,0 +1,6 @@
+This is where the meat of your helm chart goes. The `_helpers.tpl`
+file sets up a few variables to help you inside your YAML files.
+The rest of the files here translate to Kubernetes objects to be
+created in a cluster when this chart is deployed. For example, a
+Deployment will define how to replicate and create instances of an
+application.

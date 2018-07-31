@@ -1,0 +1,19 @@
+{
+  "name": "[[service]]",
+  "version": "0.1.0",
+  "description": "A node service of project [[project]]",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "nodejs src/index.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "[[repo]]"
+  },
+  "author": "[[author]]",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "*"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "[[service]]",
+  "version": "0.1.0",
+  "description": "A node service of project [[project]]",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodejs dist/index.js",
+    "debug": "nodejs --inspect-brk dist/index.js",
+    "build": "npm run build-ts && npm run tslint",
+    "bulid-ts": "tsc",
+    "watch": "tsc --watch",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "[[repo]]"
+  },
+  "author": "[[author]]",
+  "license": "ISC",
+  "dependencies": {
+    "koa": "*",
+    "koa-compress": "*",
+    "koa-helmet": "*",
+    "koa-logger": "*",
+    "koa-router": "*"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "@types/koa": "*",
+    "@types/koa-compress": "*",
+    "@types/koa-helmet": "*",
+    "@types/koa-logger": "*",
+    "@types/koa-router": "*",
+    "@types/supertest": "*",
+    "koa-error": "*",
+    "tslint": "*",
+    "typescript": "*",
+    "ts-jest": "*",
+    "supertest": "*",
+    "jest": "*"
+  }
+}

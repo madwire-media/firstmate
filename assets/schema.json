@@ -1,0 +1,646 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "FirstMate Repo Configuration",
+    "description": "Describes to FirstMate how to orchestrate a kubernetes deployment",
+    "type": "object",
+    "properties": {
+        "project": {
+            "type": "string",
+            "pattern": "^[a-z0-9/-]+$"
+        },
+        "defaultRegistry": {
+            "type": "string",
+            "pattern": "^(https?://)?[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+        },
+        "defaultService": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+        },
+        "services": {
+            "patternProperties": {
+                "^[a-z0-9-]+$": { "$ref": "#/definitions/service" }
+            },
+            "additionalProperties": false
+        }
+    },
+    "required": [
+        "project"
+    ],
+    "definitions": {
+        "port": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 65535
+        },
+        "service": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "properties": {
+                        "type": {
+                            "enum": ["dockerImage"]
+                        },
+                        "branches": {
+                            "type": "object",
+                            "properties": {
+                                "~default": { "$ref": "#/definitions/branch-dockerImage-required" }
+                            },
+                            "patternProperties": {
+                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-dockerImage" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-dockerImage-required" }
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "~default"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "branches"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": ["dockerDeployment"]
+                        },
+                        "branches": {
+                            "type": "object",
+                            "properties": {
+                                "master": { "$ref": "#/definitions/branch-dockerDeployment-required" }
+                            },
+                            "patternProperties": {
+                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-dockerDeployment" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-dockerDeployment-required" }
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "~default",
+                                "master"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "branches"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": ["buildContainer"]
+                        },
+                        "branches": {
+                            "type": "object",
+                            "properties": {
+                                "~default": { "$ref": "#/definitions/branch-buildContainer-required" }
+                            },
+                            "patternProperties": {
+                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-buildContainer" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-buildContainer-required" }
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "~default"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "required": [
+                        "type",
+                        "branches"
+                    ],
+                    "additionalProperties": false
+                },
+                {
+                    "properties": {
+                        "type": {
+                            "enum": ["pureHelm"]
+                        },
+                        "branches": {
+                            "type": "object",
+                            "properties": {
+                                "~default": { "$ref": "#/definitions/branch-helm-required" }
+                            },
+                            "patternProperties": {
+                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-helm" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-helm-required" }
+                                    ]
+                                }
+                            },
+                            "required": [
+                                "type",
+                                "branches"
+                            ],
+                            "additionalProperties": false
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            ]
+        },
+        "branch-base": {
+            "type": "object",
+            "allOf": [
+                {
+                    "properties": {
+                        "allowedModes": {
+                            "type": "array",
+                            "items": {
+                                "enum": [
+                                    "dev",
+                                    "stage",
+                                    "prod"
+                                ]
+                            }
+                        }
+                    }
+                },
+                { "$ref": "#/definitions/branch-base-env" }
+            ]
+        },
+        "branch": {
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "string"
+                },
+                "prod": {
+                    "type": "object",
+                    "properties": {
+                        "version": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "branch-required": {
+            "anyOf": [
+                {
+                    "properties": {
+                        "prod": {
+                            "required": [
+                                "version"
+                            ]
+                        }
+                    },
+                    "required": [
+                        "prod"
+                    ]
+                },
+                {
+                    "required": [
+                        "version"
+                    ]
+                }
+            ]
+        },
+        "branch-base-env": {
+            "type": "object",
+            "properties": {
+                "copyFiles": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^([^.]|\\.[^.])+$": {
+                            "type": "string",
+                            "pattern": "^([^.]||\\.[^.])+$"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "dependsOn": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9-]+$"
+                    }
+                }
+            }
+        },
+        "branch-dockerImage-base": {
+            "type": "object",
+            "allOf": [
+                {
+                    "properties": {
+                        "registry": {
+                            "type": "string",
+                            "pattern": "^(https?://)?[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+                        },
+                        "imageName": {
+                            "type": "string",
+                            "pattern": "^\\w[\\w.-]+$"
+                        },
+                        "dockerArgs": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[a-zA-Z0-9_]+$": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                { "$ref": "#/definitions/branch-base-env" }
+            ]
+        },
+        "branch-dockerImage": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch" },
+                { "$ref": "#/definitions/branch-base" },
+                { "$ref": "#/definitions/branch-dockerImage-base" },
+                {
+                    "properties": {
+                        "dev": { "$ref": "#/definitions/branch-dockerImage-base" },
+                        "stage": { "$ref": "#/definitions/branch-dockerImage-base" },
+                        "prod": { "$ref": "#/definitions/branch-dockerImage-base" }
+                    }
+                }
+            ]
+        },
+        "branch-dockerImage-required-base": {
+            "type": "object",
+            "required": [
+                "imageName"
+            ]
+        },
+        "branch-dockerImage-required": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch-required" },
+                { "$ref": "#/definitions/branch-dockerImage" },
+                {
+                    "anyOf": [
+                        { "$ref": "#/definitions/branch-dockerImage-required-base" },
+                        {
+                            "allOf": [
+                                { "$ref": "#/definitions/branch-dockerImage-base" },
+                                {
+                                    "properties": {
+                                        "dev": { "$ref": "#/definitions/branch-dockerImage-base" },
+                                        "stage": { "$ref": "#/definitions/branch-dockerImage-base" },
+                                        "prod": { "$ref": "#/definitions/branch-dockerImage-base" }
+                                    }
+                                }
+                            ],
+                            "required": [
+                                "dev",
+                                "stage",
+                                "prod"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "branch-dockerDeployment-base": {
+            "allOf": [
+                {
+                    "properties": {
+                        "registry": {
+                            "type": "string",
+                            "pattern": "^(https?://)?[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+                        },
+                        "imageNamePrefix": {
+                            "type": "string",
+                            "pattern": "^\\w[\\w.-]+$"
+                        },
+                        "containers": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[a-zA-Z0-9][a-zA-Z0-9_.-]+$": {
+                                    "properties": {
+                                        "volumes": {
+                                            "patternProperties": {
+                                                ".+": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        },
+                                        "dockerArgs": {
+                                            "type": "object",
+                                            "patternProperties": {
+                                                "^[a-zA-Z0-9_]+$": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        },
+                                        "k8sVolumes": {
+                                            "patternProperties": {
+                                                ".+": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        },
+                                        "ports": {
+                                            "type": "array",
+                                            "items": [
+                                                {
+                                                    "$ref": "#/definitions/port"
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "local": {
+                                                            "$ref": "#/definitions/port"
+                                                        },
+                                                        "remote": {
+                                                            "$ref": "#/definitions/port"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "local",
+                                                        "remote"
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        "debugCMD": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                { "$ref": "#/definitions/branch-base-env"}
+            ]
+        },
+        "branch-dockerDeployment": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch" },
+                { "$ref": "#/definitions/branch-base" },
+                { "$ref": "#/definitions/branch-helm" },
+                { "$ref": "#/definitions/branch-dockerDeployment-base" },
+                {
+                    "properties": {
+                        "dev": { "$ref": "#/definitions/branch-dockerDeployment-base" },
+                        "stage": { "$ref": "#/definitions/branch-dockerDeployment-base" },
+                        "prod": { "$ref": "#/definitions/branch-dockerDeployment-base" }
+                    }
+                },
+                {
+                    "properties": {
+                        "dev": {
+                            "properties": {
+                                "mode": {
+                                    "enum": ["proxy", "local"]
+                                },
+                                "pushDebugContainer": {
+                                    "type": "boolean"
+                                },
+                                "autodelete": {
+                                    "type": "boolean"
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "branch-dockerDeployment-required-base": {
+            "type": "object",
+            "required": [
+            ]
+        },
+        "branch-dockerDeployment-required": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch-required" },
+                { "$ref": "#/definitions/branch-dockerDeployment" },
+                { "$ref": "#/definitions/branch-helm-required" },
+                {
+                    "anyOf": [
+                        { "$ref": "#/definitions/branch-dockerDeployment-required-base" },
+                        {
+                            "allOf": [
+                                { "$ref": "#/definitions/branch-dockerDeployment-base" },
+                                {
+                                    "properties": {
+                                        "dev": { "$ref": "#/definitions/branch-dockerDeployment-base" },
+                                        "stage": { "$ref": "#/definitions/branch-dockerDeployment-base" },
+                                        "prod": { "$ref": "#/definitions/branch-dockerDeployment-base" }
+                                    }
+                                }
+                            ],
+                            "required": [
+                                "dev",
+                                "stage",
+                                "prod"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "branch-buildContainer-base": {
+            "type": "object",
+            "allOf": [
+                {
+                    "properties": {
+                        "volumes": {
+                            "type": "object",
+                            "patternProperties": {
+                                ".+": {
+                                    "type": "string",
+                                    "pattern": "^(?!/output).+"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "dockerArgs": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[a-zA-Z0-9_]+$": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                { "$ref": "#/definitions/branch-base-env" }
+            ]
+        },
+        "branch-buildContainer": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch" },
+                { "$ref": "#/definitions/branch-base" },
+                { "$ref": "#/definitions/branch-buildContainer-base" },
+                {
+                    "properties": {
+                        "dev": { "$ref": "#/definitions/branch-buildContainer-base" },
+                        "stage": { "$ref": "#/definitions/branch-buildContainer-base" },
+                        "prod": { "$ref": "#/definitions/branch-buildContainer-base" }
+                    }
+                }
+            ]
+        },
+        "branch-buildContainer-required-base": {
+            "type": "object",
+            "required": [
+            ]
+        },
+        "branch-buildContainer-required": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch-required" },
+                { "$ref": "#/definitions/branch-buildContainer" },
+                {
+                    "anyOf": [
+                        { "$ref": "#/definitions/branch-buildContainer-required-base" },
+                        {
+                            "allOf": [
+                                { "$ref": "#/definitions/branch-buildContainer-base" },
+                                {
+                                    "properties": {
+                                        "dev": { "$ref": "#/definitions/branch-buildContainer-base" },
+                                        "stage": { "$ref": "#/definitions/branch-buildContainer-base" },
+                                        "prod": { "$ref": "#/definitions/branch-buildContainer-base" }
+                                    }
+                                }
+                            ],
+                            "required": [
+                                "dev",
+                                "stage",
+                                "prod"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "branch-helm-base": {
+            "type": "object",
+            "allOf": [
+                {
+                    "properties": {
+                        "cluster": {
+                            "type": "string"
+                        },
+                        "namespace": {
+                            "type": "string"
+                        },
+                        "helmArgs": {
+                            "type": "object",
+                            "patternProperties": {
+                                "^[^=\\n]+$": {
+                                    "type": "string"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                { "$ref": "#/definitions/branch-base-env" }
+            ]
+        },
+        "branch-helm": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch" },
+                { "$ref": "#/definitions/branch-base" },
+                { "$ref": "#/definitions/branch-helm-base" },
+                {
+                    "properties": {
+                        "dev": { "$ref": "#/definitions/branch-helm-base" },
+                        "stage": { "$ref": "#/definitions/branch-helm-base" },
+                        "prod": { "$ref": "#/definitions/branch-helm-base" }
+                    }
+                }
+            ]
+        },
+        "branch-helm-required-base": {
+            "type": "object",
+            "required": [
+                "cluster",
+                "namespace"
+            ]
+        },
+        "branch-helm-required": {
+            "type": "object",
+            "allOf": [
+                { "$ref": "#/definitions/branch-required" },
+                { "$ref": "#/definitions/branch-helm" },
+                {
+                    "anyOf": [
+                        { "$ref": "#/definitions/branch-helm-required-base" },
+                        {
+                            "allOf": [
+                                { "$ref": "#/definitions/branch-helm-base" },
+                                {
+                                    "properties": {
+                                        "dev": { "$ref": "#/definitions/branch-helm-base" },
+                                        "stage": { "$ref": "#/definitions/branch-helm-base" },
+                                        "prod": { "$ref": "#/definitions/branch-helm-base" }
+                                    }
+                                }
+                            ],
+                            "required": [
+                                "dev",
+                                "stage",
+                                "prod"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "inheritedBranch": {
+            "type": "object",
+            "properties": {
+                "inheritFrom": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "inheritFrom"
+            ]
+        }
+    }
+}

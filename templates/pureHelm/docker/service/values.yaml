@@ -1,0 +1,27 @@
+# Default values for [[service]].
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# How many copies do you want running?
+replicaCount: 1
+
+# dev, stage, or prod mode?
+env: dev
+
+# Resource requests and limits
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  # requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+
+# Attributes to filter types of machines to run on
+nodeSelector: {}
+
+# Attributes to accept certain quirks of machines
+tolerations: []
+
+# How should the pods be scheduled?
+affinity: {}

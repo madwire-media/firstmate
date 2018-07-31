@@ -1,0 +1,29 @@
+{
+  "name": "[[service]]",
+  "version": "0.1.0",
+  "description": "A node service of project [[project]]",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodejs dist/index.js",
+    "debug": "nodejs --inspect-brk dist/index.js",
+    "build": "npm run build-ts && npm run tslint",
+    "bulid-ts": "tsc",
+    "watch": "tsc --watch",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "[[repo]]"
+  },
+  "author": "[[author]]",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "*",
+    "tslint": "*",
+    "typescript": "*",
+    "jest": "*",
+    "@types/jest": "*",
+    "ts-jest": "*"
+  }
+}

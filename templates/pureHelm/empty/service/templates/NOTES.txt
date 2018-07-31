@@ -1,0 +1,1 @@
+This Helm chart was created by Firstmate (https://github.com/madwire-media/firstmate).

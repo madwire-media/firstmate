@@ -1,0 +1,9 @@
+[
+    {
+        suffix: -build
+        type: buildContainer
+        template: node-ts
+
+        inheritSource: true
+    }
+]

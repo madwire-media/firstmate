@@ -1,0 +1,14 @@
+{
+    type: buildContainer
+
+    branches: {
+        ~default: {
+            version: 1.0.0
+
+            // Link the source code inside the container when it runs
+            volumes: {
+                '[[source]]': /root
+            }
+        }
+    }
+}

@@ -1,0 +1,7 @@
+If you want to include other preexisting charts as dependencies,
+you can download them into this directory for now. In the future
+you could also add them to a `requirements.yaml` file in the root
+directory of this chart. You can configure the values of your
+dependencies by using the name of the chart. For example, if you
+download the `mysql` chart with a `password` variable, you can use
+`mysql.password` to set that from this chart.

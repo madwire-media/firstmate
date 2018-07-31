@@ -1,0 +1,45 @@
+{
+    "name": "firstmate",
+    "version": "0.1.0",
+    "description": "A tool to make development on kubernetes easy",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/madwire-media/sergeant"
+    },
+    "author": "Dakota Sullivan",
+    "license": "MIT",
+    "bin": "dist/main.js",
+    "scripts": {
+        "start": "node dist/main.js",
+        "build": "npm run build-ts && npm run tslint",
+        "watch": "tsc --watch",
+        "test": "mocha TODO",
+        "build-ts": "tsc",
+        "tslint": "tslint -c tslint.json -p tsconfig.json",
+        "debug": "npm run build && node --inspect-brk dist/main.js"
+    },
+    "dependencies": {
+        "@types/leven": "^2.1.1",
+        "@types/mkdirp": "^0.5.2",
+        "@types/ncp": "^2.0.1",
+        "@types/parse-git-config": "^2.0.0",
+        "ajv": "^6.5.2",
+        "doasync": "^2.0.1",
+        "hjson": "^3.1.1",
+        "leven": "^2.1.0",
+        "mkdirp": "^0.5.1",
+        "ncp": "^2.0.0",
+        "parse-git-config": "^2.0.2",
+        "short-ansi": "^1.0.1",
+        "sywac": "^1.2.1"
+    },
+    "devDependencies": {
+        "@types/node": "^10.5.1",
+        "concurrently": "^3.6.0",
+        "mocha": "^5.2.0",
+        "mocha-typescript": "^1.1.16",
+        "ts-node": "^7.0.0",
+        "tslint": "^5.10.0",
+        "typescript": "^2.9.2"
+    }
+}
