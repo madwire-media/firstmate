@@ -44,6 +44,10 @@ function printTemplates(type: string) {
     console.log(a`\{g ${type}\}:`);
 
     for (const template of templates) {
-        console.log(a`    \{y ${template}\}`);
+        if (fs.readdirSync(`${templateDir}/${template}`).length === 0) {
+            console.log(a`    \{ld ${template}\}`);
+        } else {
+            console.log(a`    \{y ${template}\}`);
+        }
     }
 }
