@@ -11,7 +11,7 @@ routes
         ctx.body = "(⌐■_■) #Yeeeaaahhh Booooooy!!!!!!!";
     });
 
-export const port: number = (process.env.PORT && +process.env.PORT) || 3000;
+export const port: number = (process.env.PORT && +process.env.PORT) || (process.env.DOCKER === "true" ? 80 : 3000);
 app.use(logger());
 app.use(compression());
 app.use(routes.routes());

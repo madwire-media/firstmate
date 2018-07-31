@@ -1,5 +1,6 @@
 # Start from node version 10
 FROM node:10
+ENV DOCKER=true
 
 # Set the current working directory (CWD) to /root (also $HOME or ~)
 WORKDIR /root
@@ -12,7 +13,7 @@ ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 RUN npm i
 
-# Add in the Node.js package and JavaScript source code
+# Add in the Node.js package and TypeScript (compiled to JavaScript) source code
 ADD dist /root/
 
 # Run the Node.js package on container boot

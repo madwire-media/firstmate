@@ -1,0 +1,23 @@
+{
+    type: dockerDeployment
+
+    branches: {
+        ~default: {
+            version: 0.1.0
+
+            // Copy the package.json files and source code over
+            copyFiles: {
+                '[[source]]/docker/main/package.json': package.json
+                '[[source]]/docker/main/package-lock.json': package-lock.json
+                'fm/[[service]]-build/output': dist
+            }
+
+            dev: {
+                // Tell NPM to install dev packages
+                dockerArgs: {
+                    NODE_ENV: development
+                }
+            }
+        }
+    }
+}

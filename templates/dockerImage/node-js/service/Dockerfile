@@ -1,5 +1,6 @@
 # Start from node version 10
 FROM node:10
+ENV DOCKER=true
 
 # Set the current working directory (CWD) to /root (also $HOME or ~)
 WORKDIR /root

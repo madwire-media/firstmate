@@ -6,7 +6,7 @@ const helmet = require('helmet');
 const app = express();
 
 // Express configuration
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || (process.env.DOCKER === 'true' ? 80 : 3000));
 app.use(compression()); // This is incompatible with some primivitve HTTP clients, feel free to remove
 app.use(helmet());
 

@@ -1,4 +1,5 @@
 FROM php:7.2-apache
+ENV DOCKER=true
 
 # Install PHP configuration file(s)
 ADD *.ini /usr/local/etc/php/
