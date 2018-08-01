@@ -1,0 +1,16 @@
+deps.hjson
+  -> dockerDeployment/node-ts/deps.hjson
+  -> dockerImage/node-ts/deps.hjson
+
+service/docker
+  -> dockerDeployment/node-ts/service/docker
+
+service/helm
+  -> pureHelm/docker-web/service
+
+service.hjson
+  -> dockerDeployment/node-ts/service.hjson
+
+source
+  -> dockerImage/node-ts-koa/source
+

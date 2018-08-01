@@ -1,0 +1,9 @@
+service
+  -> dockerImage/node-js/service
+
+service.hjson
+  -> dockerImage/node-js/service.hjson
+
+source/jest.config.js
+  -> dockerImage/node-js/source/jest.config.js
+

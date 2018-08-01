@@ -1,0 +1,21 @@
+deps.hjson
+  -> dockerImage/node-ts/deps.hjson
+
+service
+  -> dockerImage/node-ts/service
+
+service.hjson
+  -> dockerImage/node-ts/service.hjson
+
+source/.gitignore
+  -> dockerImage/node-ts/source/.gitignore
+
+source/jest.config.js
+  -> dockerImage/node-ts/source/jest.config.js
+
+source/tsconfig.json
+  -> dockerImage/node-ts/source/tsconfig.json
+
+source/tslint.json
+  -> dockerImage/node-ts/source/tslint.json
+

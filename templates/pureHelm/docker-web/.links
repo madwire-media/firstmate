@@ -1,0 +1,34 @@
+service/.helmignore
+  -> pureHelm/docker/service/.helmignore
+  -> pureHelm/empty/service/.helmignore
+
+service/Chart.yaml
+  -> pureHelm/docker/service/Chart.yaml
+  -> pureHelm/empty/service/Chart.yaml
+
+service/charts
+  -> pureHelm/docker/service/charts
+  -> pureHelm/empty/service/charts
+
+service/templates/.note
+  -> pureHelm/docker/service/templates/.note
+  -> pureHelm/empty/service/templates/.note
+
+service/templates/NOTES.txt
+  -> pureHelm/docker/service/templates/NOTES.txt
+  -> pureHelm/empty/service/templates/NOTES.txt
+
+service/templates/_helpers.tpl
+  -> pureHelm/docker/service/templates/_helpers.tpl
+  -> pureHelm/empty/service/templates/_helpers.tpl
+
+service/templates/deployment.yaml
+  -> pureHelm/docker/service/templates/deployment.yaml
+
+service/values.yaml
+  -> pureHelm/docker/service/values.yaml
+
+service.hjson
+  -> pureHelm/docker/service.hjson
+  -> pureHelm/empty/service.hjson
+

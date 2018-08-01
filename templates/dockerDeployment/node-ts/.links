@@ -1,0 +1,13 @@
+deps.hjson
+  -> dockerImage/node-ts/deps.hjson
+
+service/docker/main
+  -> dockerImage/node-ts/service
+
+service/helm
+  -> dockerDeployment/node-js/service/helm
+  -> pureHelm/docker/service
+
+source
+  -> dockerImage/node-ts/source
+
