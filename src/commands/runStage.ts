@@ -2,8 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import {
-    a, getServiceDir, initBranch, maybeTryBranch, needsCommand,
-    needsNamespace, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
+    a, getServiceDir, initBranch, maybeTryBranch, needsCluster,
+    needsCommand, needsNamespace, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/cli';
 import {
     dockerBuild, dockerPush, dockerRun, DockerRunOptions, helmInstall,
@@ -42,11 +42,17 @@ export function runStageReqs(
     if (branch instanceof dockerImage.StageBranch) {
         reqsMet = needsCommand(context, 'docker');
     } else if (branch instanceof pureHelm.StageBranch) {
-        reqsMet = needsCommand(context, 'helm');
+        // Don't check for cluster if helm isn't installed
+        reqsMet = needsCommand(context, 'helm') &&
+            needsCluster(context, branch.cluster);
     } else if (branch instanceof dockerDeployment.StageBranch) {
-        reqsMet =
-            needsCommand(context, 'docker') &&
-            needsCommand(context, 'helm');
+        reqsMet = needsCommand(context, 'docker');
+
+        // Check for helm regardless of if docker is installed, but
+        // don't check fro cluster if helm isn't installed
+        reqsMet = needsCommand(context, 'helm') &&
+            needsCluster(context, branch.cluster) &&
+            reqsMet;
     } else if (branch instanceof buildContainer.StageBranch) {
         reqsMet = needsCommand(context, 'docker');
     }

@@ -2,8 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import {
-    a, getServiceDir, initBranch, maybeTryBranch, needsCommand,
-    needsNamespace, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
+    a, getServiceDir, initBranch, maybeTryBranch, needsCluster,
+    needsCommand, needsNamespace, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/cli';
 import {
     dockerPull, helmInstall,
@@ -42,11 +42,17 @@ export function runProdReqs(
     if (branch instanceof dockerImage.ProdBranch) {
         reqsMet = needsCommand(context, 'docker');
     } else if (branch instanceof pureHelm.ProdBranch) {
-        reqsMet = needsCommand(context, 'helm');
+        // Don't check for cluster if helm isn't installed
+        reqsMet = needsCommand(context, 'helm') &&
+            needsCluster(context, branch.cluster);
     } else if (branch instanceof dockerDeployment.ProdBranch) {
-        reqsMet =
-            needsCommand(context, 'docker') &&
-            needsCommand(context, 'helm');
+        reqsMet = needsCommand(context, 'docker');
+
+        // Check for helm regardless of if docker is installed, but
+        // don't check for cluster if helm isn't installed
+        reqsMet = needsCommand(context, 'helm') &&
+            needsCluster(context, branch.cluster) &&
+            reqsMet;
     } else if (branch instanceof buildContainer.ProdBranch) {
         reqsMet = true; // not applicable
     }

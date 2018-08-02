@@ -3,7 +3,8 @@ import * as fs from 'fs';
 import { Config } from '../config';
 import {
     a, generateMountsScript, getServiceDir, initBranch, maybeTryBranch,
-    needsCommand, needsNamespace, reqDependencies, resolveBranchName,
+    needsCluster, needsCommand, needsNamespace, reqDependencies,
+    resolveBranchName,
     SigIntHandler,
     testServiceFiles,
 } from '../helpers/cli';
@@ -46,12 +47,18 @@ export function runDevReqs(
     if (branch instanceof dockerImage.DevBranch) {
         reqsMet = needsCommand(context, 'docker');
     } else if (branch instanceof pureHelm.DevBranch) {
-        reqsMet = needsCommand(context, 'helm');
+        // Don't check for cluster if helm isn't installed
+        reqsMet = needsCommand(context, 'helm') &&
+            needsCluster(context, branch.cluster);
     } else if (branch instanceof dockerDeployment.DevBranch) {
         reqsMet = needsCommand(context, 'docker');
 
         if (branch.mode === 'proxy') {
-            reqsMet = reqsMet && needsCommand(context, 'helm');
+            // Check for helm regardless of if docker is installed, but
+            // don't check for cluster if helm isn't installed
+            reqsMet = needsCommand(context, 'helm') &&
+                needsCluster(context, branch.cluster) &&
+                reqsMet;
 
             if (debugContainer) {
                 reqsMet = reqsMet && needsCommand(context, 'telepresence');

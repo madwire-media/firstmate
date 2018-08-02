@@ -478,6 +478,38 @@ export function needsCommand(context: any, command: string): boolean {
     return true;
 }
 
+export function needsCluster(context: any, cluster: string): boolean {
+    const result = ChildProcess.spawnSync('kubectl', ['config', 'get-contexts', '-o', 'name']);
+
+    if (result.error) {
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        if (context) {
+            context.cliMessage(a`\{lr,t Could not read cluster list, is \{nt,lw kubectl\} installed?`);
+        } else {
+            console.error(a`\{lr Could not read cluster list, is \{lw kubectl\} installed?`);
+        }
+        return false;
+    }
+
+    const clusters = result.stdout.toString().split('\n').filter((s) => !!s);
+
+    if (!clusters.includes(cluster)) {
+        if (context) {
+            context.cliMessage(a`\{lr,t Could not find cluster \{nt,lw ${cluster
+                }\}, did you make a kubectl context for it?`);
+        } else {
+            console.error(a`\{lr Could not find cluster \{lw ${cluster
+                }\}, did you make a kubectl context for it?`);
+        }
+        return false;
+    }
+
+    return true;
+}
+
 export function needsFile(filename: string): boolean {
     let result = fs.existsSync(filename);
 

@@ -42,7 +42,7 @@ export function publishProdReqs(
     if (branch instanceof dockerImage.ProdBranch) {
         reqsMet = needsCommand(context, 'docker');
     } else if (branch instanceof pureHelm.ProdBranch) {
-        reqsMet = true; // not applicable
+        reqsMet = true; // not applicable yet
     } else if (branch instanceof dockerDeployment.ProdBranch) {
         reqsMet = needsCommand(context, 'docker');
     } else if (branch instanceof buildContainer.ProdBranch) {
