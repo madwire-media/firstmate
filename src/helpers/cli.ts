@@ -10,7 +10,7 @@ import * as Hjson from 'hjson';
 import * as mkdirp from 'mkdirp';
 import * as GitConfig from 'parse-git-config';
 
-import { Branch, Config, ConfigBase } from '../config';
+import { Branch, Config, ConfigBase, Service } from '../config';
 import { BranchBase } from '../serviceTypes/base/branch';
 import { parseUserConfig, User } from '../user';
 import { createNamespace, hasNamespace } from './commands';
@@ -362,6 +362,75 @@ export function initBranch(options: InitBranchOptions, fn: SvcCommandHandler, en
     return true;
 }
 
+export function maybeTryBranch(
+    service: Service,
+    usedBranchName: string,
+    mode: 'dev' | 'stage' | 'prod',
+): boolean {
+    if (!service.branches[usedBranchName][mode]) {
+        const defaultGood = mode in service.branches['~default'];
+        const branches = getGitBranches();
+        const possibleModes: Array<'dev' | 'stage' | 'prod'> = ['dev', 'stage', 'prod'];
+        const modes = possibleModes.filter((m) => !!service.branches[usedBranchName][m]);
+        let foundOption = false;
+
+        if (branches === false) {
+            return false;
+        }
+
+        branches.local = branches.local.filter(
+            (b) => b in service.branches ? !!service.branches[b][mode] : defaultGood,
+        );
+        branches.remote = branches.remote.filter(
+            (b) => b in service.branches ? !!service.branches[b][mode] : defaultGood,
+        );
+
+        console.log();
+        console.log(a`\{b Did you mean to:\}`);
+
+        for (const m of modes) {
+            console.log(a`  Run in \{c ${m}\} mode?`);
+            foundOption = true;
+        }
+        if (branches.local.length > 0) {
+            console.log(a`  Switch to a local branch? \{lw (${
+                branches.local.slice(0, 10).join(', ')
+            }${
+                branches.local.length > 10 ? ', ...' : ''
+            })\}`);
+            foundOption = true;
+        }
+        if (branches.remote.length > 0) {
+            console.log(a`  Pull down a remote branch? \{lw (${
+                branches.remote.slice(0, 10).join(', ')
+            }${
+                branches.remote.length > 10 ? ', ...' : ''
+            }) \}`);
+            foundOption = true;
+        }
+        if (defaultGood) {
+            console.log(a`  Create a new branch?`);
+            foundOption = true;
+        }
+
+        console.log(a`  Allow \{c ${mode}\} mode on branch \{g ${usedBranchName}\}?`);
+
+        // for (const branchName in service.branches) {
+        //     if (mode in service.branches[branchName]) {
+        //         if (branchName === '~default') {
+        //             defaultGood = true;
+        //         } else if (branchName[0] !== '~') {
+        //             goodBranches.push(branchName);
+        //         }
+        //     }
+        // }
+
+        return false;
+    }
+
+    return true;
+}
+
 export function needsNamespace(cluster: string, namespace: string): boolean {
     if (!hasNamespace(cluster, namespace)) {
         return createNamespace(cluster, namespace);
@@ -466,6 +535,35 @@ export function getGitBranch(context: any): string | false {
     }
 
     return branchName;
+}
+
+export interface GitBranches {
+    remote: string[];
+    local: string[];
+}
+export function getGitBranches(context?: any): GitBranches | false {
+    if (!fs.existsSync('.git')) {
+        if (context) {
+            context.cliMessage('Not a git repository');
+        } else {
+            console.error(a`\{lr Not a git repository\}`);
+        }
+        return false;
+    }
+
+    const branches: GitBranches = {
+        remote: [],
+        local: [],
+    };
+
+    if (fs.existsSync('.git/refs/remotes/origin')) {
+        branches.remote = fs.readdirSync('.git/refs/remotes/origin')
+            .filter((s) => s !== 'HEAD');
+    }
+
+    branches.local = fs.readdirSync('.git/refs/heads');
+
+    return branches;
 }
 
 export function getGitOrigin(context: any): string | false {

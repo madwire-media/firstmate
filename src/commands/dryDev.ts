@@ -2,8 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import {
-    a, getServiceDir, initBranch, needsCommand, reqDependencies,
-    resolveBranchName, runDependencies, SigIntHandler, testServiceFiles,
+    a, getServiceDir, initBranch, maybeTryBranch, needsCommand,
+    reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/cli';
 import {
     dockerBuild, dockerRun, DockerRunOptions, helmInstall,
@@ -27,7 +27,8 @@ export function dryDevReqs(
 
     if (branchBase.dev === undefined) {
         console.error(a`\{lr Cannot (dry) run service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in dev mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{c dev\} mode\}`);
+        maybeTryBranch(service, usedBranchName, 'dev');
         return false;
     }
     const branch = branchBase.dev;

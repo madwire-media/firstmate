@@ -2,8 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import {
-    a, getServiceDir, initBranch, needsCommand, needsNamespace,
-    reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
+    a, getServiceDir, initBranch, maybeTryBranch, needsCommand,
+    needsNamespace, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/cli';
 import {
     dockerPull, helmInstall,
@@ -27,7 +27,8 @@ export function runProdReqs(
 
     if (branchBase.prod === undefined) {
         console.error(a`\{lr Cannot run service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in prod mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{c prod\} mode\}`);
+        maybeTryBranch(service, usedBranchName, 'prod');
         return false;
     }
     const branch = branchBase.prod;

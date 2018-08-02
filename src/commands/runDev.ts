@@ -2,8 +2,9 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import {
-    a, generateMountsScript, getServiceDir, initBranch, needsCommand,
-    needsNamespace, reqDependencies, resolveBranchName, SigIntHandler,
+    a, generateMountsScript, getServiceDir, initBranch, maybeTryBranch,
+    needsCommand, needsNamespace, reqDependencies, resolveBranchName,
+    SigIntHandler,
     testServiceFiles,
 } from '../helpers/cli';
 import {
@@ -30,7 +31,8 @@ export function runDevReqs(
 
     if (branchBase.dev === undefined) {
         console.error(a`\{lr Cannot run service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in dev mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{c dev\} mode\}`);
+        maybeTryBranch(service, usedBranchName, 'dev');
         return false;
     }
     const branch = branchBase.dev;

@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 
 import * as doasync from 'doasync';
 import * as Hjson from 'hjson';
@@ -150,6 +151,15 @@ async function addSingleService({
         author: user.name,
         source: sourceDir,
     };
+    let prettyTemplateDir = path.normalize(templateDir);
+
+    if (process.env.HOME) {
+        const prettyTemplateRelative = path.relative(process.env.HOME, prettyTemplateDir);
+
+        if (!prettyTemplateRelative.startsWith('..')) {
+            prettyTemplateDir = `~/${prettyTemplateRelative}`;
+        }
+    }
 
     // Run dependencies
     if (fs.existsSync(`${templateDir}/deps.hjson`)) {

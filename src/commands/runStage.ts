@@ -2,8 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import {
-    a, getServiceDir, initBranch, needsCommand, needsNamespace,
-    reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
+    a, getServiceDir, initBranch, maybeTryBranch, needsCommand,
+    needsNamespace, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/cli';
 import {
     dockerBuild, dockerPush, dockerRun, DockerRunOptions, helmInstall,
@@ -27,7 +27,8 @@ export function runStageReqs(
 
     if (branchBase.stage === undefined) {
         console.error(a`\{lr Cannot run service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in stage mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{ stage\} mode\}`);
+        maybeTryBranch(service, usedBranchName, 'stage');
         return false;
     }
     const branch = branchBase.stage;
