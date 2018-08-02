@@ -198,7 +198,7 @@ async function addSingleService({
     if (fs.existsSync(`${templateDir}/source`) && !inheritedSource) {
         mkdirp.sync('source');
 
-        console.log(`Copying from ${templateDir}/source to ${sourceDir}`);
+        console.log(a`\{ld Copying from ${prettyTemplateDir}/source to \}\{m ${sourceDir}\}`);
         await new Promise((resolve, reject) => {
             ncp(`${templateDir}/source`, sourceDir, {
                 dereference: true,
@@ -222,7 +222,7 @@ async function addSingleService({
     if (fs.existsSync(`${templateDir}/service`)) {
         mkdirp.sync('fm');
 
-        console.log(`Copying from ${templateDir}/service to fm/${name}`);
+        console.log(a`\{ld Copying from ${prettyTemplateDir}/service to \}\{m fm/${name}\}`);
         await new Promise((resolve, reject) => {
             ncp(`${templateDir}/service`, `fm/${name}`, {
                 dereference: true,
