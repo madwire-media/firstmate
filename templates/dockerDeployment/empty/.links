@@ -1,0 +1,6 @@
+service/docker/main
+  -> dockerImage/empty/service
+
+service/helm
+  -> pureHelm/empty/service
+
