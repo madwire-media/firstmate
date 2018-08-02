@@ -1,25 +1,25 @@
-{
-    type: dockerImage
+        {
+            type: dockerImage
 
-    branches: {
-        ~default: {
-            version: 0.1.0
+            branches: {
+                ~default: {
+                    version: 0.1.0
 
-            imageName: '[[service]]'
+                    imageName: '[[service]]'
 
-            // Copy the package.json files and (compiled) source code over
-            copyFiles: {
-                '[[source]]/package.json': package.json
-                '[[source]]/package-lock.json': package-lock.json
-                'fm/[[service]]-build/output': dist
-            }
+                    // Copy the package.json files and (compiled) source code over
+                    copyFiles: {
+                        '[[source]]/package.json': package.json
+                        '[[source]]/package-lock.json': package-lock.json
+                        'fm/[[service]]-build/output': dist
+                    }
 
-            dev: {
-                // Tell NPM to install dev and prod packages
-                dockerArgs: {
-                    NODE_ENV: development
+                    dev: {
+                        // Tell NPM to install dev and prod packages
+                        dockerArgs: {
+                            NODE_ENV: development
+                        }
+                    }
                 }
             }
         }
-    }
-}

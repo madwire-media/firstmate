@@ -1,25 +1,25 @@
-{
-    type: dockerImage
+        {
+            type: dockerImage
 
-    branches: {
-        ~default: {
-            version: 0.1.0
+            branches: {
+                ~default: {
+                    version: 0.1.0
 
-            imageName: '[[service]]'
+                    imageName: '[[service]]'
 
-            // Copy the package.json files and source code over
-            copyFiles: {
-                '[[source]]/package.json': package.json
-                '[[source]]/package-lock.json': package-lock.json
-                '[[source]]/src': src
-            }
+                    // Copy the package.json files and source code over
+                    copyFiles: {
+                        '[[source]]/package.json': package.json
+                        '[[source]]/package-lock.json': package-lock.json
+                        '[[source]]/src': src
+                    }
 
-            dev: {
-                // Tell NPM to install dev packages
-                dockerArgs: {
-                    NODE_ENV: development
+                    dev: {
+                        // Tell NPM to install dev packages
+                        dockerArgs: {
+                            NODE_ENV: development
+                        }
+                    }
                 }
             }
         }
-    }
-}

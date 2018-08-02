@@ -1,29 +1,33 @@
-{
-    type: dockerImage
+        {
+            type: dockerImage
 
-    branches: {
-        ~default: {
-            version: 0.1.0
+            branches: {
+                ~default: {
+                    inheritFrom: master
+                }
+                master: {
+                    version: 0.1.0
 
-            imageName: '[[service]]'
+                    cluster: '' // TODO: change this
+                    namespace: '[[project]]-[[service]]'
 
-            // Copy the production configurations and source code over
-            copyFiles: {
-                'fm/[[service]]/php/php.prod.ini': php.ini
-                'fm/[[service]]/apache2/apache2.prod.conf': apache2.conf
-                'fm/[[service]]/apache2/ports.conf': ports.conf
-                '[[source]]': html
-            }
+                    // Copy the production configurations and source code over
+                    copyFiles: {
+                        'fm/[[service]]/php/php.prod.ini': php.ini
+                        'fm/[[service]]/apache2/apache2.prod.conf': apache2.conf
+                        'fm/[[service]]/apache2/ports.conf': ports.conf
+                        '[[source]]': html
+                    }
 
-            dev: {
-                // Copy the development configurations and source code over
-                copyFiles: {
-                    'fm/[[service]]/php/php.dev.ini': php.ini
-                    'fm/[[service]]/apache2/apache2.dev.conf': apache2.conf
-                    'fm/[[service]]/apache2/ports.conf': ports.conf
-                    '[[source]]': html
+                    dev: {
+                        // Copy the development configurations and source code over
+                        copyFiles: {
+                            'fm/[[service]]/php/php.dev.ini': php.ini
+                            'fm/[[service]]/apache2/apache2.dev.conf': apache2.conf
+                            'fm/[[service]]/apache2/ports.conf': ports.conf
+                            '[[source]]': html
+                        }
+                    }
                 }
             }
         }
-    }
-}

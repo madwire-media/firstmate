@@ -1,23 +1,29 @@
-{
-    type: dockerDeployment
+        {
+            type: dockerDeployment
 
-    branches: {
-        ~default: {
-            version: 0.1.0
+            branches: {
+                ~default: {
+                    inheritFrom: master
+                }
+                master: {
+                    version: 0.1.0
 
-            // Copy the package.json files and source code over
-            copyFiles: {
-                '[[source]]/docker/main/package.json': package.json
-                '[[source]]/docker/main/package-lock.json': package-lock.json
-                '[[source]]/docker/main/src': src
-            }
+                    cluster: '' // TODO: change this
+                    namespace: '[[project]]-[[service]]'
 
-            dev: {
-                // Tell NPM to install dev packages
-                dockerArgs: {
-                    NODE_ENV: development
+                    // Copy the package.json files and source code over
+                    copyFiles: {
+                        '[[source]]/docker/main/package.json': package.json
+                        '[[source]]/docker/main/package-lock.json': package-lock.json
+                        '[[source]]/docker/main/src': src
+                    }
+
+                    dev: {
+                        // Tell NPM to install dev packages
+                        dockerArgs: {
+                            NODE_ENV: development
+                        }
+                    }
                 }
             }
         }
-    }
-}
