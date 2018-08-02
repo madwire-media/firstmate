@@ -383,7 +383,7 @@ function parseDockerDeploymentBranches(context: ConfigContext,
         if (branchName === 'master') {
             allowedModes = rawBranch.allowedModes || ['prod'];
         } else {
-            allowedModes = rawBranch.allowedModes || ['dev', 'stage', 'prod'];
+            allowedModes = rawBranch.allowedModes || ['dev', 'stage'];
         }
 
         if (allowedModes.includes('dev')) {
