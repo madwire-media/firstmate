@@ -7,6 +7,9 @@
                 }
                 master: {
                     version: 0.1.0
+                    dependsOn: [
+                        '[[service]]-build'
+                    ]
 
                     cluster: '' // TODO: change this
                     namespace: '[[project]]-[[service]]'

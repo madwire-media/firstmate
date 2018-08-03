@@ -4,6 +4,9 @@
             branches: {
                 ~default: {
                     version: 0.1.0
+                    dependsOn: [
+                        '[[service]]-build'
+                    ]
 
                     imageName: '[[service]]'
 
