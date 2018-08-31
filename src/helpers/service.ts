@@ -176,7 +176,6 @@ export async function initBranch(options: InitBranchOptions, fn: SvcCommandHandl
     if (branch.copyFiles !== undefined) {
         console.log();
 
-        // TODO: Copy files migration
         const result = await copyFiles(branch.copyFiles, serviceName);
         if (result === false) {
             return false;

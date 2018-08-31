@@ -481,16 +481,6 @@ export function parseHelmInstallArgs(context: HelmContext): string[] {
     args.push('--kube-context', context.branch.cluster);
     args.push('--namespace', context.branch.namespace);
 
-    // TODO: --set [key]=[value]
-    /*
-        TODO:
-            Set deployment name
-            If DockerDeploymentDev:
-                Set telepresence version
-                If debugContainer:
-                    set container image to ignore
-     */
-
     return args;
 }
 
