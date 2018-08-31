@@ -25,7 +25,7 @@ interface ServiceDep {
 function notATemplate(template: string, templates: string[]) {
     console.log(a`\{lr Template \{w '${template}'\} is not a valid template`);
 
-    let shortest: {t: string | undefined, s: number} = {t: undefined, s: Infinity};
+    let shortest: {t: string | undefined, s: number} = {t: undefined, s: 3};
 
     for (const t of templates) {
         const distance = leven(t, template);
