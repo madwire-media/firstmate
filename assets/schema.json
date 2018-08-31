@@ -486,8 +486,7 @@
                             "type": "object",
                             "patternProperties": {
                                 ".+": {
-                                    "type": "string",
-                                    "pattern": "^(?!/output).+"
+                                    "type": "string"
                                 }
                             },
                             "additionalProperties": false
