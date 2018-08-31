@@ -2,9 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import { a } from '../helpers/cli';
-import {
-    dockerPull, helmInstall,
-} from '../helpers/commands';
+import * as docker from '../helpers/commands/docker';
+import * as helm from '../helpers/commands/helm';
 import { needsCluster, needsCommand, needsNamespace } from '../helpers/require';
 import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
@@ -90,7 +89,7 @@ export async function runProd(
 
     if (branch instanceof dockerImage.ProdBranch) {
         // Docker pull
-        if (!dockerPull(branch.registry, `${config.project}/${branch.imageName}`, branch.version)) {
+        if (!docker.pull(branch.registry, `${config.project}/${branch.imageName}`, branch.version)) {
             return false;
         }
     } else if (branch instanceof pureHelm.ProdBranch) {
@@ -105,7 +104,7 @@ export async function runProd(
             env: 'prod',
         };
 
-        if (!helmInstall(serviceFolder, helmContext, `${config.project}-${serviceName}`)) {
+        if (!helm.install(serviceFolder, helmContext, `${config.project}-${serviceName}`)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.ProdBranch) {
@@ -122,7 +121,7 @@ export async function runProd(
 
             dockerImages[dirname] = `${image}:${branch.version}`;
 
-            if (!dockerPull(branch.registry, image, branch.version)) {
+            if (!docker.pull(branch.registry, image, branch.version)) {
                 return false;
             }
         }
@@ -139,7 +138,7 @@ export async function runProd(
             env: 'prod',
         };
 
-        if (!helmInstall(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}`)) {
+        if (!helm.install(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}`)) {
             return false;
         }
     } else if (branch instanceof buildContainer.ProdBranch) {

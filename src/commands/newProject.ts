@@ -4,7 +4,7 @@ import { ncp } from 'ncp';
 
 import { Readable, Writable } from 'stream';
 import { a } from '../helpers/cli';
-import { gitInit } from '../helpers/commands';
+import * as git from '../helpers/commands/git';
 import { loadUser } from '../helpers/config';
 import { TemplateProcessor } from '../helpers/template';
 
@@ -35,7 +35,7 @@ export async function newProject(name: string): Promise<boolean> {
 
     console.log(`Initializing Git Repository`);
 
-    if (!gitInit(name)) {
+    if (!git.init(name)) {
         return false;
     }
 

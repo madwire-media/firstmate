@@ -1,8 +1,3 @@
-declare module "*.json" {
-    const value: any;
-    export default value;
-}
-
 declare module "doasync" {
     namespace doasync {}
     function doasync(cls: any): any;

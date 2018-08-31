@@ -2,9 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import { a } from '../helpers/cli';
-import {
-    dockerBuild, dockerPush, dockerRun, DockerRunOptions, helmInstall,
-} from '../helpers/commands';
+import * as docker from '../helpers/commands/docker';
+import * as helm from '../helpers/commands/helm';
 import { needsCluster, needsCommand, needsNamespace } from '../helpers/require';
 import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
@@ -90,12 +89,12 @@ export async function runStage(
 
     if (branch instanceof dockerImage.StageBranch) {
         // Docker build
-        if (!dockerBuild(serviceFolder, branch.imageName, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, branch.imageName, undefined, branch.dockerArgs)) {
             return false;
         }
 
         // Docker push
-        if (!dockerPush(`${config.project}/${branch.imageName}:stage`, branch.registry)) {
+        if (!docker.push(`${config.project}/${branch.imageName}:stage`, branch.registry)) {
             return false;
         }
     } else if (branch instanceof pureHelm.StageBranch) {
@@ -110,7 +109,7 @@ export async function runStage(
             env: 'stage',
         };
 
-        if (!helmInstall(serviceFolder, helmContext, `${config.project}-${serviceName}-stage`)) {
+        if (!helm.install(serviceFolder, helmContext, `${config.project}-${serviceName}-stage`)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.StageBranch) {
@@ -133,11 +132,11 @@ export async function runStage(
                 args = branch.containers[dirname].dockerArgs;
             }
 
-            if (!dockerBuild(dir, image, 'stage', args)) {
+            if (!docker.build(dir, image, 'stage', args)) {
                 return false;
             }
 
-            if (!dockerPush(`${image}:stage`, branch.registry)) {
+            if (!docker.push(`${image}:stage`, branch.registry)) {
                 return false;
             }
         }
@@ -154,24 +153,24 @@ export async function runStage(
             env: 'stage',
         };
 
-        if (!helmInstall(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-stage`)) {
+        if (!helm.install(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-stage`)) {
             return false;
         }
     } else if (branch instanceof buildContainer.StageBranch) {
         const image = `fmbuild-${serviceName}`;
 
-        if (!dockerBuild(serviceFolder, image, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
             return false;
         }
 
-        const runOpts: DockerRunOptions = {
+        const runOpts: docker.RunOptions = {
             image,
             name: image,
             rm: true,
             volumes: branch.volumes,
         };
 
-        if (!dockerRun(runOpts)) {
+        if (!docker.run(runOpts)) {
             return false;
         }
     }

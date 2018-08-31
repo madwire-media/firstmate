@@ -160,7 +160,7 @@ require('sywac')
     .command('publish <mode:enum> [service]', {
         desc: "Publish a service's images/charts",
         hints: [
-            '[docker] [helm]',
+            '[docker]',
         ],
         params: [
             {

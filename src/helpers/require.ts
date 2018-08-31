@@ -2,15 +2,15 @@ import * as ChildProcess from 'child_process';
 import * as fs from 'fs';
 
 import { a, which } from './cli';
-import { createNamespace, hasNamespace } from './commands';
+import * as kubectl from './commands/kubectl';
 
 export const commands: {
     [simpleName: string]: string,
 } = {};
 
 export function needsNamespace(cluster: string, namespace: string): boolean {
-    if (!hasNamespace(cluster, namespace)) {
-        return createNamespace(cluster, namespace);
+    if (!kubectl.hasNamespace(cluster, namespace)) {
+        return kubectl.createNamespace(cluster, namespace);
     }
 
     return true;

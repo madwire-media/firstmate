@@ -2,9 +2,7 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import { a } from '../helpers/cli';
-import {
-    dockerBuild, dockerPush, dockerRun, DockerRunOptions,
-} from '../helpers/commands';
+import * as docker from '../helpers/commands/docker';
 import { needsCommand } from '../helpers/require';
 import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
@@ -84,15 +82,15 @@ export async function publishProd(
         const image = `${config.project}/${branch.imageName}`;
 
         // Docker build
-        if (!dockerBuild(serviceFolder, image, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
             return false;
         }
 
         // Docker push
-        if (!dockerPush(`${image}:latest`, branch.registry)) {
+        if (!docker.push(`${image}:latest`, branch.registry)) {
             return false;
         }
-        if (!dockerPush(`${image}:${branch.version}`, branch.registry)) {
+        if (!docker.push(`${image}:${branch.version}`, branch.registry)) {
             return false;
         }
     } else if (branch instanceof pureHelm.ProdBranch) {
@@ -117,29 +115,29 @@ export async function publishProd(
                 args = branch.containers[dirname].dockerArgs;
             }
 
-            if (!dockerBuild(dir, image, branch.version, args)) {
+            if (!docker.build(dir, image, branch.version, args)) {
                 return false;
             }
 
-            if (!dockerPush(`${image}:${branch.version}`, branch.registry)) {
+            if (!docker.push(`${image}:${branch.version}`, branch.registry)) {
                 return false;
             }
         }
     } else if (branch instanceof buildContainer.ProdBranch) {
         const image = `fmbuild-${serviceName}`;
 
-        if (!dockerBuild(serviceFolder, image, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
             return false;
         }
 
-        const runOpts: DockerRunOptions = {
+        const runOpts: docker.RunOptions = {
             image,
             name: image,
             rm: true,
             volumes: branch.volumes,
         };
 
-        if (!dockerRun(runOpts)) {
+        if (!docker.run(runOpts)) {
             return false;
         }
     }

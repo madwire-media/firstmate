@@ -2,11 +2,14 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import { a } from '../helpers/cli';
-import {
-    dockerBuild, dockerContainerExists, dockerCreateNetwork, dockerDeleteNetwork,
-    dockerNetworkExists, dockerPush, dockerRemoveContainer, dockerRun, dockerRunAsync,
-    DockerRunOptions, helmDelete, helmInstall, telepresenceRunAsync, TelepresenceRunOptions, telepresenceVersion,
-} from '../helpers/commands';
+// import {
+//     docker.build, docker.containerExists, docker.createNetwork, docker.deleteNetwork,
+//     docker.networkExists, docker.push, docker.removeContainer, docker.run, docker.runAsync,
+//     docker.RunOptions, helm.del, helm.install, telepresence.runAsync, telepresence.RunOptions, telepresence.version,
+// } from '../helpers/commands';
+import * as docker from '../helpers/commands/docker';
+import * as helm from '../helpers/commands/helm';
+import * as telepresence from '../helpers/commands/telepresence';
 import { generateMountsScript } from '../helpers/mount';
 import { needsCluster, needsCommand, needsNamespace } from '../helpers/require';
 import {
@@ -104,7 +107,7 @@ export async function runDev(
         }
 
         // Docker build
-        if (!dockerBuild(serviceFolder, `${config.project}/${branch.imageName}`, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, `${config.project}/${branch.imageName}`, undefined, branch.dockerArgs)) {
             return false;
         }
     } else if (branch instanceof pureHelm.DevBranch) {
@@ -123,7 +126,7 @@ export async function runDev(
             env: 'dev',
         };
 
-        if (!helmInstall(serviceFolder, helmContext, `${config.project}-${serviceName}-dev`)) {
+        if (!helm.install(serviceFolder, helmContext, `${config.project}-${serviceName}-dev`)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.DevBranch) {
@@ -151,7 +154,7 @@ export async function runDev(
                 args = branch.containers[dirname].dockerArgs;
             }
 
-            if (!dockerBuild(dir, image, 'dev', args)) {
+            if (!docker.build(dir, image, 'dev', args)) {
                 return false;
             }
         }
@@ -167,7 +170,7 @@ export async function runDev(
                     continue;
                 }
 
-                if (!dockerPush(image, branch.registry)) {
+                if (!docker.push(image, branch.registry)) {
                     return false;
                 }
             }
@@ -179,7 +182,7 @@ export async function runDev(
 
             const helmDockerImages = {...dockerImages};
             if (debugContainer) {
-                helmDockerImages[debugContainer] = `datawire/telepresence-k8s:${telepresenceVersion()}`;
+                helmDockerImages[debugContainer] = `datawire/telepresence-k8s:${telepresence.version()}`;
             }
 
             // Helm chart run w/ vars
@@ -190,13 +193,13 @@ export async function runDev(
                 env: 'dev',
             };
 
-            if (!helmInstall(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-dev`)) {
+            if (!helm.install(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-dev`)) {
                 return false;
             }
 
             // Delete helm stuff on exit
             if (branch.autodelete) {
-                handlers.push(async () => helmDelete(helmContext, `${config.project}-${serviceName}-dev`) && undefined);
+                handlers.push(async () => helm.del(helmContext, `${config.project}-${serviceName}-dev`) && undefined);
             }
 
             // Telepresence instance?
@@ -205,7 +208,7 @@ export async function runDev(
                 const image = `${config.project}/${prefix}-${debugContainer}:dev`;
                 const containerName = `${serviceName}-${debugContainer}-dev`;
 
-                const runOpts: TelepresenceRunOptions = {
+                const runOpts: telepresence.RunOptions = {
                     cluster: branch.cluster,
                     deployment: `${config.project}-${serviceName}-dev`,
                     container: debugContainer,
@@ -244,19 +247,19 @@ export async function runDev(
                     }
                 }
 
-                handlers.push(telepresenceRunAsync(runOpts));
+                handlers.push(telepresence.runAsync(runOpts));
             }
         } else {
             const networkName = `fmdev-${serviceName}`;
-            const ownsNetwork = !dockerNetworkExists(networkName);
+            const ownsNetwork = !docker.networkExists(networkName);
 
             if (ownsNetwork) {
                 // Docker network create
-                if (!dockerCreateNetwork(networkName)) {
+                if (!docker.createNetwork(networkName)) {
                     return false;
                 }
                 handlers.push(async () => {
-                    if (!dockerDeleteNetwork(networkName)) {
+                    if (!docker.deleteNetwork(networkName)) {
                         return false;
                     }
                 });
@@ -268,11 +271,11 @@ export async function runDev(
                 const image = dockerImages[index];
                 const containerName = `${config.project}-${serviceName}-${dirname}-dev`;
 
-                if (dockerContainerExists(containerName)) {
-                    dockerRemoveContainer(containerName);
+                if (docker.containerExists(containerName)) {
+                    docker.removeContainer(containerName);
                 }
 
-                const runOpts: DockerRunOptions = {
+                const runOpts: docker.RunOptions = {
                     image,
                     name: containerName,
                     network: networkName,
@@ -290,7 +293,7 @@ export async function runDev(
                     }
                 }
 
-                handlers.push(dockerRunAsync(runOpts));
+                handlers.push(docker.runAsync(runOpts));
             }
         }
 
@@ -302,18 +305,18 @@ export async function runDev(
 
         const image = `fmbuild-${serviceName}`;
 
-        if (!dockerBuild(serviceFolder, image, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
             return false;
         }
 
-        const runOpts: DockerRunOptions = {
+        const runOpts: docker.RunOptions = {
             image,
             name: image,
             rm: true,
             volumes: branch.volumes,
         };
 
-        if (!dockerRun(runOpts)) {
+        if (!docker.run(runOpts)) {
             return false;
         }
     }

@@ -5,7 +5,8 @@ import * as dockerImage from './serviceTypes/dockerImage/module';
 import * as pureHelm from './serviceTypes/pureHelm/module';
 
 import * as Ajv from 'ajv';
-import * as configSchema from '../assets/schema.json';
+import configSchema = require('../assets/schema.json');
+
 const ajv = new Ajv();
 const validateConfig = ajv.compile(configSchema);
 

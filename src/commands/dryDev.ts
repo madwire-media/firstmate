@@ -2,9 +2,8 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import { a } from '../helpers/cli';
-import {
-    dockerBuild, dockerRun, DockerRunOptions, helmInstall,
-} from '../helpers/commands';
+import * as docker from '../helpers/commands/docker';
+import * as helm from '../helpers/commands/helm';
 import { needsCluster, needsCommand } from '../helpers/require';
 import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies, resolveBranchName,
@@ -92,7 +91,7 @@ export async function dryDev(
 
     if (branch instanceof dockerImage.DevBranch) {
         // Docker build
-        if (!dockerBuild(serviceFolder, `${config.project}/${branch.imageName}`, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, `${config.project}/${branch.imageName}`, undefined, branch.dockerArgs)) {
             return false;
         }
     } else if (branch instanceof pureHelm.DevBranch) {
@@ -103,7 +102,7 @@ export async function dryDev(
             env: 'dev',
         };
 
-        if (!helmInstall(serviceFolder, helmContext, `${config.project}-${serviceName}-dev`)) {
+        if (!helm.install(serviceFolder, helmContext, `${config.project}-${serviceName}-dev`)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.DevBranch) {
@@ -126,7 +125,7 @@ export async function dryDev(
                 args = branch.containers[dirname].dockerArgs;
             }
 
-            if (!dockerBuild(dir, image, 'dev', args)) {
+            if (!docker.build(dir, image, 'dev', args)) {
                 return false;
             }
         }
@@ -139,24 +138,24 @@ export async function dryDev(
             env: 'dev',
         };
 
-        if (!helmInstall(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-dev`)) {
+        if (!helm.install(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-dev`)) {
             return false;
         }
     } else if (branch instanceof buildContainer.DevBranch) {
         const image = `fmbuild-${serviceName}`;
 
-        if (!dockerBuild(serviceFolder, image, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
             return false;
         }
 
-        const runOpts: DockerRunOptions = {
+        const runOpts: docker.RunOptions = {
             image,
             name: image,
             rm: true,
             volumes: branch.volumes,
         };
 
-        if (!dockerRun(runOpts)) {
+        if (!docker.run(runOpts)) {
             return false;
         }
     }
