@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 import { BranchBase, Port } from './serviceTypes/base/branch';
 import * as buildContainer from './serviceTypes/buildContainer/module';
 import * as dockerDeployment from './serviceTypes/dockerDeployment/module';
@@ -5,7 +7,7 @@ import * as dockerImage from './serviceTypes/dockerImage/module';
 import * as pureHelm from './serviceTypes/pureHelm/module';
 
 import * as Ajv from 'ajv';
-import configSchema = require('../assets/schema.json');
+const configSchema = JSON.parse(fs.readFileSync(`${__dirname}/../assets/schema.json`, 'utf8'));
 
 const ajv = new Ajv();
 const validateConfig = ajv.compile(configSchema);
