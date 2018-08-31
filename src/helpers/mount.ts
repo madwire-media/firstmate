@@ -4,8 +4,11 @@ import * as path from 'path';
 import * as doasync from 'doasync';
 import * as Hjson from 'hjson';
 import { ncp } from 'ncp';
+import * as request from 'request';
+import * as rimraf from 'rimraf';
 
 import { a, fmt } from './cli';
+import { defer } from './promise';
 
 interface Mount {
     dest: string;
@@ -27,22 +30,28 @@ const mounts: Set<string> = new Set();
 let mountCount = 0;
 
 export async function mount(source: string, dest: string): Promise<boolean> {
-    source = path.relative(process.cwd(), path.resolve(source));
-    dest = path.relative(process.cwd(), path.resolve(dest));
+    let isHttp = false;
 
-    if (mounts.has(dest)) {
-        console.error(a`\{ly Aready copied to \{m ${dest}\}\}`);
-        return true;
-    }
-    if (!fs.existsSync(source)) {
-        console.error(a`\{lr Cannot copy from \{m ${source}\}\}: file does not exist`);
-        return false;
+    if (/https?:\/\//.test(source)) {
+        isHttp = true;
+    } else {
+        source = path.relative(process.cwd(), path.resolve(source));
+        dest = path.relative(process.cwd(), path.resolve(dest));
+
+        if (!fs.existsSync(source)) {
+            console.error(a`\{lr Cannot copy from \{m ${source}\}\}: file does not exist`);
+            return false;
+        }
     }
 
     let mountedUnderneath = false;
+    let relative;
     for (const mount of mounts) {
-        if (!path.relative(mount, dest).includes('..')) {
+        relative = path.relative(dest, mount);
+
+        if (relative === '.' || /(^|\/)\.\.\//.test(relative)) {
             mountedUnderneath = true;
+            break;
         }
     }
 
@@ -80,21 +89,32 @@ export async function mount(source: string, dest: string): Promise<boolean> {
         }
     }
 
-    // Copy new contents in
-    await doasync(ncp)(source, dest);
+    if (isHttp) {
+        const {promise, resolve, reject} = defer();
+
+        request(source)
+            .pipe(fs.createWriteStream(dest))
+            .on('close', resolve)
+            .on('error', reject);
+
+        await promise;
+    } else {
+        // Copy new contents in
+        await doasync(ncp)(source, dest);
+    }
 
     console.log(a`\{ld Copied \{m ${source}\} to \{m ${dest}\}\}`);
 
     return true;
 }
 
-export function unmount(mount: Mount): boolean {
+export async function unmount(mount: Mount): Promise<boolean> {
     const {
         dest,
         replaced,
     } = mount;
 
-    fs.unlinkSync(dest);
+    await doasync(rimraf)(dest);
 
     if (replaced) {
         fs.renameSync(`.fm/${replaced}`, dest);
@@ -119,9 +139,14 @@ export async function copyFiles(
     for (const source in paths) {
         const dest = `${serviceRoot}/${paths[source]}`;
 
-        const result = await mount(source, dest);
-        if (result === false) {
-            uncopyFiles();
+        try {
+            const result = await mount(source, dest);
+            if (result === false) {
+                uncopyFiles();
+                return false;
+            }
+        } catch (error) {
+            console.error(error);
             return false;
         }
     }
@@ -129,22 +154,30 @@ export async function copyFiles(
     return true;
 }
 
-export function uncopyFiles(): boolean {
+export async function uncopyFiles(): Promise<boolean> {
     let returnCode: boolean = true;
 
-    const mountIds = fs.readdirSync('.fm')
-        .filter((s) => s.endsWith('.mount'))
-        .map((s) => s.substring(0, -6))
-        .map((s) => +s)
-        .filter((s) => !isNaN(s))
-        .sort((a, b) => a - b);
+    if (fs.existsSync('.fm') && fs.statSync('.fm').isDirectory()) {
+        const mountIds = fs.readdirSync('.fm')
+            .filter((s) => s.endsWith('.mount'))
+            .map((s) => s.substring(0, -6))
+            .map((s) => +s)
+            .filter((s) => !isNaN(s))
+            .sort((a, b) => a - b);
 
-    for (const mountId of mountIds) {
-        const mount = Hjson.parse(fs.readFileSync(`.fm/${mountId}.mount`, 'utf8'));
+        for (const mountId of mountIds) {
+            try {
+                const mount = Hjson.parse(fs.readFileSync(`.fm/${mountId}.mount`, 'utf8'));
 
-        const result = unmount(mount);
-        if (result === false) {
-            returnCode = false;
+                const result = await unmount(mount);
+                if (result === false) {
+                    returnCode = false;
+                }
+
+                fs.unlinkSync(`.fm/${mountId}.mount`);
+            } catch (error) {
+                console.error(error);
+            }
         }
     }
 

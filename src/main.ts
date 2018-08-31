@@ -16,6 +16,7 @@ import { runProd, runProdReqs } from './commands/runProd';
 import { runStage, runStageReqs } from './commands/runStage';
 import { templates } from './commands/templates';
 import { validate } from './commands/validate';
+import { uncopyFiles } from './helpers/mount';
 
 (ncp as any).limit = 32;
 
@@ -34,7 +35,7 @@ const styleHooks = {
     // desc: (s: string) => a`\{c ${s}\}`,
     flags: (s: string, type: any) => {
         if (type.datatype === 'command') {
-            const parts = s.match(/^([^\s]+)(\s)(.+)$/)!;
+            const parts = s.match(/^([^\s]+)(?:(\s)(.+))?$/)!;
             let ret = a`\{m ${parts[1]}\}`;
 
             if (parts[3]) {
@@ -119,6 +120,12 @@ require('sywac')
             await templates(argv.type);
         },
     })
+    .command('clean', {
+        desc: 'Cleans up the workspace, removing any dangling copied files',
+        async run() {
+            await uncopyFiles();
+        },
+    })
     .command('run <mode:enum> [service] [debug] [--dry]', {
         desc: 'Run a service',
         hints: [
@@ -185,7 +192,7 @@ require('sywac')
             helpOnError(this, context);
         },
     })
-    .command('clean <mode:enum> <service>', {
+    .command('purge <mode:enum> <service>', {
         desc: "Clean up a service's resources",
         hints: [
             '[helm]',

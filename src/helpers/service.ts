@@ -40,6 +40,9 @@ export async function runService(
     opts: ServiceRunOpts = {},
     params: any[] = [],
 ) {
+    // Clean up any dangling copied files
+    await uncopyFiles();
+
     let {config} = opts;
     const {liveRun} = opts;
 
@@ -183,7 +186,7 @@ export async function initBranch(options: InitBranchOptions, fn: SvcCommandHandl
 
         handlers.push(async () => {
             console.log();
-            uncopyFiles();
+            await uncopyFiles();
 
             return undefined;
         });

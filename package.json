@@ -19,10 +19,6 @@
         "debug": "npm run build && node --inspect-brk dist/main.js"
     },
     "dependencies": {
-        "@types/leven": "^2.1.1",
-        "@types/mkdirp": "^0.5.2",
-        "@types/ncp": "^2.0.1",
-        "@types/parse-git-config": "^2.0.0",
         "ajv": "^6.5.2",
         "doasync": "^2.0.1",
         "hjson": "git+https://github.com/dqsully/hjson-js.git",
@@ -30,11 +26,19 @@
         "mkdirp": "^0.5.1",
         "ncp": "^2.0.0",
         "parse-git-config": "^2.0.2",
+        "request": "^2.88.0",
+        "rimraf": "^2.6.2",
         "short-ansi": "^1.0.1",
         "sywac": "^1.2.1"
     },
     "devDependencies": {
+        "@types/leven": "^2.1.1",
+        "@types/mkdirp": "^0.5.2",
+        "@types/ncp": "^2.0.1",
         "@types/node": "^10.5.1",
+        "@types/parse-git-config": "^2.0.0",
+        "@types/request": "^2.47.1",
+        "@types/rimraf": "^2.0.2",
         "concurrently": "^3.6.0",
         "mocha": "^5.2.0",
         "mocha-typescript": "^1.1.16",
