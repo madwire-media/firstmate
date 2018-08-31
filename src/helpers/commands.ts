@@ -2,7 +2,8 @@ import * as ChildProcess from 'child_process';
 import * as path from 'path';
 
 import { Port } from '../serviceTypes/base/branch';
-import { a, fmt, interrupt, SigIntHandler } from './cli';
+import { a, fmt, interrupt } from './cli';
+import { SigIntHandler } from './service';
 
 export function gitInit(cwd: string): boolean {
     const result = ChildProcess.spawnSync(
@@ -232,7 +233,6 @@ export interface DockerRunOptions {
     ports?: Port[];
     command?: string;
     rm?: boolean;
-    canMount?: boolean;
 }
 export function dockerRun(options: DockerRunOptions): boolean {
     const {args, argsText} = parseDockerArgs(options);
@@ -336,6 +336,11 @@ function parseDockerArgs(options: DockerRunOptions): {args: string[], argsText: 
         args.push('--rm');
     }
 
+    if (process.stdout.isTTY) {
+        argsText += ' -t';
+        args.push('-t');
+    }
+
     if (options.network !== undefined) {
         argsText += ` --network ${fmt(options.network)}`;
         args.push('--network', options.network);
@@ -361,20 +366,14 @@ function parseDockerArgs(options: DockerRunOptions): {args: string[], argsText: 
         }
     }
 
-    if (options.canMount) {
-        const seccompPath = path.relative(__dirname, '../../assets/seccomp-mounts.json');
-
-        argsText += ` --security-opt ${fmt(`seccomp=${seccompPath}`)}`;
-        args.push('--security-opt', `seccomp=${seccompPath}`);
-    }
-
     argsText += ` --name ${fmt(options.name)}`;
     args.push('--name', options.name);
 
-    argsText += fmt(options.image);
+    argsText += ` ${fmt(options.image)}`;
     args.push(options.image);
 
     if (options.command !== undefined) {
+        argsText += ` ${fmt(options.command)}`;
         args.push(options.command);
     }
 

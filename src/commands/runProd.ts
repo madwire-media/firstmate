@@ -1,13 +1,15 @@
 import * as fs from 'fs';
 
 import { Config } from '../config';
-import {
-    a, getServiceDir, initBranch, maybeTryBranch, needsCluster,
-    needsCommand, needsNamespace, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
-} from '../helpers/cli';
+import { a } from '../helpers/cli';
 import {
     dockerPull, helmInstall,
 } from '../helpers/commands';
+import { needsCluster, needsCommand, needsNamespace } from '../helpers/require';
+import {
+    getServiceDir, initBranch, maybeTryBranch, reqDependencies,
+    resolveBranchName, SigIntHandler, testServiceFiles,
+} from '../helpers/service';
 import * as buildContainer from '../serviceTypes/buildContainer/module';
 import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
 import * as dockerImage from '../serviceTypes/dockerImage/module';
@@ -64,13 +66,13 @@ export function runProdReqs(
     return reqsMet;
 }
 
-export function runProd(
+export async function runProd(
     config: Config,
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
     isAsync: () => void,
-): undefined | false {
+): Promise<undefined | false> {
     const service = config.services[serviceName];
 
     const serviceFolder = getServiceDir(serviceName);
@@ -78,7 +80,7 @@ export function runProd(
     const branchBase = service.branches[usedBranchName];
     const branch = branchBase.prod!; // handled in reqs function
 
-    const initResult = initBranch({
+    const initResult = await initBranch({
         branch, branchName, serviceName, serviceFolder, isAsync,
         usedBranchName, handlers, config, branchType: branchBase.type,
     }, runProd, 'prod');

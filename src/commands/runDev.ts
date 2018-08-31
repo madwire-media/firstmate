@@ -1,18 +1,18 @@
 import * as fs from 'fs';
 
 import { Config } from '../config';
-import {
-    a, generateMountsScript, getServiceDir, initBranch, maybeTryBranch,
-    needsCluster, needsCommand, needsNamespace, reqDependencies,
-    resolveBranchName,
-    SigIntHandler,
-    testServiceFiles,
-} from '../helpers/cli';
+import { a } from '../helpers/cli';
 import {
     dockerBuild, dockerContainerExists, dockerCreateNetwork, dockerDeleteNetwork,
     dockerNetworkExists, dockerPush, dockerRemoveContainer, dockerRun, dockerRunAsync,
     DockerRunOptions, helmDelete, helmInstall, telepresenceRunAsync, TelepresenceRunOptions, telepresenceVersion,
 } from '../helpers/commands';
+import { generateMountsScript } from '../helpers/mount';
+import { needsCluster, needsCommand, needsNamespace } from '../helpers/require';
+import {
+    getServiceDir, initBranch, maybeTryBranch, reqDependencies,
+    resolveBranchName, SigIntHandler, testServiceFiles,
+} from '../helpers/service';
 import * as buildContainer from '../serviceTypes/buildContainer/module';
 import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
 import * as dockerImage from '../serviceTypes/dockerImage/module';
@@ -75,14 +75,14 @@ export function runDevReqs(
     return reqsMet;
 }
 
-export function runDev(
+export async function runDev(
     config: Config,
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
     isAsync: () => void,
     [debugContainer]: string[],
-): undefined | false {
+): Promise<undefined | false> {
     const service = config.services[serviceName];
 
     const serviceFolder = getServiceDir(serviceName);
@@ -90,7 +90,7 @@ export function runDev(
     const branchBase = service.branches[usedBranchName];
     const branch = branchBase.dev!; // handled in reqs function
 
-    const initResult = initBranch({
+    const initResult = await initBranch({
         branch, branchName, serviceName, serviceFolder, isAsync,
         usedBranchName, handlers, config, branchType: branchBase.type,
     }, runDev, 'dev');
@@ -311,10 +311,7 @@ export function runDev(
             name: image,
             rm: true,
             volumes: branch.volumes,
-            canMount: true,
         };
-
-        runOpts.volumes![`${serviceFolder}/output`] = '/output';
 
         if (!dockerRun(runOpts)) {
             return false;

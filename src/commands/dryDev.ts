@@ -1,13 +1,15 @@
 import * as fs from 'fs';
 
 import { Config } from '../config';
-import {
-    a, getServiceDir, initBranch, maybeTryBranch, needsCluster,
-    needsCommand, reqDependencies, resolveBranchName, SigIntHandler, testServiceFiles,
-} from '../helpers/cli';
+import { a } from '../helpers/cli';
 import {
     dockerBuild, dockerRun, DockerRunOptions, helmInstall,
 } from '../helpers/commands';
+import { needsCluster, needsCommand } from '../helpers/require';
+import {
+    getServiceDir, initBranch, maybeTryBranch, reqDependencies, resolveBranchName,
+    SigIntHandler, testServiceFiles,
+} from '../helpers/service';
 import * as buildContainer from '../serviceTypes/buildContainer/module';
 import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
 import * as dockerImage from '../serviceTypes/dockerImage/module';
@@ -66,13 +68,13 @@ export function dryDevReqs(
     return reqsMet;
 }
 
-export function dryDev(
+export async function dryDev(
     config: Config,
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
     isAsync: () => void,
-): undefined | false {
+): Promise<undefined | false> {
     const service = config.services[serviceName];
 
     const serviceFolder = getServiceDir(serviceName);
@@ -80,7 +82,7 @@ export function dryDev(
     const branchBase = service.branches[usedBranchName];
     const branch = branchBase.dev!; // handled in reqs function
 
-    const initResult = initBranch({
+    const initResult = await initBranch({
         branch, branchName, serviceName, serviceFolder, isAsync,
         usedBranchName, handlers, config, branchType: branchBase.type,
     }, dryDev, 'dev (dry run)');
@@ -152,10 +154,7 @@ export function dryDev(
             name: image,
             rm: true,
             volumes: branch.volumes,
-            canMount: true,
         };
-
-        runOpts.volumes![`${serviceFolder}/output`] = '/output';
 
         if (!dockerRun(runOpts)) {
             return false;

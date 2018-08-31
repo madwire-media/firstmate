@@ -1,8 +1,12 @@
 import { Config } from '../config';
+import { a } from '../helpers/cli';
+import { loadConfig } from '../helpers/config';
+import { getGitBranch } from '../helpers/git';
+import { needsCommand, needsFolder } from '../helpers/require';
 import {
-    a, getGitBranch, getServiceDir, loadConfig, needsCommand, needsFolder,
-    resolveBranchName, runDependencies, runService, SigIntHandler, testServiceDir, testServiceFiles,
-} from '../helpers/cli';
+    getServiceDir, resolveBranchName, runDependencies, runService,
+    SigIntHandler, testServiceDir, testServiceFiles,
+} from '../helpers/service';
 import { BranchBase } from '../serviceTypes/base/branch';
 
 export async function validate(service?: string): Promise<boolean> {
@@ -27,7 +31,7 @@ export async function validate(service?: string): Promise<boolean> {
 
     const checkedServices = new Set<string>();
 
-    const handler = (
+    const handler = async (
         config: Config,
         serviceName: string,
         branchName: string,

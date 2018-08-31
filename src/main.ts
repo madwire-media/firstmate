@@ -3,8 +3,10 @@ import 'source-map-support/register';
 
 import * as fs from 'fs';
 
-import { a, needsCommand, needsSudo, runService } from './helpers/cli';
+import { a } from './helpers/cli';
+import { runService } from './helpers/service';
 
+import { ncp } from 'ncp';
 import { addService } from './commands/addService';
 import { dryDev } from './commands/dryDev';
 import { newProject } from './commands/newProject';
@@ -14,6 +16,8 @@ import { runProd, runProdReqs } from './commands/runProd';
 import { runStage, runStageReqs } from './commands/runStage';
 import { templates } from './commands/templates';
 import { validate } from './commands/validate';
+
+(ncp as any).limit = 32;
 
 const styleHooks = {
     usagePrefix: (s: string) => a`\{lw,u ${s.slice(0, 6)}\} \{lm,i ${s.slice(7)}\}`,

@@ -3,8 +3,9 @@ import * as fs from 'fs';
 import { ncp } from 'ncp';
 
 import { Readable, Writable } from 'stream';
-import { a, loadUser } from '../helpers/cli';
+import { a } from '../helpers/cli';
 import { gitInit } from '../helpers/commands';
+import { loadUser } from '../helpers/config';
 import { TemplateProcessor } from '../helpers/template';
 
 export async function newProject(name: string): Promise<boolean> {
@@ -19,7 +20,6 @@ export async function newProject(name: string): Promise<boolean> {
 
     console.log(`Copying files`);
 
-    (ncp as any).limit = 32;
     await doasync(ncp)(rootDir, name, {
         dereference: true,
         transform: (read: Readable, write: Writable) => {

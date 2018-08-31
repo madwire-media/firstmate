@@ -9,7 +9,9 @@ import { ncp } from 'ncp';
 
 import { Readable, Transform, Writable } from 'stream';
 import { Config, ConfigBase } from '../config';
-import { a, getGitOrigin, loadConfig, loadConfigRaw, loadUser } from '../helpers/cli';
+import { a } from '../helpers/cli';
+import { loadConfig, loadConfigRaw, loadUser } from '../helpers/config';
+import { getGitOrigin } from '../helpers/git';
 import { processTemplateS, TemplateProcessor } from '../helpers/template';
 import { User } from '../user';
 
@@ -41,8 +43,6 @@ function notATemplate(template: string, templates: string[]) {
 }
 
 export async function addService(context: any, service: string, type: string, template: string) {
-    (ncp as any).limit = 32;
-
     const raw = loadConfigRaw(context);
     if (raw === undefined) {
         return false;
