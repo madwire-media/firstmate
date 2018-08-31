@@ -87,7 +87,7 @@ require('sywac')
             await newProject(argv.projectName);
         },
     })
-    .command('add <type:enum> <template> <service>', {
+    .command('add <type:enum> <template> <service> [--no-source]', {
         desc: 'Add a new service to an existing project',
         params: [
             {
@@ -99,7 +99,7 @@ require('sywac')
             'Name of new service',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
-            const result = await addService(context, argv.service, argv.type, argv.template);
+            const result = await addService(context, argv.service, argv.type, argv.template, argv['no-source']);
 
             if (result === false) {
                 context.code++;

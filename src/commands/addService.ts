@@ -42,7 +42,7 @@ function notATemplate(template: string, templates: string[]) {
     console.log(a`\{ld (You can run \{w fm templates\} to list all templates\}`);
 }
 
-export async function addService(context: any, service: string, type: string, template: string) {
+export async function addService(context: any, service: string, type: string, template: string, noSource: boolean) {
     const raw = loadConfigRaw(context);
     if (raw === undefined) {
         return false;
@@ -69,7 +69,7 @@ export async function addService(context: any, service: string, type: string, te
 
     const result = await addSingleService({
         templatesRootDir, rawConfig, config, user, type, template, context,
-        name: service, remote, project,
+        name: service, remote, project, noSource,
     });
     if (result === false) {
         return false;
@@ -89,11 +89,12 @@ export async function addService(context: any, service: string, type: string, te
 
 async function addSingleService({
     templatesRootDir, rawConfig, config, type, template, context, name,
-    inheritedSource, user, remote, project,
+    inheritedSource, user, remote, project, noSource,
 }: {
     templatesRootDir: string, rawConfig: ConfigBase, config: Config,
     type: string, template: string, context: any, name: string,
     inheritedSource?: string, user: User, remote: string, project: string,
+    noSource: boolean,
 }) {
     if (name in rawConfig) {
         console.error(a`\{lr Service '${name}' already exists!\}`);
@@ -172,6 +173,7 @@ async function addSingleService({
                 type: dep.type,
                 template: dep.template,
                 name: name + dep.suffix,
+                noSource,
 
                 inheritedSource: dep.inheritSource ? sourceDir : undefined,
             });
@@ -195,7 +197,7 @@ async function addSingleService({
     }
 
     // Copy source files if not inheriting source
-    if (fs.existsSync(`${templateDir}/source`) && !inheritedSource) {
+    if (fs.existsSync(`${templateDir}/source`) && !inheritedSource && !noSource) {
         mkdirp.sync('source');
 
         console.log(a`\{ld Copying from ${prettyTemplateDir}/source to \}\{m ${sourceDir}\}`);
