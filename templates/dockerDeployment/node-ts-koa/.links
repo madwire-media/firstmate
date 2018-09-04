@@ -2,11 +2,23 @@ deps.hjson
   -> dockerDeployment/node-ts/deps.hjson
   -> dockerImage/node-ts/deps.hjson
 
+service/.helmignore
+  -> dockerDeployment/empty/service/.helmignore
+
+service/Chart.yaml
+  -> pureHelm/empty/service/Chart.yaml
+
+service/charts
+  -> pureHelm/empty/service/charts
+
 service/docker
   -> dockerDeployment/node-ts/service/docker
 
-service/helm
-  -> pureHelm/docker-web/service
+service/templates
+  -> pureHelm/docker-web/service/templates
+
+service/values.yaml
+  -> pureHelm/docker/service/values.yaml
 
 service.hjson
   -> dockerDeployment/node-ts/service.hjson

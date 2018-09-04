@@ -1,8 +1,20 @@
+service/.helmignore
+  -> dockerDeployment/empty/service/.helmignore
+
+service/Chart.yaml
+  -> pureHelm/empty/service/Chart.yaml
+
+service/charts
+  -> pureHelm/empty/service/charts
+
 service/docker/main
   -> dockerImage/php-apache/service
 
-service/helm
-  -> pureHelm/docker-web/service
+service/templates
+  -> pureHelm/docker-web/service/templates
+
+service/values.yaml
+  -> pureHelm/docker/service/values.yaml
 
 source
   -> dockerImage/php-apache/source

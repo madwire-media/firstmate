@@ -1,8 +1,25 @@
+service/.helmignore
+  -> dockerDeployment/empty/service/.helmignore
+
+service/Chart.yaml
+  -> pureHelm/docker-web/service/Chart.yaml
+  -> pureHelm/docker/service/Chart.yaml
+  -> pureHelm/empty/service/Chart.yaml
+
+service/charts
+  -> pureHelm/docker-web/service/charts
+  -> pureHelm/docker/service/charts
+  -> pureHelm/empty/service/charts
+
 service/docker
   -> dockerDeployment/node-js/service/docker
 
-service/helm
-  -> pureHelm/docker-web/service
+service/templates
+  -> pureHelm/docker-web/service/templates
+
+service/values.yaml
+  -> pureHelm/docker-web/service/values.yaml
+  -> pureHelm/docker/service/values.yaml
 
 service.hjson
   -> dockerDeployment/node-js/service.hjson

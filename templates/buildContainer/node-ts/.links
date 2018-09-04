@@ -1,9 +1,3 @@
-.gitignore
-  -> buildContainer/empty/.gitignore
-
-service.hjson
-  -> buildContainer/empty/service.hjson
-
 source
   -> dockerImage/node-ts/source
 

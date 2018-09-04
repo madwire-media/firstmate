@@ -1,6 +1,15 @@
+service/Chart.yaml
+  -> pureHelm/empty/service/Chart.yaml
+
+service/charts
+  -> pureHelm/empty/service/charts
+
 service/docker/main
   -> dockerImage/empty/service
 
-service/helm
-  -> pureHelm/empty/service
+service/templates
+  -> pureHelm/empty/service/templates
+
+service/values.yaml
+  -> pureHelm/empty/service/values.yaml
 
