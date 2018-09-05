@@ -41,14 +41,39 @@ export function needsCommand(context: any, command: string): boolean {
         return false;
     }
 
-    if (result.output[1].length > 0) {
-        commands[command] = result.output[1].toString().split('\n')[0].trim();
+    if (result.stdout.length > 0) {
+        commands[command] = result.stdout.toString().split('\n')[0].trim();
     } else {
         if (context) {
             context.cliMessage(a`\{lr,t Could not find \{nt,lw ${command}\} in 'which' result, is it installed?\}`);
         } else {
             console.error(a`\{lr Could not find \{lw ${command}\} 'which' result, is it installed?\}`);
         }
+        return false;
+    }
+
+    return true;
+}
+
+export function needsHelmPlugin(context: any, plugin: string, installUrl: string): boolean {
+    const result = ChildProcess.spawnSync('helm', ['plugin', 'list']);
+
+    if (result.error) {
+        console.error(result.error);
+        return false;
+    }
+
+    const stdout = result.stdout.toString().split('\n').slice(1);
+
+    if (stdout.length < 1 || !stdout.some((s) => s.split(' ')[0] === plugin)) {
+        if (context) {
+            context.cliMessage(a`\{lr,t Helm plugin \{nt,lw ${plugin}\} is not installed\}`);
+            context.cliMessage(a`\{lr,t You can install it by running \{e helm plugin install ${installUrl}\}\}`);
+        } else {
+            console.error(a`\{lr Helm plugin \{lw ${plugin}\} is not installed\}`);
+            console.error(a`\{lr You can install it by running \{e helm plugin install ${installUrl}\}\}`);
+        }
+
         return false;
     }
 

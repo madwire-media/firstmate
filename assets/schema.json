@@ -8,13 +8,22 @@
             "type": "string",
             "pattern": "^[a-z0-9/-]+$"
         },
-        "defaultRegistry": {
-            "type": "string",
-            "pattern": "^(https?://)?[a-z0-9-]+(\\.[a-z0-9-]+)+$"
-        },
-        "defaultService": {
-            "type": "string",
-            "pattern": "^[a-z0-9-]+$"
+        "defaults": {
+            "type": "object",
+            "properties": {
+                "registry": {
+                    "type": "string",
+                    "pattern": "^(https?://)?[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+                },
+                "chartmuseum": {
+                    "type": "string",
+                    "pattern": "^(?!fm$).+"
+                },
+                "service": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9-]+$"
+                }
+            }
         },
         "services": {
             "patternProperties": {
@@ -360,7 +369,11 @@
                                             "type": "object",
                                             "patternProperties": {
                                                 "^[a-zA-Z0-9_]+$": {
-                                                    "type": "string"
+                                                    "oneOf": [
+                                                        { "type": "string" },
+                                                        { "type": "number" },
+                                                        { "type": "boolean" }
+                                                    ]
                                                 }
                                             },
                                             "additionalProperties": false
@@ -559,6 +572,10 @@
             "allOf": [
                 {
                     "properties": {
+                        "chartmuesum": {
+                            "type": "string",
+                            "pattern": "^(?!fm$).+"
+                        },
                         "cluster": {
                             "type": "string"
                         },
@@ -569,7 +586,11 @@
                             "type": "object",
                             "patternProperties": {
                                 "^[^=\\n]+$": {
-                                    "type": "string"
+                                    "anyOf": [
+                                        { "type": "string" },
+                                        { "type": "number" },
+                                        { "type": "boolean" }
+                                    ]
                                 }
                             },
                             "additionalProperties": false

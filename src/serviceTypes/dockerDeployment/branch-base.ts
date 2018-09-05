@@ -1,4 +1,5 @@
 import { empty } from '../../helpers/empty';
+import { stringifyProps } from '../../helpers/transform';
 import { BranchBase, Volumes } from '../base/branch';
 import { Port } from '../base/branch';
 import { PureHelmBranchRaw } from '../pureHelm/branch-all';
@@ -6,7 +7,7 @@ import { PureHelmBranchRaw } from '../pureHelm/branch-all';
 interface ContainerRaw {
     k8sVolumes?: Volumes;
     volumes?: Volumes;
-    dockerArgs?: {[key: string]: string};
+    dockerArgs?: {[key: string]: string | number | boolean};
     ports?: Array<number | Port>;
 }
 
@@ -44,6 +45,7 @@ export class DockerDeploymentBranchBase extends BranchBase {
             for (const containerName in rawData.containers) {
                 const rawContainer = rawData.containers[containerName];
                 let ports;
+                let dockerArgs;
 
                 if (rawContainer.ports !== undefined) {
                     ports = rawContainer.ports.map((p) => {
@@ -57,9 +59,12 @@ export class DockerDeploymentBranchBase extends BranchBase {
                         }
                     });
                 }
+                if (rawContainer.dockerArgs !== undefined) {
+                    dockerArgs = stringifyProps(rawContainer.dockerArgs);
+                }
 
                 this.containers[containerName] = {
-                    ...rawContainer, ports,
+                    ...rawContainer, ports, dockerArgs,
                 };
             }
         }

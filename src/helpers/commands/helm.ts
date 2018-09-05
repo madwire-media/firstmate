@@ -25,33 +25,44 @@ export interface HelmContext {
         cluster: string,
         registry?: string,
         helmArgs?: {[argName: string]: string},
+        version?: string,
     };
     env: string;
     dockerImages?: {[container: string]: string};
     telepresenceContainer?: string;
     dryrun?: boolean;
 }
-export function install(cwd: string, context: HelmContext, release: string): boolean {
+export function install(context: HelmContext, release: string, service: string, repo = 'fm'): boolean {
     const args = parseHelmInstallArgs(context);
     const argsText = args.map(fmt).join(' ');
+
+    let chart;
+    let chartText;
+
+    if (/https?:\/\//.test(repo)) {
+        chart = ['--repo', repo, service];
+        chartText = `--repo ${fmt(repo)} ${fmt(service)}`;
+    } else {
+        chart = [`${repo}/${service}`];
+        chartText = fmt(`${repo}/${service}`);
+    }
 
     let action;
     let actionText;
 
     if (hasRelease(context.branch.cluster, release)) {
-        action = ['upgrade', release, '--force'];
-        actionText = `upgrade ${fmt(release)} --force`;
+        action = ['upgrade', release].concat(chart).concat(['--force']);
+        actionText = `upgrade ${fmt(release)} ${chartText} --force`;
     } else {
-        action = ['install', '-n', release];
-        actionText = `install -n ${fmt(release)}`;
+        action = ['install', '-n', release].concat(chart);
+        actionText = `install -n ${fmt(release)} ${chartText}`;
     }
 
     console.log();
-    console.log(a`\{lb,u cd ${cwd} && helm ${actionText} ${argsText} .\}`);
+    console.log(a`\{lb,u helm ${actionText} ${argsText}\}`);
     const result = ChildProcess.spawnSync(
-        'helm', action.concat(args).concat(['.']),
+        'helm', action.concat(args),
         {
-            cwd,
             stdio: 'inherit',
         },
     );
@@ -76,6 +87,10 @@ export function parseHelmInstallArgs(context: HelmContext): string[] {
 
     if (context.dryrun) {
         args.push('--dry-run');
+    }
+
+    if (context.branch.version !== undefined) {
+        args.push('--version', context.branch.version);
     }
 
     if (context.dockerImages !== undefined && context.branch.registry !== undefined) {
@@ -140,6 +155,97 @@ export function parseHelmDeleteArgs(context: HelmContext): string[] {
     if (context.dryrun) {
         args.push('--dry-run');
     }
+
+    args.push('--kube-context', context.branch.cluster);
+
+    return args;
+}
+
+export interface HelmContextProd extends HelmContext {
+    branch: {
+        namespace: string,
+        cluster: string,
+        registry?: string,
+        helmArgs?: {[argName: string]: string},
+        chartmuseum: string,
+        version: string,
+    };
+}
+
+export function push(context: HelmContextProd, service: string): boolean {
+    const args = parseHelmPushArgs(context, service);
+    const argsText = args.map(fmt).join(' ');
+
+    console.log();
+    console.log(a`\{lb,u helm push ${argsText}\}`);
+    const result = ChildProcess.spawnSync(
+        'helm', ['push'].concat(args),
+        {
+            stdio: 'inherit',
+        },
+    );
+
+    if (result.error) {
+        console.error(a`\{lr Helm push failed!\}`);
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        console.error(a`\{lr Helm push failed!\}`);
+        return false;
+    }
+
+    console.log(a`\{g Ok\}`);
+
+    return true;
+}
+
+export function parseHelmPushArgs(context: HelmContextProd, service: string): string[] {
+    const args: string[] = [];
+
+    args.push(`fm/${service}/`);
+    args.push(context.branch.chartmuseum);
+
+    args.push('--version', context.branch.version);
+
+    return args;
+}
+
+export function pkg(context: HelmContext, service: string, version: string): string | false {
+    const args = parseHelmPackageArgs(context, service, version);
+    const argsText = args.map(fmt).join(' ');
+
+    console.log();
+    console.log(a`\{lb,u helm package ${argsText}\}`);
+    const result = ChildProcess.spawnSync(
+        'helm', ['package'].concat(args),
+        {
+            stdio: 'inherit',
+        },
+    );
+
+    if (result.error) {
+        console.error(a`\{lr Helm package failed!\}`);
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        console.error(a`\{lr Helm package failed!\}`);
+        return false;
+    }
+
+    console.log(a`\{g Ok\}`);
+
+    return `.fm/${service}-${version}.tgz`;
+}
+
+export function parseHelmPackageArgs(context: HelmContext, service: string, version: string): string[] {
+    const args: string[] = [];
+
+    args.push(`fm/${service}`);
+
+    args.push('-d', '.fm');
+    args.push('--version', version);
 
     args.push('--kube-context', context.branch.cluster);
 

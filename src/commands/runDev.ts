@@ -126,7 +126,7 @@ export async function runDev(
             env: 'dev',
         };
 
-        if (!helm.install(serviceFolder, helmContext, `${config.project}-${serviceName}-dev`)) {
+        if (!helm.install(helmContext, `${config.project}-${serviceName}-dev`, serviceName)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.DevBranch) {
@@ -193,7 +193,7 @@ export async function runDev(
                 env: 'dev',
             };
 
-            if (!helm.install(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-dev`)) {
+            if (!helm.install(helmContext, `${config.project}-${serviceName}-dev`, serviceName)) {
                 return false;
             }
 

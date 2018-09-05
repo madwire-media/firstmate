@@ -109,7 +109,7 @@ export async function runStage(
             env: 'stage',
         };
 
-        if (!helm.install(serviceFolder, helmContext, `${config.project}-${serviceName}-stage`)) {
+        if (!helm.install(helmContext, `${config.project}-${serviceName}-stage`, serviceName)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.StageBranch) {
@@ -153,7 +153,7 @@ export async function runStage(
             env: 'stage',
         };
 
-        if (!helm.install(`${serviceFolder}/helm`, helmContext, `${config.project}-${serviceName}-stage`)) {
+        if (!helm.install(helmContext, `${config.project}-${serviceName}-stage`, serviceName)) {
             return false;
         }
     } else if (branch instanceof buildContainer.StageBranch) {

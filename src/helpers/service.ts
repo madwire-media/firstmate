@@ -360,14 +360,10 @@ export function testServiceFiles(serviceName: string, kind: string): boolean {
             break;
 
         case 'Docker Deployment':
-            if (needsFolder(`${serviceFolder}/helm`)) {
-                result = result &&
-                    needsFile(`${serviceFolder}/helm/Chart.yaml`) &&
-                    needsFile(`${serviceFolder}/helm/values.yaml`) &&
-                    needsFolder(`${serviceFolder}/helm/templates`);
-            } else {
-                result = false;
-            }
+            result = result &&
+                needsFile(`${serviceFolder}/Chart.yaml`) &&
+                needsFile(`${serviceFolder}/values.yaml`) &&
+                needsFolder(`${serviceFolder}/templates`);
 
             if (hasFolder(`${serviceFolder}/docker`)) {
                 const imageDirs = fs.readdirSync(`${serviceFolder}/docker`);

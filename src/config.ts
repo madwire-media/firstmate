@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 
+import { stringifyProps } from './helpers/transform';
 import { BranchBase, Port } from './serviceTypes/base/branch';
 import * as buildContainer from './serviceTypes/buildContainer/module';
 import * as dockerDeployment from './serviceTypes/dockerDeployment/module';
@@ -31,9 +32,13 @@ interface ConfigParams {
 
 export interface ConfigBase {
     project: string;
-    defaultRegistry?: string;
-    defaultService?: string;
+    defaults?: ConfigDefaults;
     services: {[serviceName: string]: ConfigService};
+}
+export interface ConfigDefaults {
+    registry?: string;
+    service?: string;
+    chartmuseum?: string;
 }
 export interface ConfigService {
     type: string;
@@ -41,6 +46,7 @@ export interface ConfigService {
 }
 export interface ConfigContainer {
     volumes?: {[source: string]: string};
+    dockerArgs?: {[key: string]: string | number | boolean};
     k8sVolumes?: {[source: string]: string};
     ports?: Array<number | Port>;
     debugCMD?: string;
@@ -59,9 +65,10 @@ export interface ConfigBranchBase {
     mode?: string;
     pushDebugContainer?: boolean;
     version?: string;
-    dockerArgs?: {[key: string]: string};
+    dockerArgs?: {[key: string]: string | number | boolean};
     autodelete?: boolean;
-    helmArgs?: {[argName: string]: string};
+    helmArgs?: {[argName: string]: string | number | boolean};
+    chartmuseum?: string;
 }
 export interface ConfigBranch extends ConfigBranchBase {
     inheritFrom?: string;
@@ -87,11 +94,12 @@ export class Config {
 
         const data = json as ConfigBase;
         const context: ConfigContext = {
-            registry: data.defaultRegistry,
+            registry: data.defaults && data.defaults.registry,
+            chartmuseum: data.defaults && data.defaults.chartmuseum,
         };
 
         const project = data.project;
-        const defaultService = data.defaultService;
+        const defaultService = data.defaults && data.defaults.service;
         const services = parseServices(context, data.services);
 
         return new Config({
@@ -305,7 +313,7 @@ function parseDockerImageDevBranch(context: ConfigContext, data?: ConfigBranchBa
     return new dockerImage.DevBranch({
         registry,
         imageName,
-        dockerArgs,
+        dockerArgs: dockerArgs && stringifyProps(dockerArgs),
     });
 }
 function parseDockerImageStageBranch(context: ConfigContext, data?: ConfigBranchBase): dockerImage.StageBranch {
@@ -327,7 +335,7 @@ function parseDockerImageStageBranch(context: ConfigContext, data?: ConfigBranch
     return new dockerImage.StageBranch({
         registry,
         imageName,
-        dockerArgs,
+        dockerArgs: dockerArgs && stringifyProps(dockerArgs),
     });
 }
 function parseDockerImageProdBranch(context: ConfigContext, data?: ConfigBranchBase): dockerImage.ProdBranch {
@@ -354,7 +362,7 @@ function parseDockerImageProdBranch(context: ConfigContext, data?: ConfigBranchB
         registry,
         imageName,
         version,
-        dockerArgs,
+        dockerArgs: dockerArgs && stringifyProps(dockerArgs),
     });
 }
 
@@ -377,6 +385,7 @@ function parseDockerDeploymentBranches(context: ConfigContext,
         branchContext.namespace = rawBranch.namespace || branchContext.namespace;
         branchContext.imageNamePrefix = rawBranch.imageNamePrefix || branchContext.imageNamePrefix;
         branchContext.containers = rawBranch.containers || branchContext.containers;
+        branchContext.chartmuseum = rawBranch.chartmuseum || branchContext.chartmuseum;
 
         let dev;
         let stage;
@@ -463,7 +472,7 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
         mode,
         pushDebugContainer,
         autodelete,
-        helmArgs,
+        helmArgs: helmArgs && stringifyProps(helmArgs),
     });
 }
 function parseDockerDeploymentStageBranch(context: ConfigContext,
@@ -503,21 +512,22 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
         namespace,
         imageNamePrefix,
         containers,
-        helmArgs,
+        helmArgs: helmArgs && stringifyProps(helmArgs),
     });
 }
 function parseDockerDeploymentProdBranch(context: ConfigContext,
                                          data?: ConfigBranchBase,
 ): dockerDeployment.ProdBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, version, helmArgs} = context;
+    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, chartmuseum, version} = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
-        version = data.version || version;
         helmArgs = data.helmArgs || helmArgs;
+        chartmuseum = data.chartmuseum || chartmuseum;
+        version = data.version || version;
 
         if (containers === undefined) {
             containers = data.containers;
@@ -537,6 +547,9 @@ function parseDockerDeploymentProdBranch(context: ConfigContext,
     if (namespace === undefined) {
         throw makeError(context, "'namespace' is undefined", 'prod');
     }
+    if (chartmuseum === undefined) {
+        throw makeError(context, "'chartmuseum' is undefined", 'prod');
+    }
     if (version === undefined) {
         throw makeError(context, "'version' is undefined", 'prod');
     }
@@ -548,7 +561,8 @@ function parseDockerDeploymentProdBranch(context: ConfigContext,
         imageNamePrefix,
         containers,
         version,
-        helmArgs,
+        helmArgs: helmArgs && stringifyProps(helmArgs),
+        chartmuseum,
     });
 }
 
@@ -610,7 +624,7 @@ function parseBuildContainerDevBranch(context: ConfigContext,
 
     return new buildContainer.DevBranch({
         volumes,
-        dockerArgs,
+        dockerArgs: dockerArgs && stringifyProps(dockerArgs),
     });
 }
 function parseBuildContainerStageBranch(context: ConfigContext,
@@ -625,7 +639,7 @@ function parseBuildContainerStageBranch(context: ConfigContext,
 
     return new buildContainer.StageBranch({
         volumes,
-        dockerArgs,
+        dockerArgs: dockerArgs && stringifyProps(dockerArgs),
     });
 }
 function parseBuildContainerProdBranch(context: ConfigContext,
@@ -646,7 +660,7 @@ function parseBuildContainerProdBranch(context: ConfigContext,
     return new buildContainer.ProdBranch({
         volumes,
         version,
-        dockerArgs,
+        dockerArgs: dockerArgs && stringifyProps(dockerArgs),
     });
 }
 
@@ -666,6 +680,7 @@ function parsePureHelmBranches(context: ConfigContext,
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.cluster = rawBranch.cluster || branchContext.cluster;
         branchContext.namespace = rawBranch.namespace || branchContext.namespace;
+        branchContext.chartmuseum = rawBranch.chartmuseum || branchContext.chartmuseum;
 
         let dev;
         let stage;
@@ -737,11 +752,12 @@ function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBas
     });
 }
 function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.ProdBranch {
-    let {cluster, namespace, version} = context;
+    let {cluster, namespace, chartmuseum, version} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
+        chartmuseum = data.chartmuseum || chartmuseum;
         version = data.version || version;
     }
 
@@ -751,6 +767,9 @@ function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase
     if (namespace === undefined) {
         throw makeError(context, "'namespace' is undefined", 'prod');
     }
+    if (chartmuseum === undefined) {
+        throw makeError(context, "'chartmuseum' is undefined", 'prod');
+    }
     if (version === undefined) {
         throw makeError(context, "'version' is undefined", 'prod');
     }
@@ -758,6 +777,7 @@ function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase
     return new pureHelm.ProdBranch({
         cluster,
         namespace,
+        chartmuseum,
         version,
     });
 }
