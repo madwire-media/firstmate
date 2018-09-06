@@ -1,11 +1,12 @@
-{
-    type: dockerImage
+        {
+            type: dockerImage
 
-    branches: {
-        ~default: {
-            version: 0.1.0
+            branches: {
+                ~default: {
+                    version: 0.1.0
 
-            imageName: '[[service]]'
+                    imageName: '[[service]]'
+                    registry: '' // TODO: change this if no default registry is set
+                }
+            }
         }
-    }
-}

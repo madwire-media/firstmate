@@ -20,6 +20,8 @@ import { uncopyFiles } from './helpers/mount';
 
 (ncp as any).limit = 32;
 
+process.on('unhandledRejection', (err) => console.error(err));
+
 const styleHooks = {
     usagePrefix: (s: string) => a`\{lw,u ${s.slice(0, 6)}\} \{lm,i ${s.slice(7)}\}`,
     usageCommandPlaceholder: (s: string) => a`\{m,i ${s}\}`,

@@ -51,8 +51,8 @@ export function install(context: HelmContext, release: string, service: string, 
     let actionText;
 
     if (hasRelease(context.branch.cluster, release)) {
-        action = ['upgrade', release].concat(chart).concat(['--force']);
-        actionText = `upgrade ${fmt(release)} ${chartText} --force`;
+        action = ['upgrade', release].concat(chart);
+        actionText = `upgrade ${fmt(release)} ${chartText}`;
     } else {
         action = ['install', '-n', release].concat(chart);
         actionText = `install -n ${fmt(release)} ${chartText}`;
@@ -121,8 +121,8 @@ export function parseHelmInstallArgs(context: HelmContext): string[] {
     return args;
 }
 
-export function del(context: HelmContext, release: string): boolean {
-    const args = parseHelmDeleteArgs(context);
+export function del(context: HelmContext, release: string, purge = false): boolean {
+    const args = parseHelmDeleteArgs(context, purge);
     const argsText = args.map(fmt).join(' ');
 
     console.log();
@@ -149,9 +149,12 @@ export function del(context: HelmContext, release: string): boolean {
     return true;
 }
 
-export function parseHelmDeleteArgs(context: HelmContext): string[] {
+export function parseHelmDeleteArgs(context: HelmContext, purge: boolean): string[] {
     const args: string[] = [];
 
+    if (purge) {
+        args.push('--purge');
+    }
     if (context.dryrun) {
         args.push('--dry-run');
     }

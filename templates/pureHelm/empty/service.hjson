@@ -6,6 +6,7 @@
                     version: 0.1.0
 
                     cluster: '' // TODO: change this
+                    chartmuseum: '' // TODO: change this for prod
                     namespace: '[[project]]-[[service]]'
 
                     dev: {

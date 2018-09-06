@@ -9,7 +9,9 @@
                     version: 0.1.0
 
                     cluster: '' // TODO: change this
-                    namespace: '[[project]]-[[service]]'
+                    chartmuseum: '' // TODO: change this for prod
+                    registry: '' // TODO: change this if no default registry is set
+                    namespace: '[[project]]'
 
                     // Copy the package.json files and source code over
                     copyFiles: {

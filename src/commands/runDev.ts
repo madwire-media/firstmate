@@ -2,11 +2,6 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import { a } from '../helpers/cli';
-// import {
-//     docker.build, docker.containerExists, docker.createNetwork, docker.deleteNetwork,
-//     docker.networkExists, docker.push, docker.removeContainer, docker.run, docker.runAsync,
-//     docker.RunOptions, helm.del, helm.install, telepresence.runAsync, telepresence.RunOptions, telepresence.version,
-// } from '../helpers/commands';
 import * as docker from '../helpers/commands/docker';
 import * as helm from '../helpers/commands/helm';
 import * as telepresence from '../helpers/commands/telepresence';
@@ -126,7 +121,7 @@ export async function runDev(
             env: 'dev',
         };
 
-        if (!helm.install(helmContext, `${config.project}-${serviceName}-dev`, serviceName)) {
+        if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.DevBranch) {
@@ -193,13 +188,15 @@ export async function runDev(
                 env: 'dev',
             };
 
-            if (!helm.install(helmContext, `${config.project}-${serviceName}-dev`, serviceName)) {
+            if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
                 return false;
             }
 
             // Delete helm stuff on exit
             if (branch.autodelete) {
-                handlers.push(async () => helm.del(helmContext, `${config.project}-${serviceName}-dev`) && undefined);
+                handlers.push(
+                    async () => helm.del(helmContext, `${config.project}-${serviceName}-dev`, true) && undefined,
+                );
             }
 
             // Telepresence instance?
@@ -248,6 +245,8 @@ export async function runDev(
                 }
 
                 handlers.push(telepresence.runAsync(runOpts));
+
+                isAsync();
             }
         } else {
             const networkName = `fmdev-${serviceName}`;
@@ -295,9 +294,9 @@ export async function runDev(
 
                 handlers.push(docker.runAsync(runOpts));
             }
-        }
 
-        isAsync();
+            isAsync();
+        }
     } else if (branch instanceof buildContainer.DevBranch) {
         if (debugContainer !== undefined) {
             console.log(a`\{ly Warn:\} ignoring 'debug-container' parameter`);

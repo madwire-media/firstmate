@@ -4,7 +4,7 @@
   "description": "A node service of project [[project]]",
   "main": "src/index.js",
   "scripts": {
-    "start": "nodejs dist/index.js",
+    "start": "nodejs src/index.js",
     "test": "jest"
   },
   "repository": {
@@ -16,7 +16,8 @@
   "dependencies": {
     "express": "*",
     "helmet": "*",
-    "compression": "*"
+    "compression": "*",
+    "errorhandler": "*"
   },
   "devDependencies": {
     "jest": "*",

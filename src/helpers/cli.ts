@@ -7,7 +7,6 @@ import * as readline from 'readline';
 import * as tty from 'tty';
 import * as util from 'util';
 
-import * as doasync from 'doasync';
 import * as Hjson from 'hjson';
 import * as mkdirp from 'mkdirp';
 import * as GitConfig from 'parse-git-config';

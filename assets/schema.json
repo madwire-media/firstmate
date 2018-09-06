@@ -582,6 +582,9 @@
                         "namespace": {
                             "type": "string"
                         },
+                        "releaseName": {
+                            "type": "string"
+                        },
                         "helmArgs": {
                             "type": "object",
                             "patternProperties": {

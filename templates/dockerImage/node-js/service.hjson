@@ -6,6 +6,7 @@
                     version: 0.1.0
 
                     imageName: '[[service]]'
+                    registry: '' // TODO: change this if no default registry is set
 
                     // Copy the package.json files and source code over
                     copyFiles: {
