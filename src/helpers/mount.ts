@@ -103,8 +103,6 @@ export async function mount(source: string, dest: string): Promise<boolean> {
         await promisify(ncp)(source, dest);
     }
 
-    console.log('done', dest);
-
     console.log(a`\{ld Copied \{m ${source}\} to \{m ${dest}\}\}`);
 
     return true;
