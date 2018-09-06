@@ -267,7 +267,7 @@ export async function runDev(
             // Docker runs w/ volumes and network
             for (const index in containers) {
                 const dirname = containers[index];
-                const image = dockerImages[index];
+                const image = dockerImages[dirname];
                 const containerName = `${config.project}-${serviceName}-${dirname}-dev`;
 
                 if (docker.containerExists(containerName)) {
