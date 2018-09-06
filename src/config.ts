@@ -69,6 +69,7 @@ export interface ConfigBranchBase {
     autodelete?: boolean;
     helmArgs?: {[argName: string]: string | number | boolean};
     chartmuseum?: string;
+    releaseName?: string;
 }
 export interface ConfigBranch extends ConfigBranchBase {
     inheritFrom?: string;
@@ -428,7 +429,7 @@ function parseDockerDeploymentBranches(context: ConfigContext,
 function parseDockerDeploymentDevBranch(context: ConfigContext,
                                         data?: ConfigBranchBase,
 ): dockerDeployment.DevBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs} = context;
+    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName} = context;
     let mode;
     let pushDebugContainer;
     let autodelete;
@@ -439,6 +440,7 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
         helmArgs = data.helmArgs || helmArgs;
+        releaseName = data.releaseName || releaseName;
         ({mode, pushDebugContainer, autodelete} = data);
 
         if (containers === undefined) {
@@ -473,12 +475,13 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
         pushDebugContainer,
         autodelete,
         helmArgs: helmArgs && stringifyProps(helmArgs),
+        releaseName,
     });
 }
 function parseDockerDeploymentStageBranch(context: ConfigContext,
                                           data?: ConfigBranchBase,
 ): dockerDeployment.StageBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs} = context;
+    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName} = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
@@ -486,6 +489,7 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
         helmArgs = data.helmArgs || helmArgs;
+        releaseName = data.releaseName || releaseName;
 
         if (containers === undefined) {
             containers = data.containers;
@@ -513,12 +517,16 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
         imageNamePrefix,
         containers,
         helmArgs: helmArgs && stringifyProps(helmArgs),
+        releaseName,
     });
 }
 function parseDockerDeploymentProdBranch(context: ConfigContext,
                                          data?: ConfigBranchBase,
 ): dockerDeployment.ProdBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, chartmuseum, version} = context;
+    let {
+        registry, cluster, namespace, imageNamePrefix, containers,
+        helmArgs, chartmuseum, releaseName, version,
+    } = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
@@ -527,6 +535,7 @@ function parseDockerDeploymentProdBranch(context: ConfigContext,
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
         helmArgs = data.helmArgs || helmArgs;
         chartmuseum = data.chartmuseum || chartmuseum;
+        releaseName = data.releaseName || releaseName;
         version = data.version || version;
 
         if (containers === undefined) {
@@ -562,6 +571,7 @@ function parseDockerDeploymentProdBranch(context: ConfigContext,
         containers,
         version,
         helmArgs: helmArgs && stringifyProps(helmArgs),
+        releaseName,
         chartmuseum,
     });
 }
@@ -712,11 +722,13 @@ function parsePureHelmBranches(context: ConfigContext,
 }
 
 function parsePureHelmDevBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.DevBranch {
-    let {cluster, namespace} = context;
+    let {cluster, namespace, helmArgs, releaseName} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
+        helmArgs = data.helmArgs || helmArgs;
+        releaseName = data.releaseName || releaseName;
     }
 
     if (cluster === undefined) {
@@ -729,14 +741,18 @@ function parsePureHelmDevBranch(context: ConfigContext, data?: ConfigBranchBase)
     return new pureHelm.DevBranch({
         cluster,
         namespace,
+        helmArgs: helmArgs && stringifyProps(helmArgs),
+        releaseName,
     });
 }
 function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.StageBranch {
-    let {cluster, namespace} = context;
+    let {cluster, namespace, helmArgs, releaseName} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
+        helmArgs = data.helmArgs || helmArgs;
+        releaseName = data.releaseName || releaseName;
     }
 
     if (cluster === undefined) {
@@ -749,14 +765,18 @@ function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBas
     return new pureHelm.StageBranch({
         cluster,
         namespace,
+        helmArgs: helmArgs && stringifyProps(helmArgs),
+        releaseName,
     });
 }
 function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.ProdBranch {
-    let {cluster, namespace, chartmuseum, version} = context;
+    let {cluster, namespace, helmArgs, releaseName, chartmuseum, version} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
+        helmArgs = data.helmArgs || helmArgs;
+        releaseName = data.releaseName || releaseName;
         chartmuseum = data.chartmuseum || chartmuseum;
         version = data.version || version;
     }
@@ -777,6 +797,8 @@ function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase
     return new pureHelm.ProdBranch({
         cluster,
         namespace,
+        helmArgs: helmArgs && stringifyProps(helmArgs),
+        releaseName,
         chartmuseum,
         version,
     });

@@ -14,7 +14,7 @@ ENV NODE_ENV=${NODE_ENV}
 RUN npm i
 
 # Add in the Node.js package and JavaScript source code
-ADD src /root/
+ADD src /root/src
 
 # Run the Node.js package on container boot
 CMD ["npm", "run", "start"]

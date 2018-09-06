@@ -104,7 +104,12 @@ export async function runProd(
             env: 'prod',
         };
 
-        if (!helm.install(helmContext, `${config.project}-${serviceName}`, serviceName, branch.chartmuseum)) {
+        if (!helm.install(
+            helmContext,
+            branch.releaseName || `${config.project}-${serviceName}`,
+            serviceName,
+            branch.chartmuseum,
+        )) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.ProdBranch) {
@@ -138,7 +143,12 @@ export async function runProd(
             env: 'prod',
         };
 
-        if (!helm.install(helmContext, `${config.project}-${serviceName}`, serviceName, branch.chartmuseum)) {
+        if (!helm.install(
+            helmContext,
+            branch.releaseName || `${config.project}-${serviceName}`,
+            serviceName,
+            branch.chartmuseum,
+        )) {
             return false;
         }
     } else if (branch instanceof buildContainer.ProdBranch) {

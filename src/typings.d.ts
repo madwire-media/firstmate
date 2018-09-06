@@ -1,9 +1,3 @@
-declare module "doasync" {
-    namespace doasync {}
-    function doasync(cls: any): any;
-    export = doasync;
-}
-
 declare module "hjson" {
 
 // Type definitions for hjson 2.4

@@ -1,4 +1,4 @@
-const errorHandler = require('./errorHandler');
+const errorHandler = require('errorhandler');
 
 const app = require('./app');
 

@@ -1,5 +1,5 @@
         {
-            type: dockerImage
+            type: dockerDeployment
 
             branches: {
                 ~default: {
@@ -9,22 +9,24 @@
                     version: 0.1.0
 
                     cluster: '' // TODO: change this
+                    registry: '' // TODO: change this if no default registry is set
+                    chartmuseum: '' // TODO: change this for prod
                     namespace: '[[project]]-[[service]]'
 
                     // Copy the production configurations and source code over
                     copyFiles: {
-                        'fm/[[service]]/php/php.prod.ini': docker/main/php.ini
-                        'fm/[[service]]/apache2/apache2.prod.conf': docker/main/apache2.conf
-                        'fm/[[service]]/apache2/ports.conf': docker/main/ports.conf
+                        'fm/[[service]]/docker/main/php/php.prod.ini': docker/main/php.ini
+                        'fm/[[service]]/docker/main/apache/apache2.prod.conf': docker/main/apache2.conf
+                        'fm/[[service]]/docker/main/apache/ports.conf': docker/main/ports.conf
                         '[[source]]': docker/main/html
                     }
 
                     dev: {
                         // Copy the development configurations and source code over
                         copyFiles: {
-                            'fm/[[service]]/php/php.dev.ini': docker/main/php.ini
-                            'fm/[[service]]/apache2/apache2.dev.conf': docker/main/apache2.conf
-                            'fm/[[service]]/apache2/ports.conf': docker/main/ports.conf
+                            'fm/[[service]]/docker/main/php/php.dev.ini': docker/main/php.ini
+                            'fm/[[service]]/docker/main/apache/apache2.dev.conf': docker/main/apache2.conf
+                            'fm/[[service]]/docker/main/apache/ports.conf': docker/main/ports.conf
                             '[[source]]': docker/main/html
                         }
                     }

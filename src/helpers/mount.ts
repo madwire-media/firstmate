@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { promisify } from 'util';
 
-import * as doasync from 'doasync';
 import * as Hjson from 'hjson';
 import { ncp } from 'ncp';
 import * as request from 'request';
@@ -47,7 +47,7 @@ export async function mount(source: string, dest: string): Promise<boolean> {
     let mountedUnderneath = false;
     let relative;
     for (const mount of mounts) {
-        relative = path.relative(dest, mount);
+        relative = path.relative(path.dirname(dest), mount);
 
         if (relative === '.' || /(^|\/)\.\.\//.test(relative)) {
             mountedUnderneath = true;
@@ -62,7 +62,7 @@ export async function mount(source: string, dest: string): Promise<boolean> {
             let replaced;
             do {
                 replaced = generateRandomName(16);
-            } while (!fs.existsSync(`.fm/${replaced}`));
+            } while (fs.existsSync(`.fm/${replaced}`));
 
             // Save manifest
             const mount: Mount = {
@@ -100,8 +100,10 @@ export async function mount(source: string, dest: string): Promise<boolean> {
         await promise;
     } else {
         // Copy new contents in
-        await doasync(ncp)(source, dest);
+        await promisify(ncp)(source, dest);
     }
+
+    console.log('done', dest);
 
     console.log(a`\{ld Copied \{m ${source}\} to \{m ${dest}\}\}`);
 
@@ -114,7 +116,7 @@ export async function unmount(mount: Mount): Promise<boolean> {
         replaced,
     } = mount;
 
-    await doasync(rimraf)(dest);
+    await promisify(rimraf)(dest);
 
     if (replaced) {
         fs.renameSync(`.fm/${replaced}`, dest);
@@ -160,7 +162,7 @@ export async function uncopyFiles(): Promise<boolean> {
     if (fs.existsSync('.fm') && fs.statSync('.fm').isDirectory()) {
         const mountIds = fs.readdirSync('.fm')
             .filter((s) => s.endsWith('.mount'))
-            .map((s) => s.substring(0, -6))
+            .map((s) => s.slice(0, -6))
             .map((s) => +s)
             .filter((s) => !isNaN(s))
             .sort((a, b) => a - b);

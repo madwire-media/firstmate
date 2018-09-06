@@ -32,6 +32,7 @@ export class DockerDeploymentBranchBase extends BranchBase {
     public namespace: string;
     public containers: {[containerName: string]: Container} = {};
     public helmArgs: {[argName: string]: string} = {};
+    public releaseName?: string;
 
     constructor(rawData: DockerDeploymentBranchRaw) {
         super(rawData);
@@ -40,6 +41,7 @@ export class DockerDeploymentBranchBase extends BranchBase {
         this.imageNamePrefix = rawData.imageNamePrefix;
         this.cluster = rawData.cluster;
         this.namespace = rawData.namespace;
+        this.releaseName = rawData.releaseName;
 
         if (rawData.containers !== undefined) {
             for (const containerName in rawData.containers) {

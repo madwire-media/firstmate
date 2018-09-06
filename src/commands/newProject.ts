@@ -1,6 +1,6 @@
-import * as doasync from 'doasync';
 import * as fs from 'fs';
 import { ncp } from 'ncp';
+import { promisify } from 'util';
 
 import { Readable, Writable } from 'stream';
 import { a } from '../helpers/cli';
@@ -20,7 +20,7 @@ export async function newProject(name: string): Promise<boolean> {
 
     console.log(`Copying files`);
 
-    await doasync(ncp)(rootDir, name, {
+    await promisify(ncp as any)(rootDir, name, {
         dereference: true,
         transform: (read: Readable, write: Writable) => {
             const proc = new TemplateProcessor({vars: {

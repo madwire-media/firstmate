@@ -102,7 +102,7 @@ export async function dryDev(
             env: 'dev',
         };
 
-        if (!helm.install(helmContext, `${config.project}-${serviceName}-dev`, serviceName)) {
+        if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
             return false;
         }
     } else if (branch instanceof dockerDeployment.DevBranch) {
@@ -138,7 +138,7 @@ export async function dryDev(
             env: 'dev',
         };
 
-        if (!helm.install(helmContext, `${config.project}-${serviceName}-dev`, serviceName)) {
+        if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
             return false;
         }
     } else if (branch instanceof buildContainer.DevBranch) {

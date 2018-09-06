@@ -14,7 +14,7 @@ export interface DockerDeploymentBranchDevRaw extends DockerDeploymentBranchRaw 
 export class DockerDeploymentBranchDev extends DockerDeploymentBranchBase {
     public mode: 'proxy' | 'local' = 'proxy';
     public pushDebugContainer: boolean = false;
-    public autodelete: boolean = true;
+    public autodelete: boolean = false;
 
     constructor(rawData: DockerDeploymentBranchDevRaw) {
         super(rawData);
