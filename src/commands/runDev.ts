@@ -207,7 +207,7 @@ export async function runDev(
 
                 const runOpts: telepresence.RunOptions = {
                     cluster: branch.cluster,
-                    deployment: `${config.project}-${serviceName}-dev`,
+                    deployment: `${serviceName}`,
                     container: debugContainer,
                     namespace: branch.namespace,
 
