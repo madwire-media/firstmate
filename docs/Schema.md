@@ -29,8 +29,11 @@ The services object is indexed by the name of the service:
             * `copyFiles`: *object* **List of files/folders to copy before building/running this service**
             * `dependsOn`: *string[]* **List of services that need to be deployed before this one**
             * `dev`: *object* **Properties specific to `dev` mode**
+                * When running in `dev` mode, overrides/merges with the settings in the base config
             * `stage`: *object* **Properties specific to `stage` mode**
+                * When running in `stage` mode, overrides/merges with the settings in the base config
             * `prod`: *object* **Properties specific to `prod` mode**
+                * When running in `prod` mode, overrides/merges with the settings in the base config
             * Any properties specific to `dev`, `stage`, or `prod` properties are also valid at the branch config's root, and all other properties at the branch config's root are valid in every `dev`, `stage`, and `prod` object too.
             * *This object is incomplete*, for more specific information, go to the definitions for [`dockerImage`](#dockerimage), [`pureHelm`](#purehelm), [`dockerDeployment`](#dockerdeployment), or [`buildContainer`](#buildcontainer)
 
