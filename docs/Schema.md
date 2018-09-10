@@ -4,10 +4,10 @@ You can find the JSON-Schema definition at `../assets/schema.json`.
 * `project`: *string* **The name of your Firstmate project**
     * **Required**
 * `defaults`: *object* **Default properties for your Firstmate project**
-    * See section [Defaults](#Defaults)
+    * See section [Defaults](#defaults)
 * `services`: *object* **The configurations for every service of your Firstmate project**
     * **Required**
-    * See section [Services](#Services)
+    * See section [Services](#services)
 
 ## Defaults
 As of now there are only a few defaults you can set:
@@ -32,10 +32,10 @@ The services object is indexed by the name of the service:
             * `stage`: *object* **Properties specific to `stage` mode**
             * `prod`: *object* **Properties specific to `prod` mode**
             * Any properties specific to `dev`, `stage`, or `prod` properties are also valid at the branch config's root, and all other properties at the branch config's root are valid in every `dev`, `stage`, and `prod` object too.
-            * *This object is incomplete*, for more specific information, go to the definitions for [`dockerImage`](#DockerImage), [`pureHelm`](#PureHelm), [`dockerDeployment`](#DockerDeployment), or [`buildContainer`](#BuildContainer)
+            * *This object is incomplete*, for more specific information, go to the definitions for [`dockerImage`](#dockerImage), [`pureHelm`](#pureHelm), [`dockerDeployment`](#dockerDeployment), or [`buildContainer`](#buildContainer)
 
 ### DockerImage
-This section only contains additions to the base service object. For more information see [Services](#Services).
+This section only contains additions to the base service object. For more information see [Services](#services).
 
 Properties for any mode:
 * `registry`: *string* **The registry to publish the Docker image to**
@@ -47,7 +47,7 @@ Properties for any mode:
 There are no additional `dev`-, `stage`-, or `prod`-specific properties for `dockerImage`.
 
 ### PureHelm
-This section only contains additions to the base service object. For more information see [Services](#Services).
+This section only contains additions to the base service object. For more information see [Services](#services).
 
 Properties for any mode:
 * `chartmuseum`: *string* **The chartmuseum to publish the Helm chart to**
@@ -63,7 +63,7 @@ Properties for any mode:
 There are no additional `dev`-, `stage`-, or `prod`-specific properties for `pureHelm`.
 
 ### DockerDeployment
-This section only contains additions to the base service object. For more information see [Services](#Services).
+This section only contains additions to the base service object. For more information see [Services](#services).
 
 Properties for any mode:
 * `registry`: *string* **The registry to publish the Docker images to**
@@ -105,7 +105,7 @@ There are no additional `dev`- or `prod`-specific properties for `dockerDeployme
 
 
 ### BuildContainer
-This section only contains additions to the base service object. For more information see [Services](#Services).
+This section only contains additions to the base service object. For more information see [Services](#services).
 
 Properties for any mode:
 * `volumes`: *object* **List of project files/folders to volume into the container**

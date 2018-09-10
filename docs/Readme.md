@@ -88,7 +88,7 @@ Firstmate currently has three different modes to run and deploy your code in: `d
 
 
 ## Basic File Structure
-After completing the [Quickstart](../Readme.md#Quickstart), you should have a file structure that looks roughly like this:
+After completing the [Quickstart](../Readme.md#quickstart), you should have a file structure that looks roughly like this:
 
 ```
 project1/
@@ -186,7 +186,7 @@ Undoubtedly the most important file here is the `firstmate.hjson` file. A simple
 }
 ```
 
-This example is based on the [Quickstart](../Readme.md#Quickstart) on the main README.
+This example is based on the [Quickstart](../Readme.md#quickstart) on the main README.
 
 This `firstmate.hjson` file describes one service (`svc1`) for the project `project1`. That service has three different configurations - one for the `master` branch, one for the `stage` branch, and one for any other branch, presumably a feature branch.
 
