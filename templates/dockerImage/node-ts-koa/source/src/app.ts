@@ -8,7 +8,7 @@ const routes = new router();
 
 routes
     .get("/", (ctx) => {
-        ctx.body = "(⌐■_■) #Yeeeaaahhh Booooooy!!!!!!!";
+        ctx.body = "(⌐■_■) #Yeeeaaahhh Boi!!!!!!!";
     });
 
 export const port: number = (process.env.PORT && +process.env.PORT) || (process.env.DOCKER === "true" ? 80 : 3000);

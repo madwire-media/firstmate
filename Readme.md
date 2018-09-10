@@ -139,7 +139,7 @@ $ kubectl -n project1 port-forward svc/project1-svc1-dev 8080:80
 
 If you see a message about pods in the Pending status, just wait a little and try again.
 
-Now if you head to [http://localhost:8080](http://localhost:8080) you should see a cheezy `(⌐■_■) #Yeeeaaahhh Booooooy!!!!!!!`
+Now if you head to [http://localhost:8080](http://localhost:8080) you should see a cheezy `(⌐■_■) #Yeeeaaahhh Boi!!!!!!!`
 
 ## So what just happened?
 We:
