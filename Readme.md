@@ -158,4 +158,4 @@ $ fm run dev svc1
 [lots of output here again]
 ```
 
-**If you want to learn more about how to use Firstmate, [read the docs](./docs/Readme.md)**
+**If you want to learn more about how to use Firstmate, [read the docs](./docs/)**
