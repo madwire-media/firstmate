@@ -72,7 +72,7 @@ export async function mount(source: string, dest: string): Promise<boolean> {
             fs.writeFileSync(`.fm/${mountCount++}.mount`, Hjson.stringify(mount));
 
             // Move original contents
-            fs.renameSync(source, `.fm/${replaced}`);
+            fs.renameSync(dest, `.fm/${replaced}`);
 
             // Save mount in session
             mounts.add(dest);

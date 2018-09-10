@@ -207,7 +207,7 @@ export async function runDev(
 
                 const runOpts: telepresence.RunOptions = {
                     cluster: branch.cluster,
-                    deployment: `${config.project}-${serviceName}-dev`,
+                    deployment: `${serviceName}`,
                     container: debugContainer,
                     namespace: branch.namespace,
 
@@ -265,9 +265,9 @@ export async function runDev(
             }
 
             // Docker runs w/ volumes and network
-            for (const index in containerDirs) {
+            for (const index in containers) {
                 const dirname = containers[index];
-                const image = dockerImages[index];
+                const image = dockerImages[dirname];
                 const containerName = `${config.project}-${serviceName}-${dirname}-dev`;
 
                 if (docker.containerExists(containerName)) {

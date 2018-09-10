@@ -388,26 +388,28 @@
                                         },
                                         "ports": {
                                             "type": "array",
-                                            "items": [
-                                                {
-                                                    "$ref": "#/definitions/port"
-                                                },
-                                                {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "local": {
-                                                            "$ref": "#/definitions/port"
-                                                        },
-                                                        "remote": {
-                                                            "$ref": "#/definitions/port"
-                                                        }
+                                            "items": {
+                                                "oneOf": [
+                                                    {
+                                                        "$ref": "#/definitions/port"
                                                     },
-                                                    "required": [
-                                                        "local",
-                                                        "remote"
-                                                    ]
-                                                }
-                                            ]
+                                                    {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "local": {
+                                                                "$ref": "#/definitions/port"
+                                                            },
+                                                            "remote": {
+                                                                "$ref": "#/definitions/port"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "local",
+                                                            "remote"
+                                                        ]
+                                                    }
+                                                ]
+                                            }
                                         },
                                         "debugCMD": {
                                             "type": "string"

@@ -2,7 +2,7 @@ export function stringifyProps(input: {[key: string]: any}): {[key: string]: str
     const output: {[key: string]: string} = {};
 
     for (const key in input) {
-        output[key] = input[key].toString();
+        output[key] = String(input[key]);
     }
 
     return output;
