@@ -28,7 +28,7 @@ Firstmate currently has three different modes to run and deploy your code in: `d
     * There are two sub-modes for a `dockerDeployment` run in `dev` mode:
         * `proxy`: **Run everything on Kubernetes, except for an optional local container proxied through Telepresence**
         * `local`: **Run everything in Docker containers locally, skipping any Helm charts**
-        * Both modes will allow you to volume in your source code for live reloading using the `services.myservice.containers.mycontainer.volumes{}` object ([see here for more info]()<!-- TODO: update this link -->)
+        * Both modes will allow you to volume in your source code for live reloading using the `services.myservice.containers.mycontainer.volumes{}` object ([see here for more info](./Schema.md#dockerdeployment))
     * `dockerImage` services are built and pushed with the `dev` tag
     * `pureHelm` services are run with a `-dev` suffix
     * `buildContainer` services just do their thing
