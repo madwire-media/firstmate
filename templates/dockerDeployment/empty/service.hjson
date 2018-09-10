@@ -10,7 +10,7 @@
 
                     cluster: '' // TODO: change this
                     chartmuseum: '' // TODO: change this for prod
-                    namespace: '[[project]]-[[service]]'
+                    namespace: '[[project]]'
                 }
             }
         }

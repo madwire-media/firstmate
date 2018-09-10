@@ -11,7 +11,7 @@
                     cluster: '' // TODO: change this
                     registry: '' // TODO: change this if no default registry is set
                     chartmuseum: '' // TODO: change this for prod
-                    namespace: '[[project]]-[[service]]'
+                    namespace: '[[project]]'
 
                     // Copy the production configurations and source code over
                     copyFiles: {
