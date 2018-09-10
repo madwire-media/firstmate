@@ -55,6 +55,36 @@ export function needsCommand(context: any, command: string): boolean {
     return true;
 }
 
+export function wantsCommand(context: any, command: string): boolean {
+    const result = ChildProcess.spawnSync(which, [command]);
+
+    if (result.error) {
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        if (context) {
+            context.cliMessage(a`\{ly,t Could not find \{nt,lw ${command}\} in PATH, is it installed?\}`);
+        } else {
+            console.error(a`\{ly Could not find \{lw ${command}\} in PATH, is it installed?\}`);
+        }
+        return true;
+    }
+
+    if (result.stdout.length > 0) {
+        commands[command] = result.stdout.toString().split('\n')[0].trim();
+    } else {
+        if (context) {
+            context.cliMessage(a`\{ly,t Could not find \{nt,lw ${command}\} in 'which' result, is it installed?\}`);
+        } else {
+            console.error(a`\{ly Could not find \{lw ${command}\} 'which' result, is it installed?\}`);
+        }
+        return true;
+    }
+
+    return true;
+}
+
 export function needsHelmPlugin(context: any, plugin: string, installUrl: string): boolean {
     const result = ChildProcess.spawnSync('helm', ['plugin', 'list']);
 

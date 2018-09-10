@@ -2,7 +2,7 @@ import { Config } from '../config';
 import { a } from '../helpers/cli';
 import { loadConfig } from '../helpers/config';
 import { getGitBranch } from '../helpers/git';
-import { needsCommand, needsFolder } from '../helpers/require';
+import { needsCommand, needsFolder, wantsCommand } from '../helpers/require';
 import {
     getServiceDir, resolveBranchName, runDependencies, runService,
     SigIntHandler, testServiceDir, testServiceFiles,
@@ -13,7 +13,7 @@ export async function validate(service?: string): Promise<boolean> {
     let isOk =
         needsCommand(undefined, 'docker') &&
         needsCommand(undefined, 'helm') &&
-        needsCommand(undefined, 'telepresence');
+        wantsCommand(undefined, 'telepresence');
 
     const config = loadConfig(undefined);
     if (config === undefined) {
