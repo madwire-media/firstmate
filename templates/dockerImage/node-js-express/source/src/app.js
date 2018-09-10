@@ -11,7 +11,7 @@ app.use(compression()); // This is incompatible with some primivitve HTTP client
 app.use(helmet());
 
 app.get('/', (req, res) => {
-    res.end('(⌐■_■) #Yeeeaaahhh Booooooy!!!!!!!');
+    res.end('(⌐■_■) #Yeeeaaahhh Boi!!!!!!!');
 });
 
 module.exports = app;

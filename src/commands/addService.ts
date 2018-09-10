@@ -6,7 +6,6 @@ import leven = require('leven');
 import * as mkdirp from 'mkdirp';
 import { ncp } from 'ncp';
 
-import { Readable, Transform, Writable } from 'stream';
 import { Config, ConfigBase } from '../config';
 import { a } from '../helpers/cli';
 import { loadConfig, loadConfigRaw, loadUser } from '../helpers/config';

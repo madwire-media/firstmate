@@ -1,4 +1,3 @@
-import { empty } from '../../helpers/empty';
 import { BranchBase, BranchBaseRaw, Volumes } from '../base/branch';
 
 export interface BuildContainerBranchRaw extends BranchBaseRaw {

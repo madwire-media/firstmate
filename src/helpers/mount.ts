@@ -187,7 +187,7 @@ export async function uncopyFiles(): Promise<boolean> {
 export function generateMountsScript(
     service: string,
     container: string,
-    k8sVolumes: {[source: string]: string},
+    k8sVolumes: {[dest: string]: string},
     command: string,
 ) {
     if (!fs.existsSync('.fm')) {
@@ -201,8 +201,8 @@ export function generateMountsScript(
 
     const lines = ['#!/bin/sh'];
 
-    for (const src in k8sVolumes) {
-        const dest = k8sVolumes[src];
+    for (const dest in k8sVolumes) {
+        const src = k8sVolumes[dest];
 
         lines.push(`ln -s ${fmt(src)} ${fmt(dest)}`);
     }
@@ -210,7 +210,7 @@ export function generateMountsScript(
     lines.push(`exec ${command}`);
 
     const text = lines.join('\n');
-    const filename = `.fm/${service}.${container}.boostrap.sh`;
+    const filename = `.fm/${service}.${container}.bootstrap.sh`;
 
     fs.writeFileSync(filename, text);
 
