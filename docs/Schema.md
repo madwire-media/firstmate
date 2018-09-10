@@ -32,7 +32,7 @@ The services object is indexed by the name of the service:
             * `stage`: *object* **Properties specific to `stage` mode**
             * `prod`: *object* **Properties specific to `prod` mode**
             * Any properties specific to `dev`, `stage`, or `prod` properties are also valid at the branch config's root, and all other properties at the branch config's root are valid in every `dev`, `stage`, and `prod` object too.
-            * *This object is incomplete*, for more specific information, go to the definitions for [`dockerImage`](#dockerImage), [`pureHelm`](#pureHelm), [`dockerDeployment`](#dockerDeployment), or [`buildContainer`](#buildContainer)
+            * *This object is incomplete*, for more specific information, go to the definitions for [`dockerimage`](#dockerImage), [`purehelm`](#pureHelm), [`dockerdeployment`](#dockerDeployment), or [`buildcontainer`](#buildContainer)
 
 ### DockerImage
 This section only contains additions to the base service object. For more information see [Services](#services).
