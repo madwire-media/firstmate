@@ -12,7 +12,9 @@ import { parseDockerDeploymentBranches } from './config/dockerDeployment';
 import { parseDockerImageBranches } from './config/dockerImage';
 import { makeError } from './config/helpers';
 import { parsePureHelmBranches } from './config/pureHelm';
-import { ConfigBase, ConfigContext, ConfigParams, ConfigService, Service } from './config/types';
+import { Branch, ConfigBase, ConfigContext, ConfigParams, ConfigService, Service } from './config/types';
+
+export {ConfigBase, Service, Branch};
 
 import * as Ajv from 'ajv';
 const configSchema = JSON.parse(fs.readFileSync(`${__dirname}/../assets/schema.json`, 'utf8'));
