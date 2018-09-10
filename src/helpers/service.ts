@@ -327,20 +327,20 @@ export function testServiceDir(context: any, serviceName: string): boolean {
 
     if (!fs.existsSync(serviceFolder)) {
         if (context) {
-            context.cliMessage(a`\{lr,t No firstmate source folder found at \{m ${serviceFolder
+            context.cliMessage(a`\{lr,t No Firstmate source folder found at \{m ${serviceFolder
                 }\}: \{nt folder does not exist\}\}`);
         } else {
-            console.error(a`\{lr No firstmate source folder found at \{m fm/${serviceName}\}\}: folder does not exist`);
+            console.error(a`\{lr No Firstmate source folder found at \{m fm/${serviceName}\}\}: folder does not exist`);
         }
         return false;
     }
 
     if (!fs.statSync(serviceFolder).isDirectory()) {
         if (context) {
-            context.cliMessage(a`\{lr,t No firstmate source folder found at \{m ${serviceFolder
+            context.cliMessage(a`\{lr,t No Firstmate source folder found at \{m ${serviceFolder
                 }\}: \{nt found other file instead\}`);
         } else {
-            console.error(a`\{lr No firstmate source folder found at \{m fm/${serviceName
+            console.error(a`\{lr No Firstmate source folder found at \{m fm/${serviceName
                 }\}\}: found other file instead`);
         }
         return false;
