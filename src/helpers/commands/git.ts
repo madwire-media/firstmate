@@ -1,6 +1,6 @@
 import * as ChildProcess from 'child_process';
 
-import { a, fmt } from '../cli';
+import { a } from '../cli';
 
 export function init(cwd: string): boolean {
     const result = ChildProcess.spawnSync(

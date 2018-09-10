@@ -1,21 +1,6 @@
-import * as ChildProcess from 'child_process';
 import * as EventEmitter from 'events';
-import * as fs from 'fs';
 import * as os from 'os';
-import * as path from 'path';
-import * as readline from 'readline';
 import * as tty from 'tty';
-import * as util from 'util';
-
-import * as Hjson from 'hjson';
-import * as mkdirp from 'mkdirp';
-import * as GitConfig from 'parse-git-config';
-
-import { ncp } from 'ncp';
-import { Branch, Config, ConfigBase, Service } from '../config';
-import { BranchBase } from '../serviceTypes/base/branch';
-import { parseUserConfig, User } from '../user';
-import { empty } from './empty';
 
 export const which = os.platform() === 'win32' ? 'where' : 'which';
 export let a: {
