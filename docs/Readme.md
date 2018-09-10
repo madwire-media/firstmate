@@ -40,7 +40,7 @@ Firstmate currently has three different modes to run and deploy your code in: `d
 * `prod`: **Publish and version your code, then run it in Kubernetes**
     * All code must be versioned an published before it can be run in `prod` mode
     * When code is published, a version lock/history file is updated - **this must be committed**
-    * If a production push fails, you can revert the version in your `firstmate.hjson` file and re-run to revert everything back
+    * **If a production push fails, you can revert the version in your `firstmate.hjson` file and re-run to revert everything back**
     * `dockerImage` services are built and pushed with a tag based on the service's version property
     * `pureHelm` services are pushed with the service's version to a chartmusem, and run without any suffixes
     * `dockerDeployment` services use the service's version property for Docker and Helm versioning
