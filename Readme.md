@@ -1,9 +1,19 @@
-# FirstMate
-FirstMate is a tool to help you develop and deploy software on Kubernetes using Docker and Helm. With just a few commands you could create a new node.js or Apache project and get it running on Kubernetes.
+```
+ _,_____                    _                        _
+(  ,____/                 _| |__                   _| |__
+ | |     (*)             \_   __`\                \_   __`\  __
+ | |___   ., .-,..  ,-^^,  | |   _ ,-. ,-.   .-^||  | |    ,`  \
+ \ ,--.| | | | ,-v ( (`-*  | |  | //| //||  / / ||  | |   / /* /
+ | |     | | | |    `-.*.  | |  | / | / ||  | |/ |  | |   | ,-*,
+ | |     |_| |_\   ( `-`*  |_\  |_| |_| |_\ *._.;_\ |_\    \__,*
+ |.*                ^^^^
+```
+
+Firstmate is a tool to help you develop and deploy software on Kubernetes using Docker and Helm. With just a few commands you could create a new node.js or Apache project and get it running on Kubernetes.
 
 
 ## Install (not working yet)
-In the future there could be binary releases for FirstMate, but for now just use NPM
+In the future there could be binary releases for Firstmate, but for now just use NPM
 
 ```
 $ npm install -g firstmate
@@ -33,8 +43,8 @@ Now we can add a new service, in this case a node.js express server.
 
 ```
 $ fm add dockerDeployment node-js-express svc1
-Copying from /usr/lib/node_modules/firstmate/templates/dockerDeployment/node-js-express/source to source/svc1
-Copying from /usr/lib/node_modules/firstmate/templates/dockerDeployment/node-js-express/service to fm/svc1
+Copying from /usr/lib/node_modules/Firstmate/templates/dockerDeployment/node-js-express/source to source/svc1
+Copying from /usr/lib/node_modules/Firstmate/templates/dockerDeployment/node-js-express/service to fm/svc1
 ```
 
 Now you should have some node.js source code at `source/svc1` and some Docker and Helm stuff in `fm/svc1`. Your `firstmate.hjson` file was also edited, and it should look like this:
@@ -78,9 +88,9 @@ Now you should have some node.js source code at `source/svc1` and some Docker an
 }
 ```
 
-**From here on out, this tutorial assumes you have a working Kubernetes cluster, access to a docker registry, and both Docker and Helm installed locally.**
+**From here on out, this tutorial assumes you have a working Kubernetes cluster, access to a docker registry, and both Docker and Helm installed locally.** If you need some help with this, see [these installation instructions](./docs/Depencencies.md).
 
-We're almost there, we just have to tell FirstMate where to push our Docker image to and where to host our service. Go ahead and fill in the `cluster` and `registry` properties and then add an `allowedModes` property like below.
+We're almost there, we just have to tell Firstmate where to push our Docker image to and where to host our service. Go ahead and fill in the `cluster` and `registry` properties and then add an `allowedModes` property like below. If you followed the local installation instructions then your urls should look something like `localhost:[port]`.
 
 ```
                     cluster: my.kubectl.context.here
@@ -133,7 +143,7 @@ Now if you head to [http://localhost:8080](http://localhost:8080) you should see
 
 ## So what just happened?
 We:
-* Created a new FirstMate project
+* Created a new Firstmate project
 * Created a Git repository for it and hooked it up
 * Added a node.js express service to our new project
 * Configured and validated the node.js service
@@ -148,4 +158,4 @@ $ fm run dev svc1
 [lots of output here again]
 ```
 
-**If you want to learn more about how to use FirstMate, [read the docs](./docs/Readme.md)**
+**If you want to learn more about how to use Firstmate, [read the docs](./docs/Readme.md)**
