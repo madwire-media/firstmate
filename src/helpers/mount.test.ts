@@ -232,3 +232,99 @@ describe('copyFiles mounting', () => {
         expect(fs.readdirSync('.fm')).toEqual([]);
     });
 });
+
+describe('mount script generation', () => {
+    afterEach(() => Promise.all(
+        fs.readdirSync('tmp').map((dir) => `tmp/${dir}`)
+            .concat(fs.readdirSync('.fm').map((dir) => `.fm/${dir}`))
+            .map((dir) => promisify(rimraf)(dir)),
+        ),
+    );
+
+    test('works', () => {
+        const service = 'myservice';
+        const container = 'mycontainer';
+        const k8sVolumes = {
+            '/to': '/from',
+            '/to2': '/from2',
+        };
+        const command = 'sleep infinity';
+
+        generateMountsScript(service, container, k8sVolumes, command);
+
+        expect(fs.existsSync(`.fm/${service}.${container}.bootstrap.sh`)).toBe(true);
+        expect(fs.readFileSync(`.fm/${service}.${container}.bootstrap.sh`, 'utf8')).toBe(
+`\
+#!/bin/sh
+ln -s /from /to
+ln -s /from2 /to2
+exec sleep infinity\
+`,
+        );
+    });
+
+    test('generates .fm dir', () => {
+        if (fs.existsSync('.fm')) {
+            if (fs.statSync('.fm').isDirectory()) {
+                fs.rmdirSync('.fm');
+            } else {
+                fs.unlinkSync('.fm');
+            }
+        }
+
+        const service = 'myservice';
+        const container = 'mycontainer';
+        const k8sVolumes = {
+            '/to': '/from',
+            '/to2': '/from2',
+        };
+        const command = 'sleep infinity';
+
+        generateMountsScript(service, container, k8sVolumes, command);
+
+        expect(fs.existsSync('.fm'));
+        expect(fs.statSync('.fm').isDirectory()).toBe(true);
+        expect(fs.existsSync(`.fm/${service}.${container}.bootstrap.sh`)).toBe(true);
+        expect(fs.readFileSync(`.fm/${service}.${container}.bootstrap.sh`, 'utf8')).toBe(
+`\
+#!/bin/sh
+ln -s /from /to
+ln -s /from2 /to2
+exec sleep infinity\
+`,
+        );
+    });
+
+    test('dirifies .fm', () => {
+        if (fs.existsSync('.fm')) {
+            if (fs.statSync('.fm').isDirectory()) {
+                fs.rmdirSync('.fm');
+            } else {
+                fs.unlinkSync('.fm');
+            }
+        }
+        fs.writeFileSync('.fm', 'delete me');
+
+        const service = 'myservice';
+        const container = 'mycontainer';
+        const k8sVolumes = {
+            '/to': '/from',
+            '/to2': '/from2',
+        };
+        const command = 'sleep infinity';
+
+        generateMountsScript(service, container, k8sVolumes, command);
+
+        expect(fs.existsSync('.fm'));
+        expect(fs.statSync('.fm').isDirectory()).toBe(true);
+        expect(fs.existsSync(`.fm/${service}.${container}.bootstrap.sh`)).toBe(true);
+        expect(fs.readFileSync(`.fm/${service}.${container}.bootstrap.sh`, 'utf8')).toBe(
+`\
+#!/bin/sh
+ln -s /from /to
+ln -s /from2 /to2
+exec sleep infinity\
+`,
+        );
+    });
+});
