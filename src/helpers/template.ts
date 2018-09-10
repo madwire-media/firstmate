@@ -54,45 +54,43 @@ export class TemplateProcessor extends Transform {
         let maxVarLen = 0;
 
         for (const key in options.vars) {
-            if (!/[a-zA-Z0-9_.-]/.test(key)) {
+            if (!/^[a-zA-Z0-9_. -]+$/.test(key)) {
                 throw new TypeError(`Invalid key '${key}'`);
             }
 
-            maxVarLen = Math.max(maxVarLen, options.vars[key].length);
+            maxVarLen = Math.max(maxVarLen, key.length);
         }
 
         this.maxKeyLen = maxVarLen;
     }
 
-    public _transform(chunk: string | Buffer | any, encoding: string, callback: () => void) {
-        let chunkB;
-
-        if (chunk instanceof Buffer) {
-            chunkB = chunk;
-        } else if (typeof chunk === 'string') {
-            chunkB = Buffer.from(chunk, encoding);
-        } else if (chunk instanceof Array) {
-            chunkB = Buffer.from(chunk);
-        } else {
-            chunkB = Buffer.from(chunk.toString());
-        }
-
-        this.buf = Buffer.concat([this.buf, chunkB]);
+    public _transform(chunk: Buffer, encoding: string, callback: () => void) {
+        this.buf = Buffer.concat([this.buf, chunk]);
 
         const lastTemplateStart = this.buf.lastIndexOf('[[');
         const lastTemplateEnd = this.buf.lastIndexOf(']]');
 
         // Try and grab as much parsable data as possible
         let newData;
-        if (
-            lastTemplateEnd > lastTemplateStart ||
-            lastTemplateStart < this.buf.length - this.maxKeyLen + 2
-        ) {
-            newData = this.buf;
-            this.buf = Buffer.alloc(0);
+        if (lastTemplateStart >= 0) {
+            if (
+                lastTemplateEnd > lastTemplateStart ||
+                lastTemplateStart <= this.buf.length - (this.maxKeyLen + 4)
+            ) {
+                // Grab up to the end of the last template, but leave space for the beginning of another
+                const end = Math.max(lastTemplateEnd + 2, this.buf.length - 2);
+                newData = this.buf.slice(0, end);
+                this.buf = this.buf.slice(end);
+            } else {
+                // Grab up to the beginning of the last template
+                newData = this.buf.slice(0, lastTemplateStart);
+                this.buf = this.buf.slice(lastTemplateStart);
+            }
         } else {
-            newData = this.buf.slice(0, lastTemplateStart);
-            this.buf = this.buf.slice(lastTemplateStart);
+            // Grab up to the last two characters of the buffer
+            const end = Math.max(0, this.buf.length - 2);
+            newData = this.buf.slice(0, end);
+            this.buf = this.buf.slice(end);
         }
 
         // Parse any new data

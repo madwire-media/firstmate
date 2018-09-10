@@ -1,5 +1,4 @@
-export
-function unescape(str: string) {
+export function unescape(str: string) {
     let output = '';
     const singleCharEscapes: {
         [raw: string]: string,
