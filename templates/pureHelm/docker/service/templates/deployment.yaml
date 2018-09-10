@@ -31,7 +31,7 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          livelinessProbe:
+          livenessProbe:
             httpGet:
               path: /
               port: http
