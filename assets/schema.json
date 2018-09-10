@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "FirstMate Repo Configuration",
-    "description": "Describes to FirstMate how to orchestrate a kubernetes deployment",
+    "title": "Firstmate Repo Configuration",
+    "description": "Describes to Firstmate how to orchestrate a kubernetes deployment",
     "type": "object",
     "properties": {
         "project": {
@@ -452,6 +452,15 @@
                                     "type": "boolean"
                                 }
                             }
+                        },
+                        "mode": {
+                            "enum": ["proxy", "local"]
+                        },
+                        "pushDebugContainer": {
+                            "type": "boolean"
+                        },
+                        "autodelete": {
+                            "type": "boolean"
                         }
                     }
                 }

@@ -133,7 +133,7 @@ export async function loadUser(): Promise<User | undefined> {
 
 export async function newUser(firstTime = true, oldData?: User): Promise<User | undefined> {
     if (firstTime) {
-        console.log(a`\{lw It looks like this is your first time using FirstMate,${''
+        console.log(a`\{lw It looks like this is your first time using Firstmate,${''
             } please fill out the fields below to begin\}`);
     }
 

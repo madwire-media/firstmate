@@ -81,7 +81,7 @@ require('sywac')
     .style(styleHooks)
     .preface(logo)
     .command('new <projectName>', {
-        desc: 'Creates a new empty firstmate project',
+        desc: 'Creates a new empty Firstmate project',
         paramsDesc: [
             'Name of new project',
         ],
@@ -123,7 +123,7 @@ require('sywac')
         },
     })
     .command('clean', {
-        desc: 'Cleans up the workspace, removing any dangling copied files',
+        desc: 'Clean up any dangling files if Firstmate crashed',
         async run() {
             await uncopyFiles();
         },
@@ -167,7 +167,7 @@ require('sywac')
         },
     })
     .command('publish <mode:enum> [service]', {
-        desc: "Publish a service's images/charts",
+        desc: "Publish a service's images and charts",
         hints: [
             '[docker] [helm]',
         ],
@@ -195,7 +195,7 @@ require('sywac')
         },
     })
     .command('purge <mode:enum> <service>', {
-        desc: "Clean up a service's resources",
+        desc: "Delete all of a service's resources",
         hints: [
             '[helm]',
         ],
@@ -219,7 +219,7 @@ require('sywac')
         },
     })
     .command('debug <mode:enum> [service] <container>', {
-        desc: 'Debug a container of a running service locally',
+        desc: 'Debug a container of a running service using Telepresence',
         hints: [
             '[telepresence]',
         ],
