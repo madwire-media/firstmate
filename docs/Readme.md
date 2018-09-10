@@ -10,9 +10,9 @@ Firstmate projects contain one or more Firstmate services, and there are 4 types
   * Can be used as a base Dockerfile for other services to build on
 * `pureHelm`: **Builds, pushes, and runs a Helm chart**
   * Usually used for databases or other Helm charts
-* `dockerDeployment`: **A combination of a Helm chart and one or more Docker images to be included in the Helm deployment**
+* `dockerDeployment`: **A combination of a Helm chart and one or more Docker images to be included with a Helm release**
   * Usually used as an all-in-one service deployment
-* `buildContainer`: **A docker container that runs locally as part of the build process, usually to compile code**
+* `buildContainer`: **A docker container that runs locally as part of the build process**
   * Usually used to compile or lint your code
   * Can be used to run any arbitrary commands on files
 
