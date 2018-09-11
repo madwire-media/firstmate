@@ -190,7 +190,7 @@
                 {
                     "properties": {
                         "allowedModes": {
-                            "type": "array",
+                            "type": ["array", "null"],
                             "items": {
                                 "enum": [
                                     "dev",
@@ -208,10 +208,10 @@
             "type": "object",
             "properties": {
                 "version": {
-                    "type": "string"
+                    "type": ["string", "null"]
                 },
                 "prod": {
-                    "type": "object",
+                    "type": ["object", "null"],
                     "properties": {
                         "version": {
                             "type": "string"
@@ -245,17 +245,17 @@
             "type": "object",
             "properties": {
                 "copyFiles": {
-                    "type": "object",
+                    "type": ["object", "null"],
                     "patternProperties": {
                         "^([^.]|\\.[^.])+$": {
-                            "type": "string",
+                            "type": ["string", "null"],
                             "pattern": "^([^.]||\\.[^.])+$"
                         }
                     },
                     "additionalProperties": false
                 },
                 "dependsOn": {
-                    "type": "array",
+                    "type": ["array", "null"],
                     "items": {
                         "type": "string",
                         "pattern": "^[a-z0-9-]+$"
@@ -269,18 +269,18 @@
                 {
                     "properties": {
                         "registry": {
-                            "type": "string",
+                            "type": ["string", "null"],
                             "pattern": "^(https?://)?[a-z0-9-]+(\\.[a-z0-9-]+)+$"
                         },
                         "imageName": {
-                            "type": "string",
+                            "type": ["string", "null"],
                             "pattern": "^\\w[\\w.-]+$"
                         },
                         "dockerArgs": {
-                            "type": "object",
+                            "type": ["object", "null"],
                             "patternProperties": {
                                 "^[a-zA-Z0-9_]+$": {
-                                    "type": "string"
+                                    "type": ["string", "null"]
                                 }
                             },
                             "additionalProperties": false
@@ -308,19 +308,19 @@
                         "dev": {
                             "properties": {
                                 "pushImage": {
-                                    "type": "boolean"
+                                    "type": ["boolean", "null"]
                                 }
                             }
                         },
                         "stage": {
                             "properties": {
                                 "pushImage": {
-                                    "type": "boolean"
+                                    "type": ["boolean", "null"]
                                 }
                             }
                         },
                         "pushImage": {
-                            "type": "boolean"
+                            "type": ["boolean", "null"]
                         }
                     }
                 }
@@ -366,49 +366,47 @@
                 {
                     "properties": {
                         "registry": {
-                            "type": "string",
+                            "type": ["string", "null"],
                             "pattern": "^(https?://)?[a-z0-9-]+(\\.[a-z0-9-]+)+$"
                         },
                         "imageNamePrefix": {
-                            "type": "string",
+                            "type": ["string", "null"],
                             "pattern": "^\\w[\\w.-]+$"
                         },
                         "containers": {
-                            "type": "object",
+                            "type": ["object", "null"],
                             "patternProperties": {
                                 "^[a-zA-Z0-9][a-zA-Z0-9_.-]+$": {
                                     "properties": {
                                         "volumes": {
+                                            "type": ["object", "null"],
                                             "patternProperties": {
                                                 ".+": {
-                                                    "type": "string"
+                                                    "type": ["string", "null"]
                                                 }
                                             },
                                             "additionalProperties": false
                                         },
                                         "dockerArgs": {
-                                            "type": "object",
+                                            "type": ["object", "null"],
                                             "patternProperties": {
                                                 "^[a-zA-Z0-9_]+$": {
-                                                    "oneOf": [
-                                                        { "type": "string" },
-                                                        { "type": "number" },
-                                                        { "type": "boolean" }
-                                                    ]
+                                                    "type": ["string", "number", "boolean", "null"]
                                                 }
                                             },
                                             "additionalProperties": false
                                         },
                                         "k8sVolumes": {
+                                            "type": ["object", "null"],
                                             "patternProperties": {
                                                 ".+": {
-                                                    "type": "string"
+                                                    "type": ["string", "null"]
                                                 }
                                             },
                                             "additionalProperties": false
                                         },
                                         "ports": {
-                                            "type": "array",
+                                            "type": ["array", "null"],
                                             "items": {
                                                 "oneOf": [
                                                     {
@@ -433,7 +431,7 @@
                                             }
                                         },
                                         "debugCMD": {
-                                            "type": "string"
+                                            "type": ["string", "null"]
                                         }
                                     }
                                 }
@@ -467,21 +465,22 @@
                                     "enum": ["proxy", "local"]
                                 },
                                 "pushDebugContainer": {
-                                    "type": "boolean"
+                                    "type": ["boolean", "null"]
                                 },
                                 "autodelete": {
-                                    "type": "boolean"
+                                    "type": ["boolean", "null"]
                                 }
                             }
                         },
                         "mode": {
+                            "type": ["string", "null"],
                             "enum": ["proxy", "local"]
                         },
                         "pushDebugContainer": {
-                            "type": "boolean"
+                            "type": ["boolean", "null"]
                         },
                         "autodelete": {
-                            "type": "boolean"
+                            "type": ["boolean", "null"]
                         }
                     }
                 }
@@ -528,19 +527,19 @@
                 {
                     "properties": {
                         "volumes": {
-                            "type": "object",
+                            "type": ["object", "null"],
                             "patternProperties": {
                                 ".+": {
-                                    "type": "string"
+                                    "type": ["string", "null"]
                                 }
                             },
                             "additionalProperties": false
                         },
                         "dockerArgs": {
-                            "type": "object",
+                            "type": ["object", "null"],
                             "patternProperties": {
                                 "^[a-zA-Z0-9_]+$": {
-                                    "type": "string"
+                                    "type": ["string", "null"]
                                 }
                             },
                             "additionalProperties": false
@@ -605,27 +604,23 @@
                 {
                     "properties": {
                         "chartmuesum": {
-                            "type": "string",
+                            "type": ["string", "null"],
                             "pattern": "^(?!fm$).+"
                         },
                         "cluster": {
-                            "type": "string"
+                            "type": ["string", "null"]
                         },
                         "namespace": {
-                            "type": "string"
+                            "type": ["string", "null"]
                         },
                         "releaseName": {
-                            "type": "string"
+                            "type": ["string", "null"]
                         },
                         "helmArgs": {
-                            "type": "object",
+                            "type": ["object", "null"],
                             "patternProperties": {
                                 "^[^=\\n]+$": {
-                                    "anyOf": [
-                                        { "type": "string" },
-                                        { "type": "number" },
-                                        { "type": "boolean" }
-                                    ]
+                                    "type": ["string", "number", "boolean", "null"]
                                 }
                             },
                             "additionalProperties": false
@@ -692,7 +687,7 @@
                 "inheritFrom": {
                     "oneOf": [
                         {
-                            "type": "string"
+                            "type": ["string", "null"]
                         },
                         {
                             "type": "array",
