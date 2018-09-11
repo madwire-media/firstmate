@@ -51,7 +51,7 @@ export function runStageReqs(
         reqsMet = needsCommand(context, 'docker');
 
         // Check for helm regardless of if docker is installed, but
-        // don't check fro cluster if helm isn't installed
+        // don't check for cluster if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster) &&
             reqsMet;
