@@ -28,6 +28,7 @@ The services object is indexed by the name of the service:
         * `[branch name]`: *object* **Configuration for a branch of this service**
             * `copyFiles`: *object* **List of files/folders to copy before building/running this service**
             * `dependsOn`: *string[]* **List of services that need to be deployed before this one**
+            * `inheritFrom`: *string or string[]* **List of branches to inherit non-default properties from**
             * `dev`: *object* **Properties specific to `dev` mode**
                 * When running in `dev` mode, overrides/merges with the settings in the base config
             * `stage`: *object* **Properties specific to `stage` mode**
