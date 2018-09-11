@@ -91,14 +91,18 @@ export async function runStage(
     }
 
     if (branch instanceof dockerImage.StageBranch) {
+        const image = `${config.project}/${branch.imageName}`;
+
         // Docker build
-        if (!docker.build(serviceFolder, branch.imageName, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
             return false;
         }
 
         // Docker push
-        if (!docker.push(`${config.project}/${branch.imageName}:stage`, branch.registry)) {
-            return false;
+        if (branch.pushImage) {
+            if (!docker.push(`${image}:stage`, branch.registry)) {
+                return false;
+            }
         }
     } else if (branch instanceof pureHelm.StageBranch) {
         // Create namespace if it doesn't exist

@@ -302,6 +302,27 @@
                         "stage": { "$ref": "#/definitions/branch-dockerImage-base" },
                         "prod": { "$ref": "#/definitions/branch-dockerImage-base" }
                     }
+                },
+                {
+                    "properties": {
+                        "dev": {
+                            "properties": {
+                                "pushImage": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
+                        "stage": {
+                            "properties": {
+                                "pushImage": {
+                                    "type": "boolean"
+                                }
+                            }
+                        },
+                        "pushImage": {
+                            "type": "boolean"
+                        }
+                    }
                 }
             ]
         },

@@ -52,12 +52,13 @@ export function parseDockerImageBranches(context: ConfigContext,
 }
 
 function parseDockerImageDevBranch(context: ConfigContext, data?: ConfigBranchBase): dockerImage.DevBranch {
-    let {registry, imageName, dockerArgs} = context;
+    let {registry, imageName, dockerArgs, pushImage} = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
         imageName = data.imageName || imageName;
         dockerArgs = data.dockerArgs || dockerArgs;
+        pushImage = data.pushImage || pushImage;
     }
 
     if (registry === undefined) {
@@ -71,15 +72,17 @@ function parseDockerImageDevBranch(context: ConfigContext, data?: ConfigBranchBa
         registry,
         imageName,
         dockerArgs: dockerArgs && stringifyProps(dockerArgs),
+        pushImage,
     });
 }
 function parseDockerImageStageBranch(context: ConfigContext, data?: ConfigBranchBase): dockerImage.StageBranch {
-    let {registry, imageName, dockerArgs} = context;
+    let {registry, imageName, dockerArgs, pushImage} = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
         imageName = data.imageName || imageName;
         dockerArgs = data.dockerArgs || dockerArgs;
+        pushImage = data.pushImage || pushImage;
     }
 
     if (registry === undefined) {
@@ -93,6 +96,7 @@ function parseDockerImageStageBranch(context: ConfigContext, data?: ConfigBranch
         registry,
         imageName,
         dockerArgs: dockerArgs && stringifyProps(dockerArgs),
+        pushImage,
     });
 }
 function parseDockerImageProdBranch(context: ConfigContext, data?: ConfigBranchBase): dockerImage.ProdBranch {

@@ -47,7 +47,15 @@ Properties for any mode:
 * `dockerArgs`: *object* **List of Docker build arguments**
     * `[arg name]`: *string* **Argument value**
 
-There are no additional `dev`-, `stage`-, or `prod`-specific properties for `dockerImage`.
+Properties for `dev` mode only:
+* `pushImage`: *boolean* **Whether or not to push the dev image to a registry**
+    * **Default**: `false`
+
+Properties for `stage` mode only:
+* `pushImage`: *boolean* **Whether or not to push the stage image to a registry**
+    * **Default**: `false`
+
+There are no additional `prod`-specific properties for `dockerImage`.
 
 ### PureHelm
 This section only contains additions to the base service object. For more information see [Services](#services).

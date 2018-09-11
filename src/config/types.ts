@@ -61,6 +61,7 @@ export interface ConfigBranchBase {
     helmArgs?: {[argName: string]: string | number | boolean};
     chartmuseum?: string;
     releaseName?: string;
+    pushImage?: boolean;
 }
 export interface ConfigBranch extends ConfigBranchBase {
     inheritFrom?: string[];

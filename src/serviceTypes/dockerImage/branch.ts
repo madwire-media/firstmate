@@ -1,14 +1,15 @@
 import { IBranch } from '../base/branch';
-import { DockerImageBranchAll } from './branch-all';
+import { DockerImageBranchDev } from './branch-dev';
 import { DockerImageBranchProd } from './branch-prod';
+import { DockerImageBranchStage } from './branch-stage';
 
 export class DockerImageBranch implements IBranch<
-    DockerImageBranchAll,
-    DockerImageBranchAll,
+    DockerImageBranchDev,
+    DockerImageBranchStage,
     DockerImageBranchProd
 > {
     public type = 'Docker Image';
-    public dev?: DockerImageBranchAll;
-    public stage?: DockerImageBranchAll;
+    public dev?: DockerImageBranchDev;
+    public stage?: DockerImageBranchStage;
     public prod?: DockerImageBranchProd;
 }

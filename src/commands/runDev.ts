@@ -109,13 +109,22 @@ export async function runDev(
     }
 
     if (branch instanceof dockerImage.DevBranch) {
+        const image = `${config.project}/${branch.imageName}`;
+
         if (debugContainer !== undefined) {
             console.log(a`\{ly Warn:\} ignoring 'debug-container' parameter`);
         }
 
         // Docker build
-        if (!docker.build(serviceFolder, `${config.project}/${branch.imageName}`, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
             return false;
+        }
+
+        // Docker push
+        if (branch.pushImage) {
+            if (!docker.push(`${image}:dev`, branch.registry)) {
+                return false;
+            }
         }
     } else if (branch instanceof pureHelm.DevBranch) {
         if (debugContainer !== undefined) {

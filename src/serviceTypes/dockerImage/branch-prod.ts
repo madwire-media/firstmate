@@ -1,5 +1,5 @@
 import { ProdBranch } from '../base/branch';
-import { DockerImageBranchAll, DockerImageBranchRaw } from './branch-all';
+import { DockerImageBranchAll, DockerImageBranchRaw } from './branch-base';
 
 export interface DockerImageBranchProdRaw extends DockerImageBranchRaw {
     version: string;
