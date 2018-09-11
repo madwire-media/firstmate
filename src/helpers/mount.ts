@@ -126,7 +126,7 @@ export async function unmount(mount: Mount): Promise<boolean> {
 }
 
 export async function copyFiles(
-    paths: {[source: string]: string},
+    paths: {[dest: string]: string},
     serviceName: string,
 ): Promise<boolean> {
     const serviceRoot = `fm/${serviceName}`;
@@ -136,8 +136,8 @@ export async function copyFiles(
         fs.mkdirSync('.fm');
     }
 
-    for (const source in paths) {
-        const dest = `${serviceRoot}/${paths[source]}`;
+    for (const dest in paths) {
+        const source = `${serviceRoot}/${paths[dest]}`;
 
         try {
             const result = await mount(source, dest);

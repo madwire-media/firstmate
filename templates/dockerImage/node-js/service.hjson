@@ -10,9 +10,9 @@
 
                     // Copy the package.json files and source code over
                     copyFiles: {
-                        '[[source]]/package.json': package.json
-                        '[[source]]/package-lock.json': package-lock.json
-                        '[[source]]/src': src
+                        package.json: '[[source]]/package.json'
+                        package-lock.json: '[[source]]/package-lock.json'
+                        src: '[[source]]/src'
                     }
 
                     dev: {

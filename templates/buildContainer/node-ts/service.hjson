@@ -8,9 +8,9 @@
                     // Link the source code inside the container when it runs
                     // and link build output and node_modules directory
                     volumes: {
-                        '[[source]]': /root
-                        'fm/[[service]]/output': /root/dist
-                        'fm/[[service]]/node_modules': /root/node_modules
+                        /root: '[[source]]'
+                        /root/dist: 'fm/[[service]]/output'
+                        /root/node_modules: 'fm/[[service]]/node_modules'
                     }
                 }
             }

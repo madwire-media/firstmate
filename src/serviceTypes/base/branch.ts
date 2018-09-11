@@ -7,10 +7,10 @@ export enum BranchMode {
 }
 
 interface CopyFilesRaw {
-    [source: string]: any;
+    [dest: string]: any;
 }
 interface CopyFiles {
-    [source: string]: string;
+    [dest: string]: string;
 }
 
 export interface Port {
@@ -18,7 +18,7 @@ export interface Port {
     remote: number;
 }
 export interface Volumes {
-    [source: string]: string;
+    [dest: string]: string;
 }
 
 export interface BranchBaseRaw {

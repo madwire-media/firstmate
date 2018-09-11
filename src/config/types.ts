@@ -36,15 +36,15 @@ export interface ConfigService {
     branches: {[branchName: string]: ConfigBranch};
 }
 export interface ConfigContainer {
-    volumes?: {[source: string]: string};
+    volumes?: {[dest: string]: string};
     dockerArgs?: {[key: string]: string | number | boolean};
-    k8sVolumes?: {[source: string]: string};
+    k8sVolumes?: {[dest: string]: string};
     ports?: Array<number | Port>;
     debugCMD?: string;
 }
 export interface ConfigBranchBase {
     dependsOn?: string[];
-    copyFiles?: {[source: string]: string};
+    copyFiles?: {[dest: string]: string};
     allowedModes?: Array<'dev' | 'stage' | 'prod'>;
     registry?: string;
     volumes?: {[source: string]: string};

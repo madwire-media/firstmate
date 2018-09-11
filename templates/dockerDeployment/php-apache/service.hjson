@@ -15,19 +15,17 @@
 
                     // Copy the production configurations and source code over
                     copyFiles: {
-                        'fm/[[service]]/docker/main/php/php.prod.ini': docker/main/php.ini
-                        'fm/[[service]]/docker/main/apache/apache2.prod.conf': docker/main/apache2.conf
-                        'fm/[[service]]/docker/main/apache/ports.conf': docker/main/ports.conf
-                        '[[source]]': docker/main/html
+                        docker/main/php.ini: 'fm/[[service]]/docker/main/php/php.prod.ini'
+                        docker/main/apache2.conf: 'fm/[[service]]/docker/main/apache/apache2.prod.conf'
+                        docker/main/ports.conf: 'fm/[[service]]/docker/main/apache/ports.conf'
+                        docker/main/html: '[[source]]'
                     }
 
                     dev: {
                         // Copy the development configurations and source code over
                         copyFiles: {
-                            'fm/[[service]]/docker/main/php/php.dev.ini': docker/main/php.ini
-                            'fm/[[service]]/docker/main/apache/apache2.dev.conf': docker/main/apache2.conf
-                            'fm/[[service]]/docker/main/apache/ports.conf': docker/main/ports.conf
-                            '[[source]]': docker/main/html
+                            docker/main/php.ini: 'fm/[[service]]/docker/main/php/php.dev.ini'
+                            docker/main/apache2.conf: 'fm/[[service]]/docker/main/apache/apache2.dev.conf'
                         }
                     }
                 }

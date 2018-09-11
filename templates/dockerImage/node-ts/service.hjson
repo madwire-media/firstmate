@@ -13,9 +13,9 @@
 
                     // Copy the package.json files and (compiled) source code over
                     copyFiles: {
-                        '[[source]]/package.json': package.json
-                        '[[source]]/package-lock.json': package-lock.json
-                        'fm/[[service]]-build/output': dist
+                        package.json: '[[source]]/package.json'
+                        package-lock.json: '[[source]]/package-lock.json'
+                        dist: 'fm/[[service]]-build/output'
                     }
 
                     dev: {

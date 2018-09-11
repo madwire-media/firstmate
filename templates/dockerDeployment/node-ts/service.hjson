@@ -18,9 +18,9 @@
 
                     // Copy the package.json files and source code over
                     copyFiles: {
-                        '[[source]]/package.json': docker/main/package.json
-                        '[[source]]/package-lock.json': docker/main/package-lock.json
-                        'fm/[[service]]-build/output': docker/main/dist
+                        docker/main/package.json: '[[source]]/package.json'
+                        docker/main/package-lock.json: '[[source]]/package-lock.json'
+                        docker/main/dist: 'fm/[[service]]-build/output'
                     }
 
                     dev: {

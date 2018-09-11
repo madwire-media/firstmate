@@ -202,7 +202,7 @@ export function removeContainer(containerName: string): boolean {
 export interface RunOptions {
     image: string;
     name: string;
-    volumes?: {[source: string]: string};
+    volumes?: {[dest: string]: string};
     network?: string;
     ports?: Port[];
     command?: string;
@@ -321,8 +321,8 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
     }
 
     if (options.volumes !== undefined) {
-        for (let src in options.volumes) {
-            const dest = options.volumes[src];
+        for (const dest in options.volumes) {
+            let src = options.volumes[dest];
 
             if (src[0] !== '/') {
                 src = `${process.cwd()}/${src}`;
