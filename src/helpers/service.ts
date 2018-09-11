@@ -160,26 +160,33 @@ export interface InitBranchOptions {
     params: {[key: string]: any};
     isAsync(): void;
 }
-export async function initBranch(options: InitBranchOptions, fn: SvcCommandHandler, env: string): Promise<boolean> {
+export async function initBranch(
+    options: InitBranchOptions,
+    fn: SvcCommandHandler,
+    env: string,
+    runDeps = true,
+): Promise<boolean> {
     const {
         branch, branchName, serviceName, serviceFolder, usedBranchName,
         handlers, config, branchType, isAsync, alreadyRunBranches, params,
     } = options;
 
-    const depResults = await runDependencies(
-        config,
-        branchName,
-        branch,
-        handlers,
-        alreadyRunBranches,
-        isAsync,
-        params,
-        fn,
-    );
-    if (depResults === false) {
-        return false;
-    } else {
-        handlers.push(...depResults);
+    if (runDeps) {
+        const depResults = await runDependencies(
+            config,
+            branchName,
+            branch,
+            handlers,
+            alreadyRunBranches,
+            isAsync,
+            params,
+            fn,
+        );
+        if (depResults === false) {
+            return false;
+        } else {
+            handlers.push(...depResults);
+        }
     }
 
     console.log(a`Running service \{lw ${serviceName}\} on branch \{lg ${usedBranchName}\} in ${env} mode`);

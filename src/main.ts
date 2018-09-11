@@ -11,6 +11,9 @@ import { addService } from './commands/addService';
 import { dryDev } from './commands/dryDev';
 import { newProject } from './commands/newProject';
 import { publishProd, publishProdReqs } from './commands/publishProd';
+import { purgeDev, purgeDevReqs } from './commands/purgeDev';
+import { purgeProd, purgeProdReqs } from './commands/purgeProd';
+import { purgeStage, purgeStageReqs } from './commands/purgeStage';
 import { runDev, runDevReqs } from './commands/runDev';
 import { runProd, runProdReqs } from './commands/runProd';
 import { runStage, runStageReqs } from './commands/runStage';
@@ -210,8 +213,20 @@ require('sywac')
         ],
         async run(argv: {[arg: string]: any}, context: any) {
             switch (argv.mode) {
+                case 'dev':
+                    await runService(purgeDev, purgeDevReqs, context, argv, argv.service, {});
+                    break;
+
+                case 'stage':
+                    await runService(purgeStage, purgeStageReqs, context, argv, argv.service);
+                    break;
+
+                case 'prod':
+                    await runService(purgeProd, purgeProdReqs, context, argv, argv.service);
+                    break;
+
                 default:
-                    context.cliMessage(`Unimplemented clean mode ${argv.mode}`);
+                    context.cliMessage(`Unimplemented purge mode ${argv.mode}`);
                     break;
             }
 

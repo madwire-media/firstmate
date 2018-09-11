@@ -56,7 +56,7 @@ export function runProdReqs(
             needsCluster(context, branch.cluster) &&
             reqsMet;
     } else if (branch instanceof buildContainer.ProdBranch) {
-        reqsMet = true; // not applicable
+        // N/A
     }
 
     if (reqsMet) {
