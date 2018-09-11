@@ -147,15 +147,15 @@ require('sywac')
             switch (argv.mode) {
                 case 'dev':
                     const devService = argv.dry ? dryDev : runDev;
-                    await runService(devService, runDevReqs, context, argv.service, {}, [argv.debug]);
+                    await runService(devService, runDevReqs, context, argv, argv.service, {});
                     break;
 
                 case 'stage':
-                    await runService(runStage, runStageReqs, context, argv.service);
+                    await runService(runStage, runStageReqs, context, argv, argv.service);
                     break;
 
                 case 'prod':
-                    await runService(runProd, runProdReqs, context, argv.service);
+                    await runService(runProd, runProdReqs, context, argv, argv.service);
                     break;
 
                 default:
@@ -183,7 +183,7 @@ require('sywac')
         async run(argv: {[arg: string]: any}, context: any) {
             switch (argv.mode) {
                 case 'prod':
-                    await runService(publishProd, publishProdReqs, context, argv.service);
+                    await runService(publishProd, publishProdReqs, context, argv, argv.service);
                     break;
 
                 default:
@@ -249,7 +249,7 @@ require('sywac')
             'Service to validate (validates all by default)',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
-            if (!await validate(argv.service)) {
+            if (!await validate(argv, argv.service)) {
                 context.code++;
             }
         },

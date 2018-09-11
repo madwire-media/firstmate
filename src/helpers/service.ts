@@ -19,14 +19,14 @@ export type SvcCommandHandler = (
     handlers: SigIntHandler[],
     alreadyRunBranches: Set<string>,
     isAsync: () => void,
-    params: string[],
+    params: {[arg: string]: any},
 ) => Promise<undefined | false>;
 export type SvcCommandReqHandler = (
     config: Config,
     serviceName: string,
     branchName: string,
     alreadyRunBranches: Set<string>,
-    params: string[],
+    params: {[arg: string]: any},
     context: any,
 ) => boolean;
 
@@ -38,9 +38,9 @@ export async function runService(
     fn: SvcCommandHandler,
     reqFn: SvcCommandReqHandler,
     context: any,
+    params: {[arg: string]: any},
     serviceName?: string,
     opts: ServiceRunOpts = {},
-    params: any[] = [],
 ) {
     // Clean up any dangling copied files
     await uncopyFiles();
@@ -157,15 +157,25 @@ export interface InitBranchOptions {
     alreadyRunBranches: Set<string>;
     config: Config;
     branchType: string;
+    params: {[key: string]: any};
     isAsync(): void;
 }
 export async function initBranch(options: InitBranchOptions, fn: SvcCommandHandler, env: string): Promise<boolean> {
     const {
         branch, branchName, serviceName, serviceFolder, usedBranchName,
-        handlers, config, branchType, isAsync, alreadyRunBranches,
+        handlers, config, branchType, isAsync, alreadyRunBranches, params,
     } = options;
 
-    const depResults = await runDependencies(config, branchName, branch, handlers, alreadyRunBranches, isAsync, fn);
+    const depResults = await runDependencies(
+        config,
+        branchName,
+        branch,
+        handlers,
+        alreadyRunBranches,
+        isAsync,
+        params,
+        fn,
+    );
     if (depResults === false) {
         return false;
     } else {
@@ -291,6 +301,7 @@ export async function runDependencies(
     handlers: SigIntHandler[],
     alreadyRunBranches: Set<string>,
     isAsync: () => void,
+    params: {[arg: string]: any},
     cb: SvcCommandHandler,
 ): Promise<SigIntHandler[] | false> {
     if (branch.dependsOn !== undefined) {
@@ -300,7 +311,7 @@ export async function runDependencies(
             }
             alreadyRunBranches.add(dependency);
 
-            const results = await cb(config, dependency, branchName, handlers, alreadyRunBranches, isAsync, []);
+            const results = await cb(config, dependency, branchName, handlers, alreadyRunBranches, isAsync, params);
 
             if (results === false) {
                 // Undo everything
@@ -322,6 +333,7 @@ export function reqDependencies(
     branch: BranchBase,
     alreadyRunBranches: Set<string>,
     cb: SvcCommandReqHandler,
+    params: {[arg: string]: any},
     context: any,
 ): boolean {
     if (branch.dependsOn !== undefined) {
@@ -331,7 +343,7 @@ export function reqDependencies(
             }
             alreadyRunBranches.add(dependency);
 
-            const results = cb(config, dependency, branchName, alreadyRunBranches, [], context);
+            const results = cb(config, dependency, branchName, alreadyRunBranches, params, context);
 
             if (results === false) {
                 return false;

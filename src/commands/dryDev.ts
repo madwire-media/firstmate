@@ -19,7 +19,7 @@ export function dryDevReqs(
     serviceName: string,
     branchName: string,
     alreadyRunBranches: Set<string>,
-    params: string[],
+    params: {[arg: string]: any},
     context: any,
 ): boolean {
     const service = config.services[serviceName];
@@ -62,7 +62,7 @@ export function dryDevReqs(
     }
 
     if (reqsMet) {
-        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, dryDevReqs, context);
+        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, dryDevReqs, params, context);
     }
 
     return reqsMet;
@@ -75,7 +75,8 @@ export async function dryDev(
     handlers: SigIntHandler[],
     alreadyRunBranches: Set<string>,
     isAsync: () => void,
-): Promise<undefined | false> {
+    params: {[arg: string]: any},
+    ): Promise<undefined | false> {
     const service = config.services[serviceName];
 
     const serviceFolder = getServiceDir(serviceName);
@@ -85,7 +86,7 @@ export async function dryDev(
 
     const initResult = await initBranch({
         branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
-        handlers, config, branchType: branchBase.type, alreadyRunBranches,
+        handlers, config, branchType: branchBase.type, alreadyRunBranches, params,
     }, dryDev, 'dev (dry run)');
     if (initResult === false) {
         return false;

@@ -21,9 +21,14 @@ export function runDevReqs(
     serviceName: string,
     branchName: string,
     alreadyRunBranches: Set<string>,
-    [debugContainer]: string[],
+    params: {[key: string]: any},
     context: any,
 ): boolean {
+    const {debugContainer} = params;
+    if ('debugContainer' in params) {
+        delete params.debugContainer;
+    }
+
     const service = config.services[serviceName];
 
     const usedBranchName = resolveBranchName(branchName, service.branches);
@@ -68,7 +73,7 @@ export function runDevReqs(
     }
 
     if (reqsMet) {
-        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, runDevReqs, context);
+        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, runDevReqs, params, context);
     }
 
     return reqsMet;
@@ -81,8 +86,13 @@ export async function runDev(
     handlers: SigIntHandler[],
     alreadyRunBranches: Set<string>,
     isAsync: () => void,
-    [debugContainer]: string[],
+    params: {[key: string]: any},
 ): Promise<undefined | false> {
+    const {debugContainer} = params;
+    if ('debugContainer' in params) {
+        delete params.debugContainer;
+    }
+
     const service = config.services[serviceName];
 
     const serviceFolder = getServiceDir(serviceName);
@@ -92,7 +102,7 @@ export async function runDev(
 
     const initResult = await initBranch({
         branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
-        handlers, config, branchType: branchBase.type, alreadyRunBranches,
+        handlers, config, branchType: branchBase.type, alreadyRunBranches, params,
     }, runDev, 'dev');
     if (initResult === false) {
         return false;

@@ -9,7 +9,7 @@ import {
 } from '../helpers/service';
 import { BranchBase } from '../serviceTypes/base/branch';
 
-export async function validate(service?: string): Promise<boolean> {
+export async function validate(params: {[arg: string]: any}, service?: string): Promise<boolean> {
     let isOk =
         needsCommand(undefined, 'docker') &&
         needsCommand(undefined, 'helm') &&
@@ -65,14 +65,14 @@ export async function validate(service?: string): Promise<boolean> {
             const branch = branchBaseIter[envName];
 
             if (branch !== undefined) {
-                runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, handler);
+                runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, {}, handler);
             }
         }
     };
     // const fn = runServiceBase(handler, false);
 
     if (service !== undefined) {
-        const result = await runService(handler, () => true, undefined, service, {
+        const result = await runService(handler, () => true, undefined, params, service, {
             config,
             liveRun: false,
         });
@@ -83,7 +83,7 @@ export async function validate(service?: string): Promise<boolean> {
     } else {
         for (const serviceName in config.services) {
             if (!checkedServices.has(serviceName)) {
-                const result = await runService(handler, () => true, undefined, serviceName, {
+                const result = await runService(handler, () => true, undefined, params, serviceName, {
                     config,
                     liveRun: false,
                 });
