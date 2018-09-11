@@ -18,6 +18,7 @@ export function dryDevReqs(
     config: Config,
     serviceName: string,
     branchName: string,
+    alreadyRunBranches: Set<string>,
     params: string[],
     context: any,
 ): boolean {
@@ -61,7 +62,7 @@ export function dryDevReqs(
     }
 
     if (reqsMet) {
-        reqsMet = reqDependencies(config, branchName, branch, dryDevReqs, context);
+        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, dryDevReqs, context);
     }
 
     return reqsMet;
@@ -72,6 +73,7 @@ export async function dryDev(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
+    alreadyRunBranches: Set<string>,
     isAsync: () => void,
 ): Promise<undefined | false> {
     const service = config.services[serviceName];
@@ -82,8 +84,8 @@ export async function dryDev(
     const branch = branchBase.dev!; // handled in reqs function
 
     const initResult = await initBranch({
-        branch, branchName, serviceName, serviceFolder, isAsync,
-        usedBranchName, handlers, config, branchType: branchBase.type,
+        branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
+        handlers, config, branchType: branchBase.type, alreadyRunBranches,
     }, dryDev, 'dev (dry run)');
     if (initResult === false) {
         return false;

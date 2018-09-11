@@ -20,6 +20,7 @@ export function runDevReqs(
     config: Config,
     serviceName: string,
     branchName: string,
+    alreadyRunBranches: Set<string>,
     [debugContainer]: string[],
     context: any,
 ): boolean {
@@ -67,7 +68,7 @@ export function runDevReqs(
     }
 
     if (reqsMet) {
-        reqsMet = reqDependencies(config, branchName, branch, runDevReqs, context);
+        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, runDevReqs, context);
     }
 
     return reqsMet;
@@ -78,6 +79,7 @@ export async function runDev(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
+    alreadyRunBranches: Set<string>,
     isAsync: () => void,
     [debugContainer]: string[],
 ): Promise<undefined | false> {
@@ -89,8 +91,8 @@ export async function runDev(
     const branch = branchBase.dev!; // handled in reqs function
 
     const initResult = await initBranch({
-        branch, branchName, serviceName, serviceFolder, isAsync,
-        usedBranchName, handlers, config, branchType: branchBase.type,
+        branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
+        handlers, config, branchType: branchBase.type, alreadyRunBranches,
     }, runDev, 'dev');
     if (initResult === false) {
         return false;

@@ -36,6 +36,7 @@ export async function validate(service?: string): Promise<boolean> {
         serviceName: string,
         branchName: string,
         handlers: SigIntHandler[],
+        alreadyRunBranches: Set<string>,
         isAsync: () => void,
     ) => {
         if (checkedServices.has(serviceName)) {
@@ -64,7 +65,7 @@ export async function validate(service?: string): Promise<boolean> {
             const branch = branchBaseIter[envName];
 
             if (branch !== undefined) {
-                runDependencies(config, branchName, branch, [], isAsync, handler);
+                runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, handler);
             }
         }
     };

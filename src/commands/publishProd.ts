@@ -18,6 +18,7 @@ export function publishProdReqs(
     config: Config,
     serviceName: string,
     branchName: string,
+    alreadyRunBranches: Set<string>,
     params: string[],
     context: any,
 ): boolean {
@@ -58,7 +59,7 @@ export function publishProdReqs(
     }
 
     if (reqsMet) {
-        reqsMet = reqDependencies(config, branchName, branch, publishProdReqs, context);
+        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, publishProdReqs, context);
     }
 
     return reqsMet;
@@ -69,6 +70,7 @@ export async function publishProd(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
+    alreadyRunBranches: Set<string>,
     isAsync: () => void,
 ): Promise<undefined | false> {
     const service = config.services[serviceName];
@@ -79,8 +81,8 @@ export async function publishProd(
     const branch = branchBase.prod!; // handled in reqs function
 
     const initResult = await initBranch({
-        branch, branchName, serviceName, serviceFolder, isAsync,
-        usedBranchName, handlers, config, branchType: branchBase.type,
+        branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
+        handlers, config, branchType: branchBase.type, alreadyRunBranches,
     }, publishProd, 'prod');
     if (initResult === false) {
         return false;

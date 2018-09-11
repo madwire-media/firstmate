@@ -18,6 +18,7 @@ export function runStageReqs(
     config: Config,
     serviceName: string,
     branchName: string,
+    alreadyRunBranches: Set<string>,
     params: string[],
     context: any,
 ): boolean {
@@ -59,7 +60,7 @@ export function runStageReqs(
     }
 
     if (reqsMet) {
-        reqsMet = reqDependencies(config, branchName, branch, runStageReqs, context);
+        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, runStageReqs, context);
     }
 
     return reqsMet;
@@ -70,6 +71,7 @@ export async function runStage(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
+    alreadyRunBranches: Set<string>,
     isAsync: () => void,
 ): Promise<undefined | false> {
     const service = config.services[serviceName];
@@ -80,8 +82,8 @@ export async function runStage(
     const branch = branchBase.stage!; // handled in reqs function
 
     const initResult = await initBranch({
-        branch, branchName, serviceName, serviceFolder, isAsync,
-        usedBranchName, handlers, config, branchType: branchBase.type,
+        branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
+        handlers, config, branchType: branchBase.type, alreadyRunBranches,
     }, runStage, 'stage');
     if (initResult === false) {
         return false;
