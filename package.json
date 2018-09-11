@@ -19,32 +19,32 @@
         "test": "jest"
     },
     "dependencies": {
-        "ajv": "^6.5.2",
+        "ajv": "^6.5.3",
         "hjson": "git+https://github.com/dqsully/hjson-js.git",
         "leven": "^2.1.0",
         "mkdirp": "^0.5.1",
         "ncp": "^2.0.0",
-        "parse-git-config": "^2.0.2",
+        "parse-git-config": "^2.0.3",
         "request": "^2.88.0",
         "rimraf": "^2.6.2",
         "short-ansi": "^1.0.1",
         "sywac": "^1.2.1"
     },
     "devDependencies": {
-        "@types/jest": "^23.3.1",
+        "@types/jest": "^23.3.2",
         "@types/leven": "^2.1.1",
         "@types/mkdirp": "^0.5.2",
         "@types/ncp": "^2.0.1",
-        "@types/node": "^10.5.1",
-        "@types/parse-git-config": "^2.0.0",
+        "@types/node": "^10.9.4",
+        "@types/parse-git-config": "^2.0.1",
         "@types/request": "^2.47.1",
         "@types/rimraf": "^2.0.2",
-        "concurrently": "^3.6.0",
-        "jest": "^23.5.0",
+        "concurrently": "^3.6.1",
+        "jest": "^23.6.0",
         "ts-jest": "^23.1.4",
-        "ts-node": "^7.0.0",
+        "ts-node": "^7.0.1",
         "ts-transformer-keys": "^0.3.3",
-        "tslint": "^5.10.0",
+        "tslint": "^5.11.0",
         "typescript": "^2.9.2"
     }
 }
