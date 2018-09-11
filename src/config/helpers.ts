@@ -1,3 +1,5 @@
+import { keys as keysOf } from 'ts-transformer-keys';
+
 import { BranchBase } from '../serviceTypes/base/branch';
 import { ConfigBranch, ConfigBranchBase, ConfigContext } from './types';
 
@@ -17,30 +19,82 @@ export function makeError(context: ConfigContext, msg: string, env?: string) {
     }
 }
 
+function mergeObject(source: {[key: string]: any}, dest: {[key: string]: any}) {
+    for (const key in source) {
+        const value = source[key];
+
+        if (typeof value === 'object' && !(value instanceof Array)) {
+            dest[key] = dest[key] || {};
+            mergeObject(source[key], dest[key]);
+        } else if (value === undefined || value === null) {
+            if (key in dest) {
+                delete dest[key];
+            }
+        } else {
+            dest[key] = source[key];
+        }
+    }
+}
+
 export function resolveBranch(context: ConfigContext,
                               branches: {[branchName: string]: ConfigBranch},
                               branchName: string,
 ): ConfigBranch {
-    let branch = branches[branchName];
-    const travelledBranches: string[] = [];
-
-    while (branch.inheritFrom !== undefined) {
-        if (travelledBranches.includes(branch.inheritFrom)) {
-            throw makeError({...context, branchName},
-                `recursive inheritence to branch '${branch.inheritFrom}'`);
-        }
-        if (!(branch.inheritFrom in branches)) {
-            throw makeError({...context, branchName},
-                `cannot inherit from nonexistent branch '${branch.inheritFrom}'`);
-        }
-
-        travelledBranches.push(branchName);
-        branchName = branch.inheritFrom;
-        branch = branches[branchName];
+    interface BranchNode {
+        name: string;
+        inheritFrom?: string[];
+        branch: ConfigBranch;
     }
 
-    for (const branchName of travelledBranches) {
-        branch = {...branch, ...branches[branchName]};
+    const branch = {...branches[branchName]};
+    const branchStack: BranchNode[] = [{
+        name: branchName,
+        inheritFrom: branch.inheritFrom ? branch.inheritFrom.slice() : undefined,
+        branch, // not copied here so that we can recover the object later using `branch`
+    }];
+
+    const branchKeys = keysOf<ConfigBranch>();
+
+    while (branchStack.length > 0) {
+        const top = branchStack[branchStack.length - 1];
+
+        // We reached the end of current inheritFrom array, pop from stack and merge with previous
+        if (!top.inheritFrom || top.inheritFrom.length === 0) {
+            branchStack.pop();
+            mergeObject(top.branch, branchStack[branchStack.length - 1].branch);
+            continue;
+        }
+
+        // Otherwise, there is another object to inherit from
+        const nextInherit = top.inheritFrom.shift()!;
+
+        // Check to make sure branch exists
+        if (!(nextInherit in branches)) {
+            throw makeError({...context, branchName},
+                `cannot inherit from nonexistent branch '${nextInherit}'`);
+        }
+
+        // Check to make sure inheritance isn't recursive
+        let recursive = false;
+        for (const branch of branchStack) {
+            if (branch.name === nextInherit) {
+                recursive = true;
+                break;
+            }
+        }
+
+        if (recursive) {
+            throw makeError({...context, branchName},
+                `recursive inheritence to branch '${nextInherit}`);
+        }
+
+        // Add new branch onto stack
+        const nextBranch = branches[nextInherit];
+        branchStack.push({
+            name: nextInherit,
+            inheritFrom: nextBranch.inheritFrom ? nextBranch.inheritFrom.slice() : undefined,
+            branch: nextBranch,
+        });
     }
 
     return branch;

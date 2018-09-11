@@ -63,7 +63,7 @@ export interface ConfigBranchBase {
     releaseName?: string;
 }
 export interface ConfigBranch extends ConfigBranchBase {
-    inheritFrom?: string;
+    inheritFrom?: string[];
     dev?: ConfigBranchBase;
     stage?: ConfigBranchBase;
     prod?: ConfigBranchBase;

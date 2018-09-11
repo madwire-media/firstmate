@@ -43,6 +43,7 @@
         "jest": "^23.5.0",
         "ts-jest": "^23.1.4",
         "ts-node": "^7.0.0",
+        "ts-transformer-keys": "^0.3.3",
         "tslint": "^5.10.0",
         "typescript": "^2.9.2"
     }
