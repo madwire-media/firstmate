@@ -1,13 +1,10 @@
-import * as fs from 'fs';
-
 import { Config } from '../config';
 import { a } from '../helpers/cli';
-import * as docker from '../helpers/commands/docker';
 import * as helm from '../helpers/commands/helm';
-import { needsCluster, needsCommand, needsNamespace } from '../helpers/require';
+import { needsCluster, needsCommand } from '../helpers/require';
 import {
-    getServiceDir, initBranch, maybeTryBranch, reqDependencies,
-    resolveBranchName, SigIntHandler, testServiceFiles,
+    getServiceDir, initBranch, maybeTryBranch,
+    resolveBranchName, SigIntHandler,
 } from '../helpers/service';
 import * as buildContainer from '../serviceTypes/buildContainer/module';
 import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
@@ -78,7 +75,7 @@ export async function purgeDev(
 
     if ((branch instanceof dockerImage.DevBranch) || (branch instanceof buildContainer.DevBranch)) {
         console.log(a`\{ld (not applicable)\}`);
-    } else if ((branch instanceof pureHelm.DevBranch) || (branch instanceof pureHelm.DevBranch)) {
+    } else if ((branch instanceof dockerDeployment.DevBranch) || (branch instanceof pureHelm.DevBranch)) {
         // Helm chart purge
         const helmContext = {
             branch,

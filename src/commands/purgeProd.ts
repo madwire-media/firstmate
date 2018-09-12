@@ -1,13 +1,10 @@
-import * as fs from 'fs';
-
 import { Config } from '../config';
 import { a, question } from '../helpers/cli';
-import * as docker from '../helpers/commands/docker';
 import * as helm from '../helpers/commands/helm';
-import { needsCluster, needsCommand, needsNamespace } from '../helpers/require';
+import { needsCluster, needsCommand } from '../helpers/require';
 import {
-    getServiceDir, initBranch, maybeTryBranch, reqDependencies,
-    resolveBranchName, SigIntHandler, testServiceFiles,
+    getServiceDir, initBranch, maybeTryBranch,
+    resolveBranchName, SigIntHandler,
 } from '../helpers/service';
 import * as buildContainer from '../serviceTypes/buildContainer/module';
 import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
@@ -41,7 +38,7 @@ export function purgeProdReqs(
 
     if ((branch instanceof dockerImage.ProdBranch) || (branch instanceof buildContainer.ProdBranch)) {
         // N/A
-    } else if ((branch instanceof pureHelm.ProdBranch) || (branch instanceof pureHelm.ProdBranch)) {
+    } else if ((branch instanceof dockerDeployment.ProdBranch) || (branch instanceof pureHelm.ProdBranch)) {
         // Don't check for cluster if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster);
