@@ -8,7 +8,9 @@
     },
     "author": "Dakota Sullivan",
     "license": "MIT",
-    "bin": "dist/main.js",
+    "bin": {
+        "fm": "dist/main.js"
+    },
     "scripts": {
         "start": "node dist/main.js",
         "debug": "npm run build && node --inspect-brk dist/main.js",
