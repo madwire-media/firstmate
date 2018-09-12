@@ -16,7 +16,7 @@
                     // Copy the package.json files and source code over
                     copyFiles: {
                         docker/main/package.json: '[[source]]/package.json'
-                        docker/main/pacakge-lock.json: '[[source]]/package-lock.json'
+                        docker/main/package-lock.json: '[[source]]/package-lock.json'
                         docker/main/src: '[[source]]/src'
                     }
 
