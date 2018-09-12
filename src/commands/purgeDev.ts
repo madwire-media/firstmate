@@ -26,7 +26,7 @@ export function purgeDevReqs(
 
     if (branchBase.dev === undefined) {
         console.error(a`\{lr Cannot purge service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in \{ dev\} mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{c dev\} mode\}`);
         maybeTryBranch(service, usedBranchName, 'dev');
         return false;
     }
@@ -84,7 +84,7 @@ export async function purgeDev(
 
         if (!helm.del(
             helmContext,
-            branch.releaseName || `${config.project}-${serviceName}`,
+            branch.releaseName || `${config.project}-${serviceName}-dev`,
             true,
         )) {
             return false;

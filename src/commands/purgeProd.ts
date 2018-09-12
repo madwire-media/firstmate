@@ -26,7 +26,7 @@ export function purgeProdReqs(
 
     if (branchBase.prod === undefined) {
         console.error(a`\{lr Cannot purge service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in \{ prod\} mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{c prod\} mode\}`);
         maybeTryBranch(service, usedBranchName, 'prod');
         return false;
     }

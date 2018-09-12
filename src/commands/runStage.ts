@@ -29,7 +29,7 @@ export function runStageReqs(
 
     if (branchBase.stage === undefined) {
         console.error(a`\{lr Cannot run service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in \{ stage\} mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{c stage\} mode\}`);
         maybeTryBranch(service, usedBranchName, 'stage');
         return false;
     }

@@ -26,7 +26,7 @@ export function purgeStageReqs(
 
     if (branchBase.stage === undefined) {
         console.error(a`\{lr Cannot purge service \{lw ${serviceName}\} on ${''
-            }branch \{lg ${usedBranchName}\} in \{ stage\} mode\}`);
+            }branch \{lg ${usedBranchName}\} in \{c stage\} mode\}`);
         maybeTryBranch(service, usedBranchName, 'stage');
         return false;
     }
@@ -105,7 +105,7 @@ export async function purgeStage(
 
         if (!helm.del(
             helmContext,
-            branch.releaseName || `${config.project}-${serviceName}`,
+            branch.releaseName || `${config.project}-${serviceName}-stage`,
             true,
         )) {
             return false;
