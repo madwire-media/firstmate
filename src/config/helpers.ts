@@ -67,6 +67,11 @@ export function resolveBranch(context: ConfigContext,
         // We reached the end of current inheritFrom array, pop from stack and merge with previous
         if (!top.inheritFrom || top.inheritFrom.length === 0) {
             branchStack.pop();
+
+            if (branchStack.length === 0) {
+                break;
+            }
+
             mergeObject(top.branch, branchStack[branchStack.length - 1].branch);
             continue;
         }
