@@ -91,7 +91,7 @@ export function resolveBranch(context: ConfigContext,
 
         if (recursive) {
             throw makeError({...context, branchName},
-                `recursive inheritence to branch '${nextInherit}`);
+                `recursive inheritence to branch '${nextInherit}'`);
         }
 
         // Add new branch onto stack
