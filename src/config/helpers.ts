@@ -98,7 +98,7 @@ export function resolveBranch(context: ConfigContext,
         const nextBranch = branches[nextInherit];
         branchStack.push({
             name: nextInherit,
-            inheritFrom: normInheritFrom(branch.inheritFrom),
+            inheritFrom: normInheritFrom(nextBranch.inheritFrom),
             branch: nextBranch,
         });
     }
