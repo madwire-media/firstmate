@@ -1,5 +1,3 @@
-import { keys as keysOf } from 'ts-transformer-keys';
-
 import { BranchBase } from '../serviceTypes/base/branch';
 import { ConfigBranch, ConfigBranchBase, ConfigContext } from './types';
 
@@ -52,8 +50,6 @@ export function resolveBranch(context: ConfigContext,
         inheritFrom: branch.inheritFrom ? branch.inheritFrom.slice() : undefined,
         branch, // not copied here so that we can recover the object later using `branch`
     }];
-
-    const branchKeys = keysOf<ConfigBranch>();
 
     while (branchStack.length > 0) {
         const top = branchStack[branchStack.length - 1];
