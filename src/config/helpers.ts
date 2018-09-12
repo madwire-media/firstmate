@@ -34,6 +34,16 @@ function mergeObject(source: {[key: string]: any}, dest: {[key: string]: any}) {
     }
 }
 
+function normInheritFrom(inheritFrom: string | string[] | undefined): string[] | undefined {
+    if (typeof inheritFrom === 'string') {
+        return [inheritFrom];
+    } else if (inheritFrom instanceof Array) {
+        return inheritFrom.slice();
+    } else {
+        return undefined;
+    }
+}
+
 export function resolveBranch(context: ConfigContext,
                               branches: {[branchName: string]: ConfigBranch},
                               branchName: string,
@@ -47,7 +57,7 @@ export function resolveBranch(context: ConfigContext,
     const branch = {...branches[branchName]};
     const branchStack: BranchNode[] = [{
         name: branchName,
-        inheritFrom: branch.inheritFrom ? branch.inheritFrom.slice() : undefined,
+        inheritFrom: normInheritFrom(branch.inheritFrom),
         branch, // not copied here so that we can recover the object later using `branch`
     }];
 
@@ -88,7 +98,7 @@ export function resolveBranch(context: ConfigContext,
         const nextBranch = branches[nextInherit];
         branchStack.push({
             name: nextInherit,
-            inheritFrom: nextBranch.inheritFrom ? nextBranch.inheritFrom.slice() : undefined,
+            inheritFrom: normInheritFrom(branch.inheritFrom),
             branch: nextBranch,
         });
     }
