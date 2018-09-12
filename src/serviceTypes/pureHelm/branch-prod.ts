@@ -1,12 +1,12 @@
 import { ProdBranch } from '../base/branch';
-import { PureHelmBranchAll, PureHelmBranchRaw } from './branch-all';
+import { PureHelmBranchBase, PureHelmBranchRaw } from './branch-base';
 
 export interface PureHelmBranchProdRaw extends PureHelmBranchRaw {
     version: string;
     chartmuseum: string;
 }
 
-export class PureHelmBranchProd extends PureHelmBranchAll implements ProdBranch {
+export class PureHelmBranchProd extends PureHelmBranchBase implements ProdBranch {
     public version: string;
     public chartmuseum: string;
 

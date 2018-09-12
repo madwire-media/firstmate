@@ -2,7 +2,7 @@ import { empty } from '../../helpers/empty';
 import { stringifyProps } from '../../helpers/transform';
 import { BranchBase, Volumes } from '../base/branch';
 import { Port } from '../base/branch';
-import { PureHelmBranchRaw } from '../pureHelm/branch-all';
+import { PureHelmBranchRaw } from '../pureHelm/branch-base';
 
 interface ContainerRaw {
     k8sVolumes?: Volumes;

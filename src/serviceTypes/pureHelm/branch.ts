@@ -1,14 +1,15 @@
 import { IBranch } from '../base/branch';
-import { PureHelmBranchAll } from './branch-all';
+import { PureHelmBranchDev } from './branch-dev';
 import { PureHelmBranchProd } from './branch-prod';
+import { PureHelmBranchStage } from './branch-stage';
 
 export class PureHelmBranch implements IBranch<
-    PureHelmBranchAll,
-    PureHelmBranchAll,
+    PureHelmBranchDev,
+    PureHelmBranchStage,
     PureHelmBranchProd
 > {
     public type = 'Pure Helm';
-    public dev?: PureHelmBranchAll;
-    public stage?: PureHelmBranchAll;
+    public dev?: PureHelmBranchDev;
+    public stage?: PureHelmBranchStage;
     public prod?: PureHelmBranchProd;
 }

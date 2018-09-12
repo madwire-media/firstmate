@@ -8,7 +8,7 @@ export interface PureHelmBranchRaw extends BranchBaseRaw {
     helmArgs?: {[argName: string]: string};
 }
 
-export class PureHelmBranchAll extends BranchBase {
+export class PureHelmBranchBase extends BranchBase {
     public cluster: string;
     public namespace: string;
     public releaseName?: string;

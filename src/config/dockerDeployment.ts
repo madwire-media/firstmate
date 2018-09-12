@@ -66,7 +66,7 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
 function parseDockerDeploymentDevBranch(context: ConfigContext,
                                         data?: ConfigBranchBase,
 ): dockerDeployment.DevBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName} = context;
+    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName, recreatePods} = context;
     let mode;
     let pushDebugContainer;
     let autodelete;
@@ -78,6 +78,7 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
         helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
+        recreatePods = data.recreatePods || recreatePods;
         ({mode, pushDebugContainer, autodelete} = data);
 
         if (containers === undefined) {
@@ -113,12 +114,13 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
         autodelete,
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
+        recreatePods,
     });
 }
 function parseDockerDeploymentStageBranch(context: ConfigContext,
                                           data?: ConfigBranchBase,
 ): dockerDeployment.StageBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName} = context;
+    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName, recreatePods} = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
@@ -127,6 +129,7 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
         helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
+        recreatePods = data.recreatePods || recreatePods;
 
         if (containers === undefined) {
             containers = data.containers;
@@ -155,6 +158,7 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
         containers,
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
+        recreatePods,
     });
 }
 function parseDockerDeploymentProdBranch(context: ConfigContext,

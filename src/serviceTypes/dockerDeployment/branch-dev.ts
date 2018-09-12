@@ -1,20 +1,17 @@
 import { DockerDeploymentBranchBase, DockerDeploymentBranchRaw } from './branch-base';
 
-export enum DockerDeploymentDevMode {
-    proxy,
-    local,
-}
-
 export interface DockerDeploymentBranchDevRaw extends DockerDeploymentBranchRaw {
     mode?: 'proxy' | 'local';
     pushDebugContainer?: boolean;
     autodelete?: boolean;
+    recreatePods?: boolean;
 }
 
 export class DockerDeploymentBranchDev extends DockerDeploymentBranchBase {
     public mode: 'proxy' | 'local' = 'proxy';
     public pushDebugContainer: boolean = false;
     public autodelete: boolean = false;
+    public recreatePods: boolean = false;
 
     constructor(rawData: DockerDeploymentBranchDevRaw) {
         super(rawData);
@@ -26,5 +23,6 @@ export class DockerDeploymentBranchDev extends DockerDeploymentBranchBase {
         if (rawData.autodelete !== undefined) {
             this.autodelete = rawData.autodelete;
         }
+        this.recreatePods = rawData.recreatePods || this.recreatePods;
     }
 }

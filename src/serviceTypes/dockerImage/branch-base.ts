@@ -6,7 +6,7 @@ export interface DockerImageBranchRaw extends BranchBaseRaw {
     dockerArgs?: {[key: string]: string};
 }
 
-export class DockerImageBranchAll extends BranchBase {
+export class DockerImageBranchBase extends BranchBase {
     public registry: string;
     public imageName: string;
     public dockerArgs: {[key: string]: string} = {};

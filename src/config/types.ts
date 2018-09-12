@@ -62,6 +62,7 @@ export interface ConfigBranchBase {
     chartmuseum?: string;
     releaseName?: string;
     pushImage?: boolean;
+    recreatePods?: boolean;
 }
 export interface ConfigBranch extends ConfigBranchBase {
     inheritFrom?: string[];

@@ -1,11 +1,11 @@
 import { ProdBranch } from '../base/branch';
-import { DockerImageBranchAll, DockerImageBranchRaw } from './branch-base';
+import { DockerImageBranchBase, DockerImageBranchRaw } from './branch-base';
 
 export interface DockerImageBranchProdRaw extends DockerImageBranchRaw {
     version: string;
 }
 
-export class DockerImageBranchProd extends DockerImageBranchAll implements ProdBranch {
+export class DockerImageBranchProd extends DockerImageBranchBase implements ProdBranch {
     public version: string;
 
     constructor(rawData: DockerImageBranchProdRaw) {

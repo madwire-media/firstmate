@@ -469,6 +469,16 @@
                                 },
                                 "autodelete": {
                                     "type": ["boolean", "null"]
+                                },
+                                "recreatePods": {
+                                    "type": ["boolean", "null"]
+                                }
+                            }
+                        },
+                        "stage": {
+                            "properties": {
+                                "recreatePods": {
+                                    "type": ["boolean", "null"]
                                 }
                             }
                         },
@@ -480,6 +490,9 @@
                             "type": ["boolean", "null"]
                         },
                         "autodelete": {
+                            "type": ["boolean", "null"]
+                        },
+                        "recreatePods": {
                             "type": ["boolean", "null"]
                         }
                     }
@@ -641,6 +654,27 @@
                         "dev": { "$ref": "#/definitions/branch-helm-base" },
                         "stage": { "$ref": "#/definitions/branch-helm-base" },
                         "prod": { "$ref": "#/definitions/branch-helm-base" }
+                    }
+                },
+                {
+                    "properties": {
+                        "dev": {
+                            "properties": {
+                                "recreatePods": {
+                                    "type": ["boolean", "null"]
+                                }
+                            }
+                        },
+                        "stage": {
+                            "properties": {
+                                "recreatePods": {
+                                    "type": ["boolean", "null"]
+                                }
+                            }
+                        },
+                        "recreatePods": {
+                            "type": ["boolean", "null"]
+                        }
                     }
                 }
             ]

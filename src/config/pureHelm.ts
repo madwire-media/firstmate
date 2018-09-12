@@ -52,13 +52,14 @@ export function parsePureHelmBranches(context: ConfigContext,
 }
 
 function parsePureHelmDevBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.DevBranch {
-    let {cluster, namespace, helmArgs, releaseName} = context;
+    let {cluster, namespace, helmArgs, releaseName, recreatePods} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
+        recreatePods = data.recreatePods || recreatePods;
     }
 
     if (cluster === undefined) {
@@ -73,16 +74,18 @@ function parsePureHelmDevBranch(context: ConfigContext, data?: ConfigBranchBase)
         namespace,
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
+        recreatePods,
     });
 }
 function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.StageBranch {
-    let {cluster, namespace, helmArgs, releaseName} = context;
+    let {cluster, namespace, helmArgs, releaseName, recreatePods} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
+        recreatePods = data.recreatePods || recreatePods;
     }
 
     if (cluster === undefined) {
@@ -97,6 +100,7 @@ function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBas
         namespace,
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
+        recreatePods,
     });
 }
 function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.ProdBranch {

@@ -1,9 +1,7 @@
 import { PureHelmBranch as Branch } from './branch';
-import {
-    PureHelmBranchAll as DevBranch,
-    PureHelmBranchAll as StageBranch,
-} from './branch-all';
+import { PureHelmBranchDev as DevBranch } from './branch-dev';
 import { PureHelmBranchProd as ProdBranch } from './branch-prod';
+import { PureHelmBranchStage as StageBranch } from './branch-stage';
 import { PureHelmService as Service } from './service';
 
 export {

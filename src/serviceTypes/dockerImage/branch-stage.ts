@@ -1,11 +1,11 @@
 import { BranchBase } from '../base/branch';
-import { DockerImageBranchAll, DockerImageBranchRaw } from './branch-base';
+import { DockerImageBranchBase, DockerImageBranchRaw } from './branch-base';
 
 export interface DockerImageBranchStageRaw extends DockerImageBranchRaw {
     pushImage?: boolean;
 }
 
-export class DockerImageBranchStage extends DockerImageBranchAll implements BranchBase {
+export class DockerImageBranchStage extends DockerImageBranchBase implements BranchBase {
     public pushImage: boolean = false;
 
     constructor(rawData: DockerImageBranchStageRaw) {
