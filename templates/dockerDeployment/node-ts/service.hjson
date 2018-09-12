@@ -15,6 +15,7 @@
                     registry: '' // TODO: change this if no default registry is set
                     chartmuseum: '' // TODO: change this for prod
                     namespace: '[[project]]'
+                    recreatePods: true
 
                     // Copy the package.json files and source code over
                     copyFiles: {

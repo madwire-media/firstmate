@@ -1,1 +1,22 @@
-../empty/service.hjson
+        {
+            type: pureHelm
+
+            branches: {
+                ~default: {
+                    version: 0.1.0
+
+                    cluster: '' // TODO: change this
+                    chartmuseum: '' // TODO: change this for prod
+                    namespace: '[[project]]'
+                    recreatePods: true
+
+                    dev: {
+                        namespace: '[[service]]-dev'
+                    }
+
+                    stage: {
+                        namespace: '[[service]]-stage'
+                    }
+                }
+            }
+        }

@@ -11,6 +11,7 @@
                     cluster: '' // TODO: change this
                     chartmuseum: '' // TODO: change this for prod
                     namespace: '[[project]]'
+                    recreatePods: true
                 }
             }
         }
