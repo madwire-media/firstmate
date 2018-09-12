@@ -11,6 +11,7 @@ app.use(compression()); // This is incompatible with some primivitve HTTP client
 app.use(helmet());
 
 app.get('/', (req, res) => {
+    res.set('Content-Type', 'text/html; charset=utf-8');
     res.end('(⌐■_■) #Yeeeaaahhh Boi!!!!!!!');
 });
 

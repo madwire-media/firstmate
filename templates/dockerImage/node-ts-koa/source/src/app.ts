@@ -8,6 +8,7 @@ const routes = new router();
 
 routes
     .get("/", (ctx) => {
+        ctx.response.header["Content-Type"] = "text/html; charset=utf-8";
         ctx.body = "(⌐■_■) #Yeeeaaahhh Boi!!!!!!!";
     });
 
