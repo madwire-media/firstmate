@@ -57,7 +57,7 @@ Copying from /usr/lib/node_modules/Firstmate/templates/dockerDeployment/node-js-
 Copying from /usr/lib/node_modules/Firstmate/templates/dockerDeployment/node-js-express/service to fm/svc1
 ```
 
-Now you should have some node.js source code at `source/svc1` and some Docker and Helm stuff in `fm/svc1`. Your `firstmate.hjson` file was also edited, and it should look like this:
+Now you should have some node.js source code at `source/svc1` and some Docker and Helm stuff in `fm/svc1`. Firstmate also put some stuff into your `firstmate.hjson` file. Hjson is a human-readable extension of JSON, and it looks like this: (if you want to learn more, see [hjson.org](http://hjson.org/))
 
 ```hjson
 {
