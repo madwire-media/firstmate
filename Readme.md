@@ -144,7 +144,7 @@ And its up!
 In a separate terminal you can run a kubectl command to access your new service:
 
 ```
-$ kubectl -n project1 port-forward svc/project1-svc1-dev 8080:80
+$ kubectl -n project1 port-forward svc/svc1 8080:80
 ```
 
 If you see a message about pods in the Pending status, just wait a little and try again.
