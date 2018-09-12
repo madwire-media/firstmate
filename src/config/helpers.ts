@@ -17,21 +17,41 @@ export function makeError(context: ConfigContext, msg: string, env?: string) {
     }
 }
 
-function mergeObject(source: {[key: string]: any}, dest: {[key: string]: any}) {
-    for (const key in source) {
-        const value = source[key];
+interface Obj {[key: string]: any; }
+
+export function mergeValues(source: any, dest: any): any {
+    if (typeof source === 'object' && !(source instanceof Array)) {
+        dest = dest || {};
+        return mergeObjects(source, dest);
+    } else if (source === undefined) {
+        return dest;
+    } else if (source === null) {
+        return undefined;
+    } else {
+        return source;
+    }
+}
+
+export function mergeObjects(from: Obj, onto: Obj): Obj {
+    onto = {...onto};
+
+    for (const key in from) {
+        const value = from[key];
 
         if (typeof value === 'object' && !(value instanceof Array)) {
-            dest[key] = dest[key] || {};
-            mergeObject(source[key], dest[key]);
-        } else if (value === undefined || value === null) {
-            if (key in dest) {
-                delete dest[key];
+            onto[key] = mergeObjects(from[key], onto[key] || {});
+        } else if (value === undefined) {
+            // Leave onto as it was
+        } else if (value === null) {
+            if (key in onto) {
+                delete onto[key];
             }
         } else {
-            dest[key] = source[key];
+            onto[key] = from[key];
         }
     }
+
+    return onto;
 }
 
 function normInheritFrom(inheritFrom: string | string[] | undefined): string[] | undefined {
@@ -54,25 +74,25 @@ export function resolveBranch(context: ConfigContext,
         branch: ConfigBranch;
     }
 
-    const branch = {...branches[branchName]};
     const branchStack: BranchNode[] = [{
         name: branchName,
-        inheritFrom: normInheritFrom(branch.inheritFrom),
-        branch, // not copied here so that we can recover the object later using `branch`
+        inheritFrom: normInheritFrom(branches[branchName].inheritFrom),
+        branch: {...branches[branchName]}, // not copied here so that we can recover the object later using `branch`
     }];
 
-    while (branchStack.length > 0) {
+    while (true) {
         const top = branchStack[branchStack.length - 1];
 
         // We reached the end of current inheritFrom array, pop from stack and merge with previous
         if (!top.inheritFrom || top.inheritFrom.length === 0) {
-            branchStack.pop();
+            const branch = branchStack.pop()!;
 
             if (branchStack.length === 0) {
-                break;
+                return branch.branch;
             }
 
-            mergeObject(top.branch, branchStack[branchStack.length - 1].branch);
+            const newTop = branchStack[branchStack.length - 1];
+            newTop.branch = mergeObjects(top.branch, newTop.branch);
             continue;
         }
 
@@ -107,8 +127,6 @@ export function resolveBranch(context: ConfigContext,
             branch: nextBranch,
         });
     }
-
-    return branch;
 }
 
 export function parseBaseAnyBranch<T extends BranchBase>(context: ConfigContext,

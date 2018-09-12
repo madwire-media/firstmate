@@ -1,7 +1,7 @@
 import { stringifyProps } from '../helpers/transform';
 import * as dockerImage from '../serviceTypes/dockerImage/module';
 
-import { makeError, parseBaseAnyBranch, resolveBranch } from './helpers';
+import { makeError, mergeValues, parseBaseAnyBranch, resolveBranch } from './helpers';
 import { ConfigBranch, ConfigBranchBase, ConfigContext } from './types';
 
 export function parseDockerImageBranches(context: ConfigContext,
@@ -17,10 +17,13 @@ export function parseDockerImageBranches(context: ConfigContext,
 
         branchContext.copyFiles = rawBranch.copyFiles || branchContext.copyFiles;
         branchContext.dependsOn = rawBranch.dependsOn || branchContext.dependsOn;
+
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.registry = rawBranch.registry || branchContext.registry;
         branchContext.imageName = rawBranch.imageName || branchContext.imageName;
-        branchContext.dockerArgs = rawBranch.dockerArgs || branchContext.dockerArgs;
+        branchContext.pushImage = rawBranch.pushImage || branchContext.pushImage;
+
+        branchContext.dockerArgs = mergeValues(rawBranch.dockerArgs, branchContext.dockerArgs);
 
         let dev: dockerImage.DevBranch | undefined;
         let stage: dockerImage.StageBranch | undefined;
@@ -57,8 +60,9 @@ function parseDockerImageDevBranch(context: ConfigContext, data?: ConfigBranchBa
     if (data !== undefined) {
         registry = data.registry || registry;
         imageName = data.imageName || imageName;
-        dockerArgs = data.dockerArgs || dockerArgs;
         pushImage = data.pushImage || pushImage;
+
+        dockerArgs = mergeValues(data.dockerArgs, dockerArgs);
     }
 
     if (registry === undefined) {
@@ -81,8 +85,9 @@ function parseDockerImageStageBranch(context: ConfigContext, data?: ConfigBranch
     if (data !== undefined) {
         registry = data.registry || registry;
         imageName = data.imageName || imageName;
-        dockerArgs = data.dockerArgs || dockerArgs;
         pushImage = data.pushImage || pushImage;
+
+        dockerArgs = mergeValues(data.dockerArgs, dockerArgs);
     }
 
     if (registry === undefined) {
@@ -106,7 +111,8 @@ function parseDockerImageProdBranch(context: ConfigContext, data?: ConfigBranchB
         registry = data.registry || registry;
         imageName = data.imageName || imageName;
         version = data.version || version;
-        dockerArgs = data.dockerArgs || dockerArgs;
+
+        dockerArgs = mergeValues(data.dockerArgs, dockerArgs);
     }
 
     if (registry === undefined) {

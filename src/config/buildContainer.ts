@@ -1,7 +1,7 @@
 import { stringifyProps } from '../helpers/transform';
 import * as buildContainer from '../serviceTypes/buildContainer/module';
 
-import { makeError, parseBaseAnyBranch, resolveBranch } from './helpers';
+import { makeError, mergeValues, parseBaseAnyBranch, resolveBranch } from './helpers';
 import { ConfigBranch, ConfigBranchBase, ConfigContext } from './types';
 
 export function parseBuildContainerBranches(context: ConfigContext,
@@ -17,9 +17,11 @@ export function parseBuildContainerBranches(context: ConfigContext,
 
         branchContext.copyFiles = rawBranch.copyFiles || branchContext.copyFiles;
         branchContext.dependsOn = rawBranch.dependsOn || branchContext.dependsOn;
+
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.volumes = rawBranch.volumes || branchContext.volumes;
-        branchContext.dockerArgs = rawBranch.dockerArgs || branchContext.dockerArgs;
+
+        branchContext.dockerArgs = mergeValues(rawBranch.dockerArgs, branchContext.dockerArgs);
 
         let dev;
         let stage;
@@ -57,7 +59,8 @@ function parseBuildContainerDevBranch(context: ConfigContext,
 
     if (data !== undefined) {
         volumes = data.volumes || volumes;
-        dockerArgs = data.dockerArgs || dockerArgs;
+
+        dockerArgs = mergeValues(data.dockerArgs, dockerArgs);
     }
 
     return new buildContainer.DevBranch({
@@ -72,7 +75,8 @@ function parseBuildContainerStageBranch(context: ConfigContext,
 
     if (data !== undefined) {
         volumes = data.volumes || volumes;
-        dockerArgs = data.dockerArgs || dockerArgs;
+
+        dockerArgs = mergeValues(data.dockerArgs, dockerArgs);
     }
 
     return new buildContainer.StageBranch({
@@ -88,7 +92,8 @@ function parseBuildContainerProdBranch(context: ConfigContext,
     if (data !== undefined) {
         volumes = data.volumes || volumes;
         version = data.version || version;
-        dockerArgs = data.dockerArgs || dockerArgs;
+
+        dockerArgs = mergeValues(data.dockerArgs, dockerArgs);
     }
 
     if (version === undefined) {

@@ -1,7 +1,7 @@
 import { stringifyProps } from '../helpers/transform';
 import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
 
-import { makeError, parseBaseAnyBranch, resolveBranch } from './helpers';
+import { makeError, mergeValues, parseBaseAnyBranch, resolveBranch } from './helpers';
 import { ConfigBranch, ConfigBranchBase, ConfigContext } from './types';
 
 export function parseDockerDeploymentBranches(context: ConfigContext,
@@ -17,13 +17,18 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
 
         branchContext.copyFiles = rawBranch.copyFiles || branchContext.copyFiles;
         branchContext.dependsOn = rawBranch.dependsOn || branchContext.dependsOn;
+
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.registry = rawBranch.registry || branchContext.registry;
         branchContext.cluster = rawBranch.cluster || branchContext.cluster;
         branchContext.namespace = rawBranch.namespace || branchContext.namespace;
         branchContext.imageNamePrefix = rawBranch.imageNamePrefix || branchContext.imageNamePrefix;
-        branchContext.containers = rawBranch.containers || branchContext.containers;
         branchContext.chartmuseum = rawBranch.chartmuseum || branchContext.chartmuseum;
+        branchContext.releaseName = rawBranch.releaseName || branchContext.releaseName;
+        branchContext.recreatePods = rawBranch.recreatePods || branchContext.recreatePods;
+
+        branchContext.containers = mergeValues(rawBranch.containers, branchContext.containers);
+        branchContext.helmArgs = mergeValues(rawBranch.helmArgs, branchContext.helmArgs);
 
         let dev;
         let stage;
@@ -66,20 +71,23 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
 function parseDockerDeploymentDevBranch(context: ConfigContext,
                                         data?: ConfigBranchBase,
 ): dockerDeployment.DevBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName, recreatePods} = context;
-    let mode;
-    let pushDebugContainer;
-    let autodelete;
+    let {registry, cluster, namespace, imageNamePrefix, containers,
+        helmArgs, releaseName, recreatePods, mode, pushDebugContainer, autodelete,
+    } = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
-        helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
         recreatePods = data.recreatePods || recreatePods;
-        ({mode, pushDebugContainer, autodelete} = data);
+        mode = data.mode || mode;
+        pushDebugContainer = data.pushDebugContainer || pushDebugContainer;
+        autodelete = data.autodelete || autodelete;
+
+        helmArgs = mergeValues(data.helmArgs, helmArgs);
+        containers = mergeValues(data.containers, containers);
 
         if (containers === undefined) {
             containers = data.containers;
@@ -127,9 +135,11 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
-        helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
         recreatePods = data.recreatePods || recreatePods;
+
+        helmArgs = mergeValues(data.helmArgs, helmArgs);
+        containers = mergeValues(data.containers, containers);
 
         if (containers === undefined) {
             containers = data.containers;
@@ -174,10 +184,12 @@ function parseDockerDeploymentProdBranch(context: ConfigContext,
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
-        helmArgs = data.helmArgs || helmArgs;
         chartmuseum = data.chartmuseum || chartmuseum;
         releaseName = data.releaseName || releaseName;
         version = data.version || version;
+
+        helmArgs = mergeValues(data.helmArgs, helmArgs);
+        containers = mergeValues(data.containers, containers);
 
         if (containers === undefined) {
             containers = data.containers;

@@ -1,7 +1,7 @@
 import { stringifyProps } from '../helpers/transform';
 import * as pureHelm from '../serviceTypes/pureHelm/module';
 
-import { makeError, parseBaseAnyBranch, resolveBranch } from './helpers';
+import { makeError, mergeValues, parseBaseAnyBranch, resolveBranch } from './helpers';
 import { ConfigBranch, ConfigBranchBase, ConfigContext } from './types';
 
 export function parsePureHelmBranches(context: ConfigContext,
@@ -17,10 +17,14 @@ export function parsePureHelmBranches(context: ConfigContext,
 
         branchContext.copyFiles = rawBranch.copyFiles || branchContext.copyFiles;
         branchContext.dependsOn = rawBranch.dependsOn || branchContext.dependsOn;
+
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.cluster = rawBranch.cluster || branchContext.cluster;
         branchContext.namespace = rawBranch.namespace || branchContext.namespace;
         branchContext.chartmuseum = rawBranch.chartmuseum || branchContext.chartmuseum;
+        branchContext.recreatePods = rawBranch.recreatePods || branchContext.recreatePods;
+
+        branchContext.helmArgs = mergeValues(rawBranch.helmArgs, branchContext.helmArgs);
 
         let dev;
         let stage;
@@ -57,9 +61,10 @@ function parsePureHelmDevBranch(context: ConfigContext, data?: ConfigBranchBase)
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
-        helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
         recreatePods = data.recreatePods || recreatePods;
+
+        helmArgs = mergeValues(data.helmArgs, helmArgs);
     }
 
     if (cluster === undefined) {
@@ -83,9 +88,10 @@ function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBas
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
-        helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
         recreatePods = data.recreatePods || recreatePods;
+
+        helmArgs = mergeValues(data.helmArgs, helmArgs);
     }
 
     if (cluster === undefined) {
@@ -109,10 +115,11 @@ function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
-        helmArgs = data.helmArgs || helmArgs;
         releaseName = data.releaseName || releaseName;
         chartmuseum = data.chartmuseum || chartmuseum;
         version = data.version || version;
+
+        helmArgs = mergeValues(data.helmArgs, helmArgs);
     }
 
     if (cluster === undefined) {
