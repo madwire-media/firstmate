@@ -25,6 +25,7 @@ export interface HelmContext {
         cluster: string,
         registry?: string,
         helmArgs?: {[argName: string]: string},
+        recreatePods?: boolean,
         version?: string,
     };
     env: string;
@@ -34,7 +35,7 @@ export interface HelmContext {
 }
 export function install(context: HelmContext, release: string, service: string, repo = 'fm'): boolean {
     const args = parseHelmInstallArgs(context);
-    const argsText = args.map(fmt).join(' ');
+    let argsText = args.map(fmt).join(' ');
 
     let chart;
     let chartText;
@@ -53,6 +54,11 @@ export function install(context: HelmContext, release: string, service: string, 
     if (hasRelease(context.branch.cluster, release)) {
         action = ['upgrade', release].concat(chart);
         actionText = `upgrade ${fmt(release)} ${chartText}`;
+
+        if (context.branch.recreatePods) {
+            args.push('--recreate-pods');
+            argsText += ' --recreate-pods';
+        }
     } else {
         action = ['install', '-n', release].concat(chart);
         actionText = `install -n ${fmt(release)} ${chartText}`;
