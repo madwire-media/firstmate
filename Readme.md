@@ -1,5 +1,5 @@
-```
- _,_____                    _                        _
+<pre style="line-height: 1.1;">
+<code> _,_____                    _                        _
 (  ,____/                 _| |__                   _| |__
  | |     (*)             \_   __`\                \_   __`\  __
  | |___   ., .-,..  ,-^^,  | |   _ ,-. ,-.   .-^||  | |    ,`  \
@@ -7,16 +7,26 @@
  | |     | | | |    `-.*.  | |  | / | / ||  | |/ |  | |   | ,-*,
  | |     |_| |_\   ( `-`*  |_\  |_| |_| |_\ *._.;_\ |_\    \__,*
  |.*                ^^^^
-```
+</code></pre>
 
 Firstmate is a tool to help you develop and deploy software on Kubernetes using Docker and Helm. With just a few commands you could create a new node.js or Apache project and get it running on Kubernetes.
 
 
-## Install (not working yet)
+## Install
 In the future there could be binary releases for Firstmate, but for now just use NPM
 
+### From NPM (not working yet)
 ```
 $ npm install -g firstmate
+```
+
+### From Source
+```
+$ git clone https://github.com/madwire-media/firstmate
+$ cd firstmate
+$ npm i
+$ npm run build
+$ npm link
 ```
 
 
