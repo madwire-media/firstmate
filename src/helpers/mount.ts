@@ -136,8 +136,9 @@ export async function copyFiles(
         fs.mkdirSync('.fm');
     }
 
-    for (const dest in paths) {
-        const source = `${serviceRoot}/${paths[dest]}`;
+    for (let dest in paths) {
+        const source = paths[dest];
+        dest = `${serviceRoot}/${dest}`;
 
         try {
             const result = await mount(source, dest);
