@@ -142,7 +142,7 @@ export async function copyFiles(
         try {
             const result = await mount(source, dest);
             if (result === false) {
-                uncopyFiles();
+                await uncopyFiles();
                 return false;
             }
         } catch (error) {

@@ -323,7 +323,7 @@ export async function runDependencies(
             if (results === false) {
                 // Undo everything
                 for (const handler of handlers) {
-                    handler();
+                    await handler();
                 }
 
                 return false;

@@ -43,8 +43,8 @@ export interface TemplateProcessorOptions extends TransformOptions {
 
 export class TemplateProcessor extends Transform {
     private buf = Buffer.alloc(0);
-    private vars: {[key: string]: string};
-    private maxKeyLen: number;
+    private readonly vars: {[key: string]: string};
+    private readonly maxKeyLen: number;
 
     constructor(options: TemplateProcessorOptions) {
         super(options);

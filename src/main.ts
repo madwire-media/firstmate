@@ -122,7 +122,7 @@ require('sywac')
             'Filter templates by a specific type',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
-            await templates(argv.type);
+            templates(argv.type);
         },
     })
     .command('clean', {

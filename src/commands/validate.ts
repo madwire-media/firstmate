@@ -65,7 +65,7 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
             const branch = branchBaseIter[envName];
 
             if (branch !== undefined) {
-                runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, {}, handler);
+                await runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, {}, handler);
             }
         }
     };

@@ -93,7 +93,7 @@ if (tty.isatty(0)) {
         return promise;
     };
 } else {
-    question = () => Promise.resolve(undefined);
+    question = async () => undefined;
 }
 
 export { question };
