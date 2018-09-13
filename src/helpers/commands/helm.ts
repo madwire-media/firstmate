@@ -105,6 +105,7 @@ export function parseHelmInstallArgs(context: HelmContext): string[] {
 
             if (context.telepresenceContainer === container) {
                 args.push('--set', `images.${container}=${image}`);
+                args.push('--set', `debugContainer=${container}`);
             } else {
                 args.push('--set', `images.${container}=${context.branch.registry}/${image}`);
             }
