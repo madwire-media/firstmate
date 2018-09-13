@@ -14,7 +14,7 @@ ENV NODE_ENV=${NODE_ENV}
 RUN npm i
 
 # Add in the Node.js package and TypeScript (compiled to JavaScript) source code
-ADD dist /root/
+ADD dist /root/dist
 
 # Run the Node.js package on container boot
 CMD ["npm", "run", "start"]
