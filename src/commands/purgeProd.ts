@@ -75,7 +75,7 @@ export async function purgeProd(
 
     if ((branch instanceof dockerImage.ProdBranch) || (branch instanceof buildContainer.ProdBranch)) {
         console.log(a`\{ld (not applicable)\}`);
-    } else if ((branch instanceof pureHelm.ProdBranch) || (branch instanceof pureHelm.ProdBranch)) {
+    } else if ((branch instanceof dockerDeployment.ProdBranch) || (branch instanceof pureHelm.ProdBranch)) {
         // Confirm deletion
         while (true) {
             let answer = await question(

@@ -75,7 +75,7 @@ export async function purgeStage(
 
     if ((branch instanceof dockerImage.StageBranch) || (branch instanceof buildContainer.StageBranch)) {
         console.log(a`\{ld (not applicable)\}`);
-    } else if ((branch instanceof pureHelm.StageBranch) || (branch instanceof pureHelm.StageBranch)) {
+    } else if ((branch instanceof dockerDeployment.StageBranch) || (branch instanceof pureHelm.StageBranch)) {
         // Confirm deletion
         while (true) {
             let answer = await question(
