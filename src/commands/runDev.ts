@@ -88,8 +88,8 @@ export async function runDev(
     isAsync: () => void,
     params: {[key: string]: any},
 ): Promise<undefined | false> {
-    const {debugContainer} = params;
-    if ('debugContainer' in params) {
+    const debugContainer = params.debug;
+    if ('debug' in params) {
         delete params.debugContainer;
     }
 
@@ -112,7 +112,7 @@ export async function runDev(
         const image = `${config.project}/${branch.imageName}`;
 
         if (debugContainer !== undefined) {
-            console.log(a`\{ly Warn:\} ignoring 'debug-container' parameter`);
+            console.log(a`\{ly Warn:\} ignoring 'debug' parameter`);
         }
 
         // Docker build
@@ -128,7 +128,7 @@ export async function runDev(
         }
     } else if (branch instanceof pureHelm.DevBranch) {
         if (debugContainer !== undefined) {
-            console.log(a`\{ly Warn:\} ignoring 'debug-container' parameter`);
+            console.log(a`\{ly Warn:\} ignoring 'debug' parameter`);
         }
 
         // Create namespace if it doesn't exist
@@ -320,7 +320,7 @@ export async function runDev(
         }
     } else if (branch instanceof buildContainer.DevBranch) {
         if (debugContainer !== undefined) {
-            console.log(a`\{ly Warn:\} ignoring 'debug-container' parameter`);
+            console.log(a`\{ly Warn:\} ignoring 'debug' parameter`);
         }
 
         const image = `fmbuild-${serviceName}`;
