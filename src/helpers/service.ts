@@ -361,6 +361,41 @@ export function reqDependencies(
     return true;
 }
 
+export function getDependencies(
+    config: Config,
+    mode: 'dev' | 'stage' | 'prod',
+    branchName: string,
+    serviceName: string,
+): string[] {
+    const dependencies = new Set([serviceName]);
+    const toCrawl = new Set([serviceName]);
+
+    while (toCrawl.size > 0) {
+        const serviceName = toCrawl.values().next().value;
+        toCrawl.delete(serviceName);
+
+        if (serviceName in config.services) {
+            dependencies.add(serviceName);
+
+            const service = config.services[serviceName];
+            const usedBranchName = resolveBranchName(branchName, service.branches);
+            const branch = service.branches[usedBranchName][mode];
+
+            if (branch !== undefined && branch.dependsOn !== undefined) {
+                for (const dep of branch.dependsOn) {
+                    if (!dependencies.has(dep) && !toCrawl.has(dep)) {
+                        toCrawl.add(dep);
+                    }
+                }
+            }
+        }
+    }
+
+    dependencies.delete(serviceName);
+
+    return Array.from(dependencies);
+}
+
 export function getServiceDir(serviceName: string): string {
     return `fm/${serviceName}`;
 }

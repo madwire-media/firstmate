@@ -3,8 +3,8 @@ import { a } from '../helpers/cli';
 import * as helm from '../helpers/commands/helm';
 import { needsCluster, needsCommand } from '../helpers/require';
 import {
-    getServiceDir, initBranch, maybeTryBranch,
-    resolveBranchName, SigIntHandler,
+    getDependencies, getServiceDir, initBranch,
+    maybeTryBranch, resolveBranchName, SigIntHandler,
 } from '../helpers/service';
 import * as buildContainer from '../serviceTypes/buildContainer/module';
 import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
@@ -88,6 +88,17 @@ export async function purgeDev(
             true,
         )) {
             return false;
+        }
+    }
+
+    const deps = getDependencies(config, 'dev', branchName, serviceName);
+
+    if (deps.length > 0) {
+        console.log();
+        console.log(a`\{lw,u Reminder\}: You need to run \{b fm purge dev [service]\} for all of these too:`);
+
+        for (const dep of deps) {
+            console.log(a`  \{c ${dep}\}`);
         }
     }
 
