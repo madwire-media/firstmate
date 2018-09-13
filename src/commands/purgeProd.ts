@@ -99,7 +99,7 @@ export async function purgeProd(
         // REALLY confirm deletion
         while (true) {
             let answer = await question(
-                a`\{y,t Are you REALLY sure you want to delete this service?\} (type the service name): `,
+                a`\{r,t Are you REALLY sure you want to delete this service?\} (type the service name): `,
             );
 
             if (answer === undefined) {
