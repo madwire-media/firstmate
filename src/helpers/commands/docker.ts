@@ -166,10 +166,12 @@ export function containerExists(containerName: string): boolean {
     );
 
     if (result.error) {
+        console.error(a`\{lr Docker ps failed!\}`);
         console.error(result.error);
         return false;
     }
     if (result.status !== 0) {
+        console.error(a`\{lr Docker ps failed!\}`);
         return false;
     }
 
@@ -347,8 +349,35 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
     args.push(options.image);
 
     if (options.command !== undefined) {
-        argsText += ` ${fmt(options.command)}`;
-        args.push(options.command);
+        const command = [];
+        let escaped = false;
+        let quote: string | null = null;
+        let buf = '';
+
+        for (const char of options.command) {
+            if (escaped) {
+                buf += char;
+                escaped = false;
+            } else if (char === '\'') {
+                escaped = true;
+            } else if (char === quote) {
+                quote = null;
+            } else if (quote === null && `'"`.includes(char)) {
+                quote = char;
+            } else if (char === ' ') {
+                command.push(buf);
+                buf = '';
+            } else {
+                buf += char;
+            }
+        }
+
+        if (buf.length > 0) {
+            command.push(buf);
+        }
+
+        argsText += ` ${command.map(fmt).join(' ')}`;
+        args.push(...command);
     }
 
     return {args, argsText};
@@ -379,4 +408,28 @@ export function pull(registry: string, imageName: string, tag: string): boolean 
     console.log(a`\{g Ok\}`);
 
     return true;
+}
+
+export function inspectImage(imageName: string): any | false {
+    const result = ChildProcess.spawnSync(
+        'docker', ['image', 'inspect', imageName],
+    );
+
+    if (result.error) {
+        console.error(a`\{lr Docker image inspect failed!\}`);
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        console.error(a`\{lr Docker image inspect failed!\}`);
+        return false;
+    }
+
+    try {
+        return JSON.parse(result.stdout.toString());
+    } catch (error) {
+        console.error(a`\{lr Could not parse Docker image inspect result!\}`);
+        console.error(error);
+        return false;
+    }
 }

@@ -58,12 +58,13 @@ Firstmate currently has three different modes to run and deploy your code in: `d
         * `[type]` is optionally the template type to filter by
     * `fm clean`: **Clean up any dangling files if Firstmate crashed**
 * Service Operations
-    * `fm run <mode:enum> [service] [debug] [--dry]`: **Run a service**
+    * `fm run <mode:enum> [service] [debug] [--dry] [--tponly]`: **Run a service**
         * May require Docker, Helm, and Telepresence depending on the service and what options are enabled
         * `<mode:enum>` can be any of `dev`, `stage`, or `prod`
         * `[service]` is the name of the service you want to run, or if omitted, the default service set in your `firstmate.hjson` file
         * `[debug]` only applies to `dockerDeployment` services, and is the name of the container you want to debug using Telepresence
         * `[--dry]` runs Helm in dry-run mode and builds Docker images, but never truly deploys any code to a Kubernetes cluster
+        * `[--tponly]` skips the Helm and Docker commands and only runs Telepresence - use this when your dev mode deployment is still running
     * `fm publish <mode:enum> [service]`: **Publish a service's images and charts**
         * *Only implemented for `prod` mode*
         * May require Docker and Helm, depending on the service and what options are enabled

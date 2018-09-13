@@ -156,68 +156,86 @@ export async function runDev(
             return false;
         }
 
-        // Docker builds
-        for (const index in containers) {
-            const dirname = containers[index];
-            const dir = containerDirs[index];
-            const prefix = branch.imageNamePrefix || serviceName;
-            const image = `${config.project}/${prefix}-${dirname}`;
-            let args;
-
-            dockerImages[dirname] = `${image}:dev`;
-
-            if (dirname in branch.containers) {
-                args = branch.containers[dirname].dockerArgs;
+        // Skip some stuff if only running telepresence
+        if (!params.tponly || branch.mode !== 'proxy' || !debugContainer) {
+            if (params.tponly) {
+                if (branch.mode !== 'proxy') {
+                    console.log(a`\{ly Ignoring \{y debugCMD\} parameter since mode is not \{g 'proxy'\}\}`);
+                } else if (!debugContainer) {
+                    console.log(a`\{ly Ignoring \{y debugCMD\} parameter since not debugging a container\}`);
+                }
             }
 
-            if (!docker.build(dir, image, 'dev', args)) {
-                return false;
+            // Docker builds
+            for (const index in containers) {
+                const dirname = containers[index];
+                const dir = containerDirs[index];
+                const prefix = branch.imageNamePrefix || serviceName;
+                const image = `${config.project}/${prefix}-${dirname}`;
+                let args;
+
+                dockerImages[dirname] = `${image}:dev`;
+
+                if (dirname in branch.containers) {
+                    args = branch.containers[dirname].dockerArgs;
+                }
+
+                if (!docker.build(dir, image, 'dev', args)) {
+                    return false;
+                }
             }
         }
 
         // Detect development mode
         if (branch.mode === 'proxy') {
-            // Docker pushes
-            for (const dirname of containers) {
-                const image = dockerImages[dirname];
+            // Skip some stuff if only running telepresence
+            if (!params.tponly || !debugContainer) {
+                // Docker pushes
+                for (const dirname of containers) {
+                    const image = dockerImages[dirname];
 
-                // Skip pushing current debug container?
-                if (debugContainer && !branch.pushDebugContainer && dirname === debugContainer) {
-                    continue;
+                    // Skip pushing current debug container?
+                    if (debugContainer && !branch.pushDebugContainer && dirname === debugContainer) {
+                        continue;
+                    }
+
+                    if (!docker.push(image, branch.registry)) {
+                        return false;
+                    }
                 }
 
-                if (!docker.push(image, branch.registry)) {
+                // Create namespace if it doesn't exist
+                if (!needsNamespace(branch.cluster, branch.namespace)) {
                     return false;
                 }
-            }
 
-            // Create namespace if it doesn't exist
-            if (!needsNamespace(branch.cluster, branch.namespace)) {
-                return false;
-            }
+                const helmDockerImages = {...dockerImages};
+                if (debugContainer) {
+                    helmDockerImages[debugContainer] = `datawire/telepresence-k8s-priv:${telepresence.version()}`;
+                }
 
-            const helmDockerImages = {...dockerImages};
-            if (debugContainer) {
-                helmDockerImages[debugContainer] = `datawire/telepresence-k8s:${telepresence.version()}`;
-            }
+                // Helm chart run w/ vars
+                const helmContext = {
+                    branch,
+                    dockerImages: helmDockerImages,
+                    telepresenceContainer: debugContainer,
+                    env: 'dev',
+                };
 
-            // Helm chart run w/ vars
-            const helmContext = {
-                branch,
-                dockerImages: helmDockerImages,
-                telepresenceContainer: debugContainer,
-                env: 'dev',
-            };
+                if (!helm.install(
+                    helmContext,
+                    branch.releaseName || `${config.project}-${serviceName}-dev`,
+                    serviceName,
+                )) {
+                    return false;
+                }
 
-            if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
-                return false;
-            }
-
-            // Delete helm stuff on exit
-            if (branch.autodelete) {
-                handlers.push(
-                    async () => helm.del(helmContext, `${config.project}-${serviceName}-dev`, true) && undefined,
-                );
+                // Delete helm stuff on exit
+                if (branch.autodelete) {
+                    handlers.push(
+                        async () => helm.del(helmContext, `${config.project}-${serviceName}-dev`, true) && undefined,
+                    );
+                }
             }
 
             // Telepresence instance?
@@ -265,7 +283,20 @@ export async function runDev(
                     }
                 }
 
-                handlers.push(telepresence.runAsync(runOpts));
+                const tpHandler = telepresence.runAsync(runOpts);
+                handlers.push(async () => {
+                    let result: false | undefined;
+
+                    if (await tpHandler() === false) {
+                        result = false;
+                    }
+
+                    if (docker.containerExists(containerName)) {
+                        docker.removeContainer(containerName);
+                    }
+
+                    return result;
+                });
 
                 isAsync();
             }

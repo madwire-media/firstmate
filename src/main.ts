@@ -131,7 +131,7 @@ require('sywac')
             await uncopyFiles();
         },
     })
-    .command('run <mode:enum> [service] [debug] [--dry]', {
+    .command('run <mode:enum> [service] [debug] [--dry] [--tponly]', {
         desc: 'Run a service',
         hints: [
             '[docker] [helm] [telepresence]',
@@ -145,6 +145,8 @@ require('sywac')
             'Environment to run in',
             'Service to run',
             'Container to debug (only in dev mode)',
+            'Do a dry run?',
+            'Run only telepresence?',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
             switch (argv.mode) {

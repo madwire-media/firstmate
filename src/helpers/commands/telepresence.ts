@@ -3,6 +3,7 @@ import * as ChildProcess from 'child_process';
 import { a, fmt, interrupt } from '../cli';
 import { SigIntHandler } from '../service';
 
+import { empty } from '../empty';
 import * as docker from './docker';
 
 export interface RunOptions extends docker.RunOptions {
@@ -28,6 +29,27 @@ export function runAsync(options: RunOptions): SigIntHandler {
 
     args.push('--mount', '/tmp/telepresence');
     argsText += ` --mount /tmp/telepresence`;
+
+    const inspect = docker.inspectImage(options.image);
+    const exposed = new Set();
+
+    try {
+        const ports = inspect[0].Config.ExposedPorts;
+
+        if (!empty(ports)) {
+            for (const key in ports) {
+                const port = key.slice(0, key.indexOf('/'));
+                exposed.add(port);
+            }
+        }
+    } catch (error) {
+        // Do nothing
+    }
+
+    for (const port of exposed.values()) {
+        args.push('--expose', port);
+        argsText += ` --expose ${fmt(port)}`;
+    }
 
     args.push('--docker-run', ...dockerArgs);
     argsText += ` --docker-run ${dockerArgsText}`;
