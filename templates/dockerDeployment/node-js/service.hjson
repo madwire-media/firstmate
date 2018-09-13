@@ -21,6 +21,15 @@
                         docker/main/src: '[[source]]/src'
                     }
 
+                    containers: {
+                        main: {
+                            debugCMD: npm run watch
+                            volumes: {
+                                /root: '[[source]]'
+                            }
+                        }
+                    }
+
                     dev: {
                         // Tell NPM to install dev packages
                         dockerArgs: {

@@ -24,6 +24,15 @@
                         docker/main/dist: 'fm/[[service]]-build/output'
                     }
 
+                    containers: {
+                        main: {
+                            debugCMD: npm run watch
+                            volumes: {
+                                /root: '[[source]]'
+                            }
+                        }
+                    }
+
                     dev: {
                         // Tell NPM to install dev packages
                         dockerArgs: {

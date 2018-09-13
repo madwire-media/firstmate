@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "nodejs src/index.js",
+    "watch": "nodemon --watch src src/index.js",
     "test": "jest"
   },
   "repository": {
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "jest": "*",
-    "supertest": "*"
+    "supertest": "*",
+    "nodemon": "*"
   }
 }

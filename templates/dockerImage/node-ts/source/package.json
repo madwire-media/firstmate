@@ -8,7 +8,8 @@
     "debug": "nodejs --inspect-brk dist/index.js",
     "build": "npm run build-ts && npm run tslint",
     "build-ts": "tsc",
-    "watch": "tsc --watch",
+    "build-watch": "tsc --watch",
+    "watch": "concurrently \"npm:build-watch\" \"nodemon --watch dist dist/index.js\"",
     "tslint": "tslint -c tslint.json -p tsconfig.json",
     "test": "jest"
   },
@@ -24,6 +25,7 @@
     "typescript": "*",
     "jest": "*",
     "@types/jest": "*",
-    "ts-jest": "*"
+    "ts-jest": "*",
+    "concurrently": "*"
   }
 }
