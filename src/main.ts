@@ -3,7 +3,7 @@ import 'source-map-support/register';
 
 import * as fs from 'fs';
 
-import { a } from './helpers/cli';
+import { a, cleanup } from './helpers/cli';
 import { runService } from './helpers/service';
 
 import { ncp } from 'ncp';
@@ -272,4 +272,7 @@ require('sywac')
     .help('-h, --help')
     .version('-v, --version')
     .showHelpByDefault()
-    .parseAndExit();
+    .parseAndExit()
+    .then(() => {
+        cleanup();
+    });

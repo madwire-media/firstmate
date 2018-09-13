@@ -65,10 +65,11 @@ export function interrupt() {
 process.on('SIGINT', interrupt);
 
 let question: (query: string) => Promise<string | undefined>;
+let cleanup: () => void;
 
 if (tty.isatty(0)) {
     // tslint:disable-next-line:variable-name
-    let _rl: readline.ReadLine;
+    let _rl: readline.ReadLine | undefined;
 
     function getRL() {
         if (_rl === undefined) {
@@ -92,8 +93,14 @@ if (tty.isatty(0)) {
 
         return promise;
     };
+    cleanup = () => {
+        if (_rl !== undefined) {
+            _rl.close();
+        }
+    };
 } else {
     question = async () => undefined;
+    cleanup = () => undefined;
 }
 
-export { question };
+export { question, cleanup };
