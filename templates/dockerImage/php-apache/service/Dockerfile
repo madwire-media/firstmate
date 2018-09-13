@@ -11,4 +11,7 @@ ADD ports.conf /etc/apache2/ports.conf
 # Enable a couple useful apache modules
 RUN a2enmod rewrite headers
 
+# Expose http port
+EXPOSE 80
+
 # No CMD line because we don't need to override the Apache image's default

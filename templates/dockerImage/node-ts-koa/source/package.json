@@ -24,7 +24,8 @@
     "koa-compress": "*",
     "koa-helmet": "*",
     "koa-logger": "*",
-    "koa-router": "*"
+    "koa-router": "*",
+    "source-map-support": "*"
   },
   "devDependencies": {
     "@types/node": "*",
@@ -41,6 +42,7 @@
     "ts-jest": "*",
     "supertest": "*",
     "jest": "*",
+    "nodemon": "*",
     "concurrently": "*"
   }
 }

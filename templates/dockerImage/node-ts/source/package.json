@@ -19,6 +19,9 @@
   },
   "author": "[[author]]",
   "license": "ISC",
+  "dependencies": {
+    "source-map-support": "*"
+  },
   "devDependencies": {
     "@types/node": "*",
     "tslint": "*",
@@ -26,6 +29,7 @@
     "jest": "*",
     "@types/jest": "*",
     "ts-jest": "*",
+    "nodemon": "*",
     "concurrently": "*"
   }
 }

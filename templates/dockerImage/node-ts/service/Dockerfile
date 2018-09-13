@@ -16,5 +16,8 @@ RUN npm i
 # Add in the Node.js package and TypeScript (compiled to JavaScript) source code
 ADD dist /root/dist
 
+# Expose http port
+EXPOSE 80
+
 # Run the Node.js package on container boot
 CMD ["npm", "run", "start"]

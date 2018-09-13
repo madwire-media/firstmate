@@ -25,7 +25,8 @@
                         main: {
                             debugCMD: npm run watch
                             volumes: {
-                                /root: '[[source]]'
+                                /root/src: '[[source]]/src'
+                                /root/node_modules: '[[source]]/node_modules'
                             }
                         }
                     }
