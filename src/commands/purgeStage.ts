@@ -79,7 +79,7 @@ export async function purgeStage(
         // Confirm deletion
         while (true) {
             let answer = await question(
-                a`\{ly Are you sure you want to delete the service \{lw ${serviceName}\}?\} (yes/no)`,
+                a`\{ly Are you sure you want to delete the service \{lw ${serviceName}\}?\} (yes/no): `,
             );
 
             if (answer === undefined) {
