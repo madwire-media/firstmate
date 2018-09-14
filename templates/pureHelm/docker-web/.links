@@ -22,13 +22,9 @@ service/templates/_helpers.tpl
   -> pureHelm/docker/service/templates/_helpers.tpl
   -> pureHelm/empty/service/templates/_helpers.tpl
 
-service/templates/deployment.yaml
-  -> pureHelm/docker/service/templates/deployment.yaml
-
 service/values.yaml
   -> pureHelm/docker/service/values.yaml
 
 service.hjson
   -> pureHelm/docker/service.hjson
-  -> pureHelm/empty/service.hjson
 

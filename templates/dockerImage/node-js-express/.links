@@ -4,6 +4,9 @@ service
 service.hjson
   -> dockerImage/node-js/service.hjson
 
+source/.gitignore
+  -> dockerImage/node-js/source/.gitignore
+
 source/jest.config.js
   -> dockerImage/node-js/source/jest.config.js
 

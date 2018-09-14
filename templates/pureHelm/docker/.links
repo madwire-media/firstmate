@@ -16,6 +16,3 @@ service/templates/NOTES.txt
 service/templates/_helpers.tpl
   -> pureHelm/empty/service/templates/_helpers.tpl
 
-service.hjson
-  -> pureHelm/empty/service.hjson
-
