@@ -366,24 +366,32 @@ export function getDependencies(
     mode: 'dev' | 'stage' | 'prod',
     branchName: string,
     serviceName: string,
+    types?: string[],
 ): string[] {
     const dependencies = new Set([serviceName]);
     const toCrawl = new Set([serviceName]);
+    const ignored = new Set<string>([]);
 
     while (toCrawl.size > 0) {
         const serviceName = toCrawl.values().next().value;
         toCrawl.delete(serviceName);
 
         if (serviceName in config.services) {
-            dependencies.add(serviceName);
-
             const service = config.services[serviceName];
+
+            // Only add as dependency if right kind of service
+            if (types === undefined || types.includes(service.type)) {
+                dependencies.add(serviceName);
+            } else {
+                ignored.add(serviceName);
+            }
+
             const usedBranchName = resolveBranchName(branchName, service.branches);
             const branch = service.branches[usedBranchName][mode];
 
             if (branch !== undefined && branch.dependsOn !== undefined) {
                 for (const dep of branch.dependsOn) {
-                    if (!dependencies.has(dep) && !toCrawl.has(dep)) {
+                    if (!dependencies.has(dep) && !toCrawl.has(dep) && !ignored.has(dep)) {
                         toCrawl.add(dep);
                     }
                 }

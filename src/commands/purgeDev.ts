@@ -91,7 +91,7 @@ export async function purgeDev(
         }
     }
 
-    const deps = getDependencies(config, 'dev', branchName, serviceName);
+    const deps = getDependencies(config, 'dev', branchName, serviceName, ['dockerDeployment', 'pureHelm']);
 
     if (deps.length > 0) {
         console.log();

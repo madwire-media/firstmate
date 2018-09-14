@@ -130,7 +130,7 @@ export async function purgeProd(
         }
     }
 
-    const deps = getDependencies(config, 'prod', branchName, serviceName);
+    const deps = getDependencies(config, 'dev', branchName, serviceName, ['dockerDeployment', 'pureHelm']);
 
     if (deps.length > 0) {
         console.log();
