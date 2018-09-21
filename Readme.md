@@ -9,7 +9,7 @@
  |.*                ^^^^
 ```
 
-Firstmate is a tool to help you develop and deploy software on Kubernetes using Docker and Helm. With just a few commands you could create a new node.js or Apache project and get it running on Kubernetes.
+Firstmate is a tool to quicken and simplify your software development workflow on Kubernetes. With just a few commands you could create a new node.js or Apache project and get it running on Kubernetes.
 
 
 ## Install
