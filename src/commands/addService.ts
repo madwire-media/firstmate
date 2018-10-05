@@ -34,7 +34,7 @@ function notATemplate(template: string, templates: string[]) {
     }
 
     if (shortest.s) {
-        console.log(a`Did you mean \{lw '${shortest.s}'\}?`);
+        console.log(a`Did you mean \{lw '${shortest.t}'\}?`);
     }
 
     console.log(a`\{ld (You can run \{w fm templates\} to list all templates\}`);
