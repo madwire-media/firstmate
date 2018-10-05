@@ -9,12 +9,23 @@ describe('copyFiles mounting', () => {
         fs.mkdirSync('tmp');
     }
 
-    afterEach(() => Promise.all(
-        fs.readdirSync('tmp').map((dir) => `tmp/${dir}`)
-            .concat(fs.readdirSync('.fm').map((dir) => `.fm/${dir}`))
-            .map((dir) => promisify(rimraf)(dir)),
-        ),
-    );
+    const originalFunctions: {[name: string]: any} = {
+        'console.log': console.log,
+    };
+
+    beforeEach(() => {
+        console.log = () => undefined;
+    });
+
+    afterEach(async () => {
+        console.log = originalFunctions['console.log'];
+
+        await Promise.all(
+            fs.readdirSync('tmp').map((dir) => `tmp/${dir}`)
+                .concat(fs.readdirSync('.fm').map((dir) => `.fm/${dir}`))
+                .map((dir) => promisify(rimraf)(dir)),
+        );
+    });
 
     test('basic copy file', async () => {
         // Setup
