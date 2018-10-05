@@ -33,13 +33,7 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
         let dev;
         let stage;
         let prod;
-        let allowedModes;
-
-        if (branchName === 'master') {
-            allowedModes = rawBranch.allowedModes || ['prod'];
-        } else {
-            allowedModes = rawBranch.allowedModes || ['dev', 'stage'];
-        }
+        const allowedModes = rawBranch.allowedModes || ['dev', 'stage', 'prod'];
 
         if (allowedModes.includes('dev')) {
             dev = parseDockerDeploymentDevBranch(branchContext, rawBranch.dev);
@@ -60,9 +54,6 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
 
     if (!('~default' in branches)) {
         throw makeError(context, "'~default' branch is missing");
-    }
-    if (!('master' in branches)) {
-        throw makeError(context, "'master' branch is missing");
     }
 
     return branches;

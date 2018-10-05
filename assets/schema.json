@@ -87,7 +87,7 @@
                         "branches": {
                             "type": "object",
                             "properties": {
-                                "master": { "$ref": "#/definitions/branch-dockerDeployment-required" }
+                                "~default": { "$ref": "#/definitions/branch-dockerDeployment-required" }
                             },
                             "patternProperties": {
                                 "^~?[^/\\000-\\037\\117 ~^:]+$": {
@@ -103,8 +103,7 @@
                                 }
                             },
                             "required": [
-                                "~default",
-                                "master"
+                                "~default"
                             ],
                             "additionalProperties": false
                         }
