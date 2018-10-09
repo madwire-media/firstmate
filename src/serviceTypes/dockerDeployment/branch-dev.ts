@@ -5,6 +5,7 @@ export interface DockerDeploymentBranchDevRaw extends DockerDeploymentBranchRaw 
     pushDebugContainer?: boolean;
     autodelete?: boolean;
     recreatePods?: boolean;
+    chartmuseum?: string;
 }
 
 export class DockerDeploymentBranchDev extends DockerDeploymentBranchBase {
@@ -12,6 +13,7 @@ export class DockerDeploymentBranchDev extends DockerDeploymentBranchBase {
     public pushDebugContainer: boolean = false;
     public autodelete: boolean = false;
     public recreatePods: boolean = false;
+    public chartmuseum?: string;
 
     constructor(rawData: DockerDeploymentBranchDevRaw) {
         super(rawData);
@@ -22,6 +24,9 @@ export class DockerDeploymentBranchDev extends DockerDeploymentBranchBase {
         }
         if (rawData.autodelete !== undefined) {
             this.autodelete = rawData.autodelete;
+        }
+        if (rawData.chartmuseum !== undefined) {
+            this.chartmuseum = rawData.chartmuseum;
         }
         this.recreatePods = rawData.recreatePods || this.recreatePods;
     }

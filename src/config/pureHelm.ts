@@ -9,7 +9,7 @@ export function parsePureHelmBranches(context: ConfigContext,
 ): {[branchName: string]: pureHelm.Branch} {
     const branches: {[branchname: string]: pureHelm.Branch} = {};
 
-    // JSON schema laready checks branch names
+    // JSON schema already checks branch names
 
     for (const branchName in data) {
         const rawBranch = resolveBranch(context, data, branchName);
@@ -22,6 +22,7 @@ export function parsePureHelmBranches(context: ConfigContext,
         branchContext.cluster = rawBranch.cluster || branchContext.cluster;
         branchContext.namespace = rawBranch.namespace || branchContext.namespace;
         branchContext.chartmuseum = rawBranch.chartmuseum || branchContext.chartmuseum;
+        branchContext.releaseName = rawBranch.releaseName || branchContext.releaseName;
         branchContext.recreatePods = rawBranch.recreatePods || branchContext.recreatePods;
 
         branchContext.helmArgs = mergeValues(rawBranch.helmArgs, branchContext.helmArgs);

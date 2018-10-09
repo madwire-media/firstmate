@@ -134,12 +134,12 @@ export function parseBaseAnyBranch<T extends BranchBase>(context: ConfigContext,
                                                          rawBranch: ConfigBranchBase | undefined,
 ): T | undefined {
     if (branch !== undefined) {
-        branch.copyFiles = context.copyFiles;
-        branch.dependsOn = context.dependsOn;
+        branch.copyFiles = mergeValues(context.copyFiles, branch.copyFiles);
+        branch.dependsOn = mergeValues(context.dependsOn, branch.dependsOn);
 
         if (rawBranch !== undefined) {
-            branch.copyFiles = rawBranch.copyFiles || branch.copyFiles;
-            branch.dependsOn = rawBranch.dependsOn || branch.dependsOn;
+            branch.copyFiles = mergeValues(rawBranch.copyFiles, branch.copyFiles);
+            branch.dependsOn = mergeValues(rawBranch.dependsOn, branch.dependsOn);
         }
 
         return branch;

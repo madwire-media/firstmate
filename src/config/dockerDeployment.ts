@@ -20,11 +20,14 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
 
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.registry = rawBranch.registry || branchContext.registry;
-        branchContext.cluster = rawBranch.cluster || branchContext.cluster;
-        branchContext.namespace = rawBranch.namespace || branchContext.namespace;
         branchContext.imageNamePrefix = rawBranch.imageNamePrefix || branchContext.imageNamePrefix;
         branchContext.chartmuseum = rawBranch.chartmuseum || branchContext.chartmuseum;
+        branchContext.cluster = rawBranch.cluster || branchContext.cluster;
+        branchContext.namespace = rawBranch.namespace || branchContext.namespace;
         branchContext.releaseName = rawBranch.releaseName || branchContext.releaseName;
+        branchContext.mode = rawBranch.mode || branchContext.mode;
+        branchContext.pushDebugContainer = rawBranch.pushDebugContainer || branchContext.pushDebugContainer;
+        branchContext.autodelete = rawBranch.autodelete || branchContext.autodelete;
         branchContext.recreatePods = rawBranch.recreatePods || branchContext.recreatePods;
 
         branchContext.containers = mergeValues(rawBranch.containers, branchContext.containers);
@@ -62,15 +65,17 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
 function parseDockerDeploymentDevBranch(context: ConfigContext,
                                         data?: ConfigBranchBase,
 ): dockerDeployment.DevBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers,
+    let {
+        registry, cluster, namespace, imageNamePrefix, containers, chartmuseum,
         helmArgs, releaseName, recreatePods, mode, pushDebugContainer, autodelete,
     } = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
+        imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
+        chartmuseum = data.cluster || chartmuseum;
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
-        imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
         releaseName = data.releaseName || releaseName;
         recreatePods = data.recreatePods || recreatePods;
         mode = data.mode || mode;
@@ -79,14 +84,6 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
 
         helmArgs = mergeValues(data.helmArgs, helmArgs);
         containers = mergeValues(data.containers, containers);
-
-        if (containers === undefined) {
-            containers = data.containers;
-        } else if (data.containers !== undefined) {
-            for (const newContainerName in data.containers) {
-                containers[newContainerName] = data.containers[newContainerName];
-            }
-        }
     }
 
     if (registry === undefined) {
@@ -114,15 +111,20 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
         recreatePods,
+        chartmuseum,
     });
 }
 function parseDockerDeploymentStageBranch(context: ConfigContext,
                                           data?: ConfigBranchBase,
 ): dockerDeployment.StageBranch {
-    let {registry, cluster, namespace, imageNamePrefix, containers, helmArgs, releaseName, recreatePods} = context;
+    let {
+        registry, cluster, namespace, imageNamePrefix, containers, helmArgs,
+        releaseName, recreatePods, chartmuseum,
+    } = context;
 
     if (data !== undefined) {
         registry = data.registry || registry;
+        chartmuseum = data.cluster || chartmuseum;
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
@@ -131,14 +133,6 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
 
         helmArgs = mergeValues(data.helmArgs, helmArgs);
         containers = mergeValues(data.containers, containers);
-
-        if (containers === undefined) {
-            containers = data.containers;
-        } else if (data.containers !== undefined) {
-            for (const newContainerName in data.containers) {
-                containers[newContainerName] = data.containers[newContainerName];
-            }
-        }
     }
 
     if (registry === undefined) {
@@ -160,6 +154,7 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
         recreatePods,
+        chartmuseum,
     });
 }
 function parseDockerDeploymentProdBranch(context: ConfigContext,
@@ -172,23 +167,15 @@ function parseDockerDeploymentProdBranch(context: ConfigContext,
 
     if (data !== undefined) {
         registry = data.registry || registry;
-        cluster = data.cluster || cluster;
-        namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
         chartmuseum = data.chartmuseum || chartmuseum;
+        cluster = data.cluster || cluster;
+        namespace = data.namespace || namespace;
         releaseName = data.releaseName || releaseName;
         version = data.version || version;
 
         helmArgs = mergeValues(data.helmArgs, helmArgs);
         containers = mergeValues(data.containers, containers);
-
-        if (containers === undefined) {
-            containers = data.containers;
-        } else if (data.containers !== undefined) {
-            for (const newContainerName in data.containers) {
-                containers[newContainerName] = data.containers[newContainerName];
-            }
-        }
     }
 
     if (registry === undefined) {
