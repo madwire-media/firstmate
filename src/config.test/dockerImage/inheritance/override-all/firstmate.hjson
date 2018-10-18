@@ -1,0 +1,34 @@
+{
+    project: test
+    services: {
+        test: {
+            type: dockerImage
+            branches: {
+                ~default: {
+                    registry: registry.com
+                    imageName: image
+                    dockerArgs: {
+                        foo: bar
+                        mahna: mahna
+                    }
+
+                    pushImage: true
+                    version: test
+                }
+                inherited: {
+                    inheritFrom: ~default
+
+                    registry: unregistry.com
+                    imageName: unimage
+                    dockerArgs: {
+                        foo: unbar
+                        mahna: unmahna
+                    }
+
+                    pushImage: false
+                    version: untest
+                }
+            }
+        }
+    }
+}

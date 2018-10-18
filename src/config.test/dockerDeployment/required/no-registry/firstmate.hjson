@@ -1,0 +1,19 @@
+{
+    project: test
+    defaults: {
+        chartmuseum: museum.com
+    }
+    services: {
+        test: {
+            type: dockerDeployment
+            branches: {
+                ~default: {
+                    cluster: cluster
+                    namespace: namespace
+
+                    version: test
+                }
+            }
+        }
+    }
+}

@@ -12,11 +12,15 @@ export function parseDockerDeploymentBranches(context: ConfigContext,
     // JSON schema already checks branch names
 
     for (const branchName in data) {
+        if (branchName.startsWith('~') && branchName !== '~default') {
+            continue;
+        }
+
         const rawBranch = resolveBranch(context, data, branchName);
         const branchContext = {...context, branchName};
 
-        branchContext.copyFiles = rawBranch.copyFiles || branchContext.copyFiles;
-        branchContext.dependsOn = rawBranch.dependsOn || branchContext.dependsOn;
+        branchContext.copyFiles = mergeValues(rawBranch.copyFiles, branchContext.copyFiles);
+        branchContext.dependsOn = mergeValues(rawBranch.dependsOn, branchContext.dependsOn);
 
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.registry = rawBranch.registry || branchContext.registry;
@@ -73,7 +77,7 @@ function parseDockerDeploymentDevBranch(context: ConfigContext,
     if (data !== undefined) {
         registry = data.registry || registry;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;
-        chartmuseum = data.cluster || chartmuseum;
+        chartmuseum = data.chartmuseum || chartmuseum;
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         releaseName = data.releaseName || releaseName;
@@ -124,7 +128,7 @@ function parseDockerDeploymentStageBranch(context: ConfigContext,
 
     if (data !== undefined) {
         registry = data.registry || registry;
-        chartmuseum = data.cluster || chartmuseum;
+        chartmuseum = data.chartmuseum || chartmuseum;
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         imageNamePrefix = data.imageNamePrefix || imageNamePrefix;

@@ -40,8 +40,8 @@ describe('copyFiles mounting', () => {
         expect(fs.readFileSync(src, 'utf8')).toBe(content);
 
         // Run copy
-        const paths = {};
-        paths[src] = dest;
+        const paths: {[dest: string]: string} = {};
+        paths[dest] = src;
 
         const copyResult = await copyFiles(paths, '..');
 
@@ -76,8 +76,8 @@ describe('copyFiles mounting', () => {
         expect(fs.readFileSync(`${src}/data.txt`, 'utf8')).toBe(content);
 
         // Run copy
-        const paths = {};
-        paths[src] = dest;
+        const paths: {[dest: string]: string} = {};
+        paths[dest] = src;
 
         const copyResult = await copyFiles(paths, '..');
 
@@ -120,8 +120,8 @@ describe('copyFiles mounting', () => {
         expect(fs.readFileSync(src, 'utf8')).toBe(newContent);
 
         // Run copy
-        const paths = {};
-        paths[src] = dest;
+        const paths: {[dest: string]: string} = {};
+        paths[dest] = src;
 
         const copyResult = await copyFiles(paths, '..');
 
@@ -165,8 +165,8 @@ describe('copyFiles mounting', () => {
         expect(fs.readFileSync(`${src}/data.txt`, 'utf8')).toBe(newContent);
 
         // Run copy
-        const paths = {};
-        paths[src] = dest;
+        const paths: {[dest: string]: string} = {};
+        paths[dest] = src;
 
         const copyResult = await copyFiles(paths, '..');
 
@@ -213,9 +213,9 @@ describe('copyFiles mounting', () => {
         expect(fs.readFileSync(src2, 'utf8')).toBe(content2);
 
         // Run copy
-        const paths = {};
-        paths[src1] = dest1;
-        paths[src2] = dest2;
+        const paths: {[dest: string]: string} = {};
+        paths[dest1] = src1;
+        paths[dest2] = src2;
 
         const copyResult = await copyFiles(paths, '..');
 

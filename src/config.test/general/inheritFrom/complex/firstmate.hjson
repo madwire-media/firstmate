@@ -1,0 +1,48 @@
+{
+    project: test
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+                ~default: {
+                    chartmuseum: foomuseum
+                    cluster: foocluster
+
+                    namespace: test
+                    version: test
+                    releaseName: test
+
+                    allowedModes: ['prod']
+                }
+
+                ~museum: {
+                    chartmuseum: barmuseum
+                }
+                ~cluster: {
+                    cluster: barcluster
+                }
+                ~defaultRelease: {
+                    releaseName: null
+                }
+
+                museum: {
+                    inheritFrom: ['~default', '~museum']
+                }
+                cluster: {
+                    inheritFrom: ['~default', '~cluster']
+                }
+                museumcluster: {
+                    inheritFrom: ['~default', '~museum', '~cluster']
+                }
+                defaultRelease: {
+                    inheritFrom: ['~default', '~defaultRelease']
+                }
+                newRelease: {
+                    inheritFrom: ['~default', '~defaultRelease'],
+
+                    releaseName: overridden
+                }
+            }
+        }
+    }
+}

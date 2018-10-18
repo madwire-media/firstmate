@@ -1,0 +1,31 @@
+{
+    project: test
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+                ~default: {
+                    chartmuseum: museum
+                    cluster: cluster
+
+                    namespace: test
+                    version: test
+                }
+
+                ~dev: {
+                    allowedModes: ['dev']
+                }
+                ~stage: {
+                    allowedModes: ['stage']
+                }
+
+                one: {
+                    inheritFrom: ['~default', '~dev']
+                }
+                two: {
+                    inheritFrom: ['~default', '~dev', '~stage']
+                }
+            }
+        }
+    }
+}

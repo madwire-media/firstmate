@@ -6,6 +6,7 @@ export interface PureHelmBranchRaw extends BranchBaseRaw {
     namespace: string;
     releaseName?: string;
     helmArgs?: {[argName: string]: string};
+    chartmuseum?: string;
 }
 
 export class PureHelmBranchBase extends BranchBase {
@@ -13,6 +14,7 @@ export class PureHelmBranchBase extends BranchBase {
     public namespace: string;
     public releaseName?: string;
     public helmArgs: {[argName: string]: string} = {};
+    public chartmuseum?: string;
 
     constructor(rawData: PureHelmBranchRaw) {
         super(rawData);
@@ -20,6 +22,7 @@ export class PureHelmBranchBase extends BranchBase {
         this.cluster = rawData.cluster;
         this.namespace = rawData.namespace;
         this.releaseName = rawData.releaseName;
+        this.chartmuseum = rawData.chartmuseum;
 
         if (rawData.helmArgs !== undefined && !empty(rawData.helmArgs)) {
             this.helmArgs = rawData.helmArgs;

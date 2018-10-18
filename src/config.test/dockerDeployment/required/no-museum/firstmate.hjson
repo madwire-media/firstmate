@@ -1,0 +1,19 @@
+{
+    project: test
+    defaults: {
+        registry: registry.com
+    }
+    services: {
+        test: {
+            type: dockerDeployment
+            branches: {
+                ~default: {
+                    cluster: cluster
+                    namespace: namespace
+
+                    version: test
+                }
+            }
+        }
+    }
+}

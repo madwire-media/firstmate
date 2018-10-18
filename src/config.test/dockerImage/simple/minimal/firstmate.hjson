@@ -1,0 +1,16 @@
+{
+    project: test
+    services: {
+        test: {
+            type: dockerImage
+            branches: {
+                ~default: {
+                    registry: registry.com
+                    version: test
+
+                    imageName: image
+                }
+            }
+        }
+    }
+}

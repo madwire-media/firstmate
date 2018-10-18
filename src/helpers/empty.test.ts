@@ -2,7 +2,7 @@ import { empty } from './empty';
 
 describe('object emptiness test', () => {
     test('on arrays', () => {
-        const notfull = [];
+        const notfull: any[] = [];
         const full = ['hi'];
         const emptied = ['hi'];
         const containsUndefined = [undefined];

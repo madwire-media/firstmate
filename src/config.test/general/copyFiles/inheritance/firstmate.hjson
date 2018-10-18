@@ -1,0 +1,30 @@
+{
+    project: test
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+                ~default: {
+                    cluster: cluster
+                    namespace: test
+                    version: test
+
+                    allowedModes: ['dev']
+
+                    copyFiles: {
+                        to/location/1: from/1
+                        to/location/2: from/2
+                    }
+                }
+                inheritTest: {
+                    inheritFrom: ~default
+
+                    copyFiles: {
+                        to/location/1: from/overridden
+                        to/location/3: from/3
+                    }
+                }
+            }
+        }
+    }
+}

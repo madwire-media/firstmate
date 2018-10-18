@@ -1,0 +1,20 @@
+{
+    project: test
+    defaults: {
+        registry: registry.com
+        chartmuseum: museum.com
+    }
+    services: {
+        test: {
+            type: dockerDeployment
+            branches: {
+                ~default: {
+                    cluster: cluster
+                    namespace: namespace
+
+                    version: test
+                }
+            }
+        }
+    }
+}

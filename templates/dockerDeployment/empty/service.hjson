@@ -3,9 +3,6 @@
 
             branches: {
                 ~default: {
-                    inheritFrom: master
-                }
-                master: {
                     version: 0.1.0
 
                     cluster: '' // TODO: change this

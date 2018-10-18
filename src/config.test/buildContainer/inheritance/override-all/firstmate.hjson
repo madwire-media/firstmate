@@ -1,0 +1,34 @@
+{
+    project: test
+    services: {
+        test: {
+            type: buildContainer
+            branches: {
+                ~default: {
+                    volumes: {
+                        /foo: bar
+                        /mahna: mahna
+                    }
+                    dockerArgs: {
+                        foo: bar
+                        mahna: mahna
+                    }
+
+                    version: test
+                }
+                inherited: {
+                    volumes: {
+                        /foo: unbar
+                        /mahna: unmahna
+                    }
+                    dockerArgs: {
+                        foo: unbar
+                        mahna: unmahna
+                    }
+
+                    version: untest
+                }
+            }
+        }
+    }
+}

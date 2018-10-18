@@ -1,0 +1,10 @@
+{
+    project: test
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+            }
+        }
+    }
+}

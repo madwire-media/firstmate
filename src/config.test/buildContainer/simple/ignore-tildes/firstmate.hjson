@@ -1,0 +1,15 @@
+{
+    project: test
+    services: {
+        test: {
+            type: buildContainer
+            branches: {
+                ~default: {
+                    version: test
+                }
+                ~dont-matter: {
+                }
+            }
+        }
+    }
+}

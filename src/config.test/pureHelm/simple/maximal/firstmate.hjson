@@ -1,0 +1,51 @@
+{
+    project: test
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+                ~default: {
+                    dev: {
+                        chartmuseum: museum.com
+                        cluster: cluster
+                        namespace: namespace
+
+                        releaseName: release
+                        helmArgs: {
+                            bar: foo
+                            mahna: mahna
+                        }
+
+                        recreatePods: true,
+                    }
+                    stage: {
+                        chartmuseum: museum.com
+                        cluster: cluster
+                        namespace: namespace
+
+                        releaseName: release
+                        helmArgs: {
+                            bar: foo
+                            mahna: mahna
+                        }
+
+                        recreatePods: true,
+                    }
+                    prod: {
+                        chartmuseum: museum.com
+                        cluster: cluster
+                        namespace: namespace
+
+                        releaseName: release
+                        helmArgs: {
+                            bar: foo
+                            mahna: mahna
+                        }
+
+                        version: test
+                    }
+                }
+            }
+        }
+    }
+}

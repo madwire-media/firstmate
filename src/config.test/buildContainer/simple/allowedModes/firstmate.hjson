@@ -1,0 +1,56 @@
+{
+    project: test
+    services: {
+        test: {
+            type: buildContainer
+            branches: {
+                ~default: {
+                    dev: {
+                        volumes: {
+                            /foo: bar
+                            /mahna: mahna
+                        }
+                        dockerArgs: {
+                            foo: bar
+                            mahna: mahna
+                        }
+                    }
+                    stage: {
+                        volumes: {
+                            /foo: bar
+                            /mahna: mahna
+                        }
+                        dockerArgs: {
+                            foo: bar
+                            mahna: mahna
+                        }
+                    }
+                    prod: {
+                        volumes: {
+                            /foo: bar
+                            /mahna: mahna
+                        }
+                        dockerArgs: {
+                            foo: bar
+                            mahna: mahna
+                        }
+
+                        version: test
+                    }
+                }
+                dev: {
+                    inheritFrom: ~default
+                    allowedModes: ['dev']
+                }
+                stage: {
+                    inheritFrom: ~default
+                    allowedModes: ['stage']
+                }
+                prod: {
+                    inheritFrom: ~default
+                    allowedModes: ['prod']
+                }
+            }
+        }
+    }
+}

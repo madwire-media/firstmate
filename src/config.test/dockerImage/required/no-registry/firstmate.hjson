@@ -1,0 +1,15 @@
+{
+    project: test
+    services: {
+        test: {
+            type: dockerImage
+            branches: {
+                ~default: {
+                    version: test
+
+                    imageName: image
+                }
+            }
+        }
+    }
+}

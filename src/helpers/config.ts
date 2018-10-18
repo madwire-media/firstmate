@@ -9,11 +9,11 @@ import { a } from './cli';
 import { Config, ConfigBase } from '../config';
 import { parseUserConfig, User } from '../user';
 
-export function loadConfigRaw(context: any, dir = ''): [ConfigBase, string, boolean] | undefined {
+export function loadConfigRaw(context: any, dir = '.'): [ConfigBase, string, boolean] | undefined {
     let filename;
     let isHjson;
-    const filename1 = `${dir}firstmate.hjson`;
-    const filename2 = `${dir}firstmate.json`;
+    const filename1 = `${dir}/firstmate.hjson`;
+    const filename2 = `${dir}/firstmate.json`;
 
     const file1Exists = fs.existsSync(filename1);
     const file2Exists = fs.existsSync(filename2);
@@ -66,8 +66,8 @@ export function loadConfigRaw(context: any, dir = ''): [ConfigBase, string, bool
     return [data, filename, isHjson];
 }
 
-export function loadConfig(context: any): Config | undefined {
-    const raw = loadConfigRaw(context);
+export function loadConfig(context: any, dir = '.'): Config | undefined {
+    const raw = loadConfigRaw(context, dir);
 
     if (raw === undefined) {
         return;

@@ -12,11 +12,15 @@ export function parsePureHelmBranches(context: ConfigContext,
     // JSON schema already checks branch names
 
     for (const branchName in data) {
+        if (branchName.startsWith('~') && branchName !== '~default') {
+            continue;
+        }
+
         const rawBranch = resolveBranch(context, data, branchName);
         const branchContext = {...context, branchName};
 
-        branchContext.copyFiles = rawBranch.copyFiles || branchContext.copyFiles;
-        branchContext.dependsOn = rawBranch.dependsOn || branchContext.dependsOn;
+        branchContext.copyFiles = mergeValues(rawBranch.copyFiles, branchContext.copyFiles);
+        branchContext.dependsOn = mergeValues(rawBranch.dependsOn, branchContext.dependsOn);
 
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.cluster = rawBranch.cluster || branchContext.cluster;
@@ -57,13 +61,14 @@ export function parsePureHelmBranches(context: ConfigContext,
 }
 
 function parsePureHelmDevBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.DevBranch {
-    let {cluster, namespace, helmArgs, releaseName, recreatePods} = context;
+    let {cluster, namespace, helmArgs, releaseName, recreatePods, chartmuseum} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         releaseName = data.releaseName || releaseName;
         recreatePods = data.recreatePods || recreatePods;
+        chartmuseum = data.chartmuseum || chartmuseum;
 
         helmArgs = mergeValues(data.helmArgs, helmArgs);
     }
@@ -81,16 +86,18 @@ function parsePureHelmDevBranch(context: ConfigContext, data?: ConfigBranchBase)
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
         recreatePods,
+        chartmuseum,
     });
 }
 function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.StageBranch {
-    let {cluster, namespace, helmArgs, releaseName, recreatePods} = context;
+    let {cluster, namespace, helmArgs, releaseName, recreatePods, chartmuseum} = context;
 
     if (data !== undefined) {
         cluster = data.cluster || cluster;
         namespace = data.namespace || namespace;
         releaseName = data.releaseName || releaseName;
         recreatePods = data.recreatePods || recreatePods;
+        chartmuseum = data.chartmuseum || chartmuseum;
 
         helmArgs = mergeValues(data.helmArgs, helmArgs);
     }
@@ -108,6 +115,7 @@ function parsePureHelmStageBranch(context: ConfigContext, data?: ConfigBranchBas
         helmArgs: helmArgs && stringifyProps(helmArgs),
         releaseName,
         recreatePods,
+        chartmuseum,
     });
 }
 function parsePureHelmProdBranch(context: ConfigContext, data?: ConfigBranchBase): pureHelm.ProdBranch {

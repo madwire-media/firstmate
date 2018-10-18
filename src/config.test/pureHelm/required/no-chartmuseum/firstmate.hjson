@@ -1,0 +1,16 @@
+{
+    project: test
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+                ~default: {
+                    cluster: cluster
+                    namespace: namespace
+
+                    version: test
+                }
+            }
+        }
+    }
+}

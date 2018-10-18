@@ -1,0 +1,19 @@
+{
+    project: test
+    defaults: {
+        chartmuseum: museum.com
+    }
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+                ~default: {
+                    cluster: cluster
+                    namespace: namespace
+
+                    version: test
+                }
+            }
+        }
+    }
+}

@@ -55,7 +55,7 @@
                                 "~default": { "$ref": "#/definitions/branch-dockerImage-required" }
                             },
                             "patternProperties": {
-                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                "^[^/\\000-\\037\\117 ~^:]+$": {
                                     "anyOf": [
                                         {
                                             "allOf": [
@@ -64,6 +64,17 @@
                                             ]
                                         },
                                         { "$ref": "#/definitions/branch-dockerImage-required" }
+                                    ]
+                                },
+                                "^~[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-dockerImage" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-dockerImage" }
                                     ]
                                 }
                             },
@@ -90,7 +101,7 @@
                                 "~default": { "$ref": "#/definitions/branch-dockerDeployment-required" }
                             },
                             "patternProperties": {
-                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                "^[^/\\000-\\037\\117 ~^:]+$": {
                                     "anyOf": [
                                         {
                                             "allOf": [
@@ -99,6 +110,17 @@
                                             ]
                                         },
                                         { "$ref": "#/definitions/branch-dockerDeployment-required" }
+                                    ]
+                                },
+                                "^~[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-dockerDeployment" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-dockerDeployment" }
                                     ]
                                 }
                             },
@@ -125,7 +147,7 @@
                                 "~default": { "$ref": "#/definitions/branch-buildContainer-required" }
                             },
                             "patternProperties": {
-                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                "^[^/\\000-\\037\\117 ~^:]+$": {
                                     "anyOf": [
                                         {
                                             "allOf": [
@@ -134,6 +156,17 @@
                                             ]
                                         },
                                         { "$ref": "#/definitions/branch-buildContainer-required" }
+                                    ]
+                                },
+                                "^~[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-buildContainer" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-buildContainer" }
                                     ]
                                 }
                             },
@@ -160,7 +193,7 @@
                                 "~default": { "$ref": "#/definitions/branch-helm-required" }
                             },
                             "patternProperties": {
-                                "^~?[^/\\000-\\037\\117 ~^:]+$": {
+                                "^[^/\\000-\\037\\117 ~^:]+$": {
                                     "anyOf": [
                                         {
                                             "allOf": [
@@ -170,15 +203,29 @@
                                         },
                                         { "$ref": "#/definitions/branch-helm-required" }
                                     ]
+                                },
+                                "^~[^/\\000-\\037\\117 ~^:]+$": {
+                                    "anyOf": [
+                                        {
+                                            "allOf": [
+                                                { "$ref": "#/definitions/inheritedBranch" },
+                                                { "$ref": "#/definitions/branch-helm" }
+                                            ]
+                                        },
+                                        { "$ref": "#/definitions/branch-helm" }
+                                    ]
                                 }
                             },
                             "required": [
-                                "type",
-                                "branches"
+                                "~default"
                             ],
                             "additionalProperties": false
                         }
                     },
+                    "required": [
+                        "type",
+                        "branches"
+                    ],
                     "additionalProperties": false
                 }
             ]
@@ -468,16 +515,6 @@
                                 },
                                 "autodelete": {
                                     "type": ["boolean", "null"]
-                                },
-                                "recreatePods": {
-                                    "type": ["boolean", "null"]
-                                }
-                            }
-                        },
-                        "stage": {
-                            "properties": {
-                                "recreatePods": {
-                                    "type": ["boolean", "null"]
                                 }
                             }
                         },
@@ -489,9 +526,6 @@
                             "type": ["boolean", "null"]
                         },
                         "autodelete": {
-                            "type": ["boolean", "null"]
-                        },
-                        "recreatePods": {
                             "type": ["boolean", "null"]
                         }
                     }

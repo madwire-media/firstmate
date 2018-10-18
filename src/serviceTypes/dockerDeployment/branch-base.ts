@@ -23,6 +23,7 @@ export interface DockerDeploymentBranchRaw extends PureHelmBranchRaw {
     registry: string;
     imageNamePrefix?: string;
     containers?: {[containerName: string]: ContainerRaw};
+    chartmuseum?: string;
 }
 
 export class DockerDeploymentBranchBase extends BranchBase {
@@ -33,6 +34,7 @@ export class DockerDeploymentBranchBase extends BranchBase {
     public containers: {[containerName: string]: Container} = {};
     public helmArgs: {[argName: string]: string} = {};
     public releaseName?: string;
+    public chartmuseum?: string;
 
     constructor(rawData: DockerDeploymentBranchRaw) {
         super(rawData);
@@ -42,6 +44,7 @@ export class DockerDeploymentBranchBase extends BranchBase {
         this.cluster = rawData.cluster;
         this.namespace = rawData.namespace;
         this.releaseName = rawData.releaseName;
+        this.chartmuseum = rawData.chartmuseum;
 
         if (rawData.containers !== undefined) {
             for (const containerName in rawData.containers) {

@@ -20,13 +20,13 @@ export function makeError(context: ConfigContext, msg: string, env?: string) {
 interface Obj {[key: string]: any; }
 
 export function mergeValues(source: any, dest: any): any {
-    if (typeof source === 'object' && !(source instanceof Array)) {
+    if (source === null) {
+        return undefined;
+    } else if (typeof source === 'object' && !(source instanceof Array)) {
         dest = dest || {};
         return mergeObjects(source, dest);
     } else if (source === undefined) {
         return dest;
-    } else if (source === null) {
-        return undefined;
     } else {
         return source;
     }
@@ -38,14 +38,14 @@ export function mergeObjects(from: Obj, onto: Obj): Obj {
     for (const key in from) {
         const value = from[key];
 
-        if (typeof value === 'object' && !(value instanceof Array)) {
-            onto[key] = mergeObjects(from[key], onto[key] || {});
-        } else if (value === undefined) {
-            // Leave onto as it was
-        } else if (value === null) {
+        if (value === null) {
             if (key in onto) {
                 delete onto[key];
             }
+        } else if (typeof value === 'object' && !(value instanceof Array)) {
+            onto[key] = mergeObjects(from[key], onto[key] || {});
+        } else if (value === undefined) {
+            // Leave onto as it was
         } else {
             onto[key] = from[key];
         }
@@ -92,12 +92,12 @@ export function resolveBranch(context: ConfigContext,
             }
 
             const newTop = branchStack[branchStack.length - 1];
-            newTop.branch = mergeObjects(top.branch, newTop.branch);
+            newTop.branch = mergeObjects(newTop.branch, top.branch);
             continue;
         }
 
         // Otherwise, there is another object to inherit from
-        const nextInherit = top.inheritFrom.shift()!;
+        const nextInherit = top.inheritFrom.pop()!;
 
         // Check to make sure branch exists
         if (!(nextInherit in branches)) {

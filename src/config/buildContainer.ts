@@ -12,11 +12,15 @@ export function parseBuildContainerBranches(context: ConfigContext,
     // JSON schema already checks branch names
 
     for (const branchName in data) {
+        if (branchName.startsWith('~') && branchName !== '~default') {
+            continue;
+        }
+
         const rawBranch = resolveBranch(context, data, branchName);
         const branchContext = {...context, branchName};
 
-        branchContext.copyFiles = rawBranch.copyFiles || branchContext.copyFiles;
-        branchContext.dependsOn = rawBranch.dependsOn || branchContext.dependsOn;
+        branchContext.copyFiles = mergeValues(rawBranch.copyFiles, branchContext.copyFiles);
+        branchContext.dependsOn = mergeValues(rawBranch.dependsOn, branchContext.dependsOn);
 
         branchContext.version = rawBranch.version || branchContext.version;
         branchContext.volumes = rawBranch.volumes || branchContext.volumes;

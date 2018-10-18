@@ -27,16 +27,17 @@ module.exports = {
   // coverageDirectory: '.',
 
   // An array of regexp pattern strings used to skip coverage collection
-  // coveragePathIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  coveragePathIgnorePatterns: [
+    "/node_modules/",
+    "/[^/]+\\.test/"
+  ],
 
   // A list of reporter names that Jest uses when writing coverage reports
   coverageReporters: [
   //   "json",
     "text",
     "lcov",
-  //   "clover"
+  //   "clover",
   ],
 
   // An object that configures minimum threshold enforcement for coverage results
@@ -57,7 +58,7 @@ module.exports = {
   // A set of global variables that need to be available in all test environments
   globals: {
     'ts-jest': {
-      tsConfigFile: 'tsconfig.json'
+      tsConfig: 'tsconfig.json'
     }
   },
 
@@ -95,7 +96,10 @@ module.exports = {
   // projects: null,
 
   // Use this configuration option to add custom reporters to Jest
-  // reporters: undefined,
+  reporters: [
+    "<rootDir>/jest/fingersCrossed.js",
+    "<rootDir>/jest/summary.js",
+  ],
 
   // Automatically reset mock state between every test
   // resetMocks: false,
@@ -140,7 +144,7 @@ module.exports = {
 
   // The glob patterns Jest uses to detect test files
   testMatch: [
-    "**/__tests__/**/*.(js|ts)?(x)",
+    // "**/(*.)+test/**/*.(js|ts)?(x)",
     "**/?(*.)+(spec|test).(js|ts)?(x)"
   ],
 
@@ -178,7 +182,7 @@ module.exports = {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  // verbose: null,
+  // verbose: true,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],

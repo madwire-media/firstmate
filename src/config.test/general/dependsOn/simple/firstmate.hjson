@@ -1,0 +1,35 @@
+{
+    project: test
+    services: {
+        test: {
+            type: pureHelm
+            branches: {
+                ~default: {
+                    cluster: cluster
+                    namespace: test
+                    version: test
+
+                    allowedModes: ['dev']
+                    dependsOn: ['dep1', 'dep2']
+                }
+            }
+        }
+        dep1: {
+            type: buildContainer
+            branches: {
+                ~default: {
+                    version: test
+                    dependsOn: ['dep2']
+                }
+            }
+        }
+        dep2: {
+            type: buildContainer
+            branches: {
+                ~default: {
+                    version: test
+                }
+            }
+        }
+    }
+}
