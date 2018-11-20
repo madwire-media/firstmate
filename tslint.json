@@ -78,7 +78,12 @@
         "forin": false,
         "object-literal-sort-keys": false,
         "no-shadowed-variable": false,
-        "only-arrow-functions": false
+        "only-arrow-functions": false,
+        "max-classes-per-file": false,
+        "array-type": [
+            true,
+            "array"
+        ]
     },
     "rulesDirectory": []
 }
