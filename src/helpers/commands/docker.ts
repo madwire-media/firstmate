@@ -1,6 +1,6 @@
 import * as ChildProcess from 'child_process';
 
-import { Port } from '../../serviceTypes/base/branch';
+import { Port } from '../../config/types/common';
 import { a, fmt, interrupt } from '../cli';
 import { SigIntHandler } from '../service';
 
@@ -337,8 +337,18 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
 
     if (options.ports !== undefined) {
         for (const port of options.ports) {
-            argsText += ` -p ${port.local}:${port.remote}`;
-            args.push('-p', `${port.local}:${port.remote}`);
+            let inner;
+            let outer;
+
+            if (typeof port === 'number') {
+                inner = port;
+                outer = port;
+            } else {
+                ({inner, outer} = port);
+            }
+
+            argsText += ` -p ${inner}:${outer}`;
+            args.push('-p', `${inner}:${outer}`);
         }
     }
 

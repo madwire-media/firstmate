@@ -1,8 +1,7 @@
 import * as fs from 'fs';
 import * as util from 'util';
 
-import { Branch, Config, Service } from '../config';
-import { BranchBase } from '../serviceTypes/base/branch';
+import { Config, BranchEnv, Service, Branch } from '../config';
 
 import { a, colors, events } from './cli';
 import { loadConfig } from './config';
@@ -53,7 +52,7 @@ export async function runService(
         return false;
     }
 
-    serviceName = serviceName || config.defaultService;
+    serviceName = serviceName || (config.defaults && config.defaults.service);
     if (serviceName === undefined) {
         if (context) {
             context.cliMessage('No default service in config');
@@ -148,7 +147,7 @@ export async function runService(
 }
 
 export interface InitBranchOptions {
-    branch: BranchBase;
+    branch: BranchEnv;
     branchName: string;
     serviceName: string;
     serviceFolder: string;
@@ -304,7 +303,7 @@ export function resolveBranchName(branchName: string, branches: {[branchName: st
 export async function runDependencies(
     config: Config,
     branchName: string,
-    branch: BranchBase,
+    branch: BranchEnv,
     handlers: SigIntHandler[],
     alreadyRunBranches: Set<string>,
     isAsync: () => void,
@@ -337,7 +336,7 @@ export async function runDependencies(
 export function reqDependencies(
     config: Config,
     branchName: string,
-    branch: BranchBase,
+    branch: BranchEnv,
     alreadyRunBranches: Set<string>,
     cb: SvcCommandReqHandler,
     params: {[arg: string]: any},

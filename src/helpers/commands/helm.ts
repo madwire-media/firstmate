@@ -88,6 +88,31 @@ export function install(context: HelmContext, release: string, service: string, 
     return true;
 }
 
+export function escapeHelmArg(arg: string): string {
+    let out = '';
+
+    let isString = false;
+    let isEscaped = false;
+
+    for (const char of arg) {
+        if (isEscaped) {
+            out += char;
+            isEscaped = false;
+        } else if (char === '"') {
+            out += char;
+            isString = !isString;
+        } else if (!isString && char === ',') {
+            out += '\,';
+        } else if (!isString && char === '=') {
+            out += '\=';
+        } else {
+            out += char;
+        }
+    }
+
+    return out;
+}
+
 export function parseHelmInstallArgs(context: HelmContext): string[] {
     const args: string[] = [];
 
@@ -116,7 +141,7 @@ export function parseHelmInstallArgs(context: HelmContext): string[] {
         for (const argName in context.branch.helmArgs) {
             const arg = context.branch.helmArgs[argName];
 
-            args.push('--set', `${argName}=${arg}`);
+            args.push('--set', `${escapeHelmArg(argName)}=${escapeHelmArg(arg)}`);
         }
     }
 

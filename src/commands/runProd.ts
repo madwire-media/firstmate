@@ -9,10 +9,7 @@ import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
     resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/service';
-import * as buildContainer from '../serviceTypes/buildContainer/module';
-import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
-import * as dockerImage from '../serviceTypes/dockerImage/module';
-import * as pureHelm from '../serviceTypes/pureHelm/module';
+import { tagged } from '../config/types/branch';
 
 export function runProdReqs(
     config: Config,
@@ -41,13 +38,13 @@ export function runProdReqs(
 
     let reqsMet = true;
 
-    if (branch instanceof dockerImage.ProdBranch) {
+    if (tagged(branch, 'dockerImage')) {
         reqsMet = needsCommand(context, 'docker');
-    } else if (branch instanceof pureHelm.ProdBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Don't check for cluster if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster);
-    } else if (branch instanceof dockerDeployment.ProdBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         reqsMet = needsCommand(context, 'docker');
 
         // Check for helm regardless of if docker is installed, but
@@ -55,7 +52,7 @@ export function runProdReqs(
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster) &&
             reqsMet;
-    } else if (branch instanceof buildContainer.ProdBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         // N/A
     }
 
@@ -90,12 +87,12 @@ export async function runProd(
         return false;
     }
 
-    if (branch instanceof dockerImage.ProdBranch) {
+    if (tagged(branch, 'dockerImage')) {
         // Docker pull
         if (!docker.pull(branch.registry, `${config.project}/${branch.imageName}`, branch.version)) {
             return false;
         }
-    } else if (branch instanceof pureHelm.ProdBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Create namespace if it doesn't exist
         if (!needsNamespace(branch.cluster, branch.namespace)) {
             return false;
@@ -115,7 +112,7 @@ export async function runProd(
         )) {
             return false;
         }
-    } else if (branch instanceof dockerDeployment.ProdBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         const containers = fs.readdirSync(`${serviceFolder}/docker`)
             .filter((dir) => fs.statSync(`${serviceFolder}/docker/${dir}`).isDirectory());
         const containerDirs = containers.map((dir) => `${serviceFolder}/docker/${dir}`);
@@ -154,7 +151,7 @@ export async function runProd(
         )) {
             return false;
         }
-    } else if (branch instanceof buildContainer.ProdBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         console.log(a`\{ld (not applicable)\}`);
     }
 

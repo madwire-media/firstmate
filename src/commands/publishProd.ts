@@ -9,10 +9,7 @@ import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
     resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/service';
-import * as buildContainer from '../serviceTypes/buildContainer/module';
-import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
-import * as dockerImage from '../serviceTypes/dockerImage/module';
-import * as pureHelm from '../serviceTypes/pureHelm/module';
+import { tagged } from '../config/types/branch';
 
 export function publishProdReqs(
     config: Config,
@@ -41,15 +38,15 @@ export function publishProdReqs(
 
     let reqsMet = true;
 
-    if (branch instanceof dockerImage.ProdBranch) {
+    if (tagged(branch, 'dockerImage')) {
         reqsMet = needsCommand(context, 'docker');
-    } else if (branch instanceof pureHelm.ProdBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Don't check for helm plugin if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsHelmPlugin(context, 'push', 'https://github.com/chartmuseum/helm-push') && reqsMet;
-    } else if (branch instanceof dockerDeployment.ProdBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         reqsMet = needsCommand(context, 'docker');
-    } else if (branch instanceof buildContainer.ProdBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         reqsMet = needsCommand(context, 'docker');
 
         // Check for helm regardless of if docker is installed, but
@@ -89,7 +86,7 @@ export async function publishProd(
         return false;
     }
 
-    if (branch instanceof dockerImage.ProdBranch) {
+    if (tagged(branch, 'dockerImage')) {
         const image = `${config.project}/${branch.imageName}`;
 
         // Docker build
@@ -104,7 +101,7 @@ export async function publishProd(
         if (!docker.push(`${image}:${branch.version}`, branch.registry)) {
             return false;
         }
-    } else if (branch instanceof pureHelm.ProdBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Helm chart publish
         const helmContext = {
             branch,
@@ -114,7 +111,7 @@ export async function publishProd(
         if (!helm.push(helmContext, serviceName)) {
             return false;
         }
-    } else if (branch instanceof dockerDeployment.ProdBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         const containers = fs.readdirSync(`${serviceFolder}/docker`)
             .filter((dir) => fs.statSync(`${serviceFolder}/docker/${dir}`).isDirectory());
         const containerDirs = containers.map((dir) => `${serviceFolder}/docker/${dir}`);
@@ -152,7 +149,7 @@ export async function publishProd(
         if (!helm.push(helmContext, serviceName)) {
             return false;
         }
-    } else if (branch instanceof buildContainer.ProdBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         const image = `fmbuild-${serviceName}`;
 
         if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {

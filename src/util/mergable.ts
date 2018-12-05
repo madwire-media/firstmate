@@ -1,0 +1,112 @@
+export const mergedContents = Symbol('mergedContents');
+
+export type Merged<T extends object> = T & {
+    [mergedContents]: T[],
+};
+
+const isOnlyObject = <T>(input: T): input is Exclude<T, any[] | boolean | string | number | null | undefined> =>
+    typeof input === 'object' && input !== null && !(input instanceof Array);
+
+const unsupportedOperation = (op: string) => () => {throw new TypeError(`unsupported operation: ${op}`); };
+
+export function merge<T extends object>(...items: (Exclude<T, any[]>)[]): Merged<Exclude<T, any[]>> {
+    const contents: Exclude<T, any[]>[] = [];
+
+    for (const item of items) {
+        if (mergedContents in item) {
+            for (const subItem of (item as Merged<typeof item>)[mergedContents]) {
+                if (isOnlyObject(subItem)) {
+                    contents.push(subItem);
+                } else if (subItem === null && contents.length === 0) {
+                    // Null shouldn't have been an input in the first place
+                    return null!;
+                } else {
+                    break;
+                }
+            }
+        } else if (isOnlyObject(item)) {
+            contents.push(item);
+        } else if (item === null && contents.length === 0) {
+            // Null shouldn't have been an input in the first place
+            return null!;
+        } else {
+            break;
+        }
+    }
+
+    if (contents.length === 0 && items.length > 0) {
+        throw new TypeError('no object(s) given as first parameter(s)');
+    }
+
+    return new Proxy({contents}, {
+        apply: unsupportedOperation('apply'),
+        construct: unsupportedOperation('construct'),
+        defineProperty: unsupportedOperation('defineProperty'),
+        deleteProperty: unsupportedOperation('deleteProperty'),
+        get(target, property, receiver) {
+            if (property === mergedContents) {
+                return target.contents;
+            }
+
+            const subContents: object[] = [];
+
+            for (const item of target.contents) {
+                if (property in item) {
+                    const prop = Reflect.get(item, property, receiver);
+
+                    if (isOnlyObject(prop)) {
+                        subContents.push(prop);
+                    } else if (subContents.length > 0) {
+                        return merge(...subContents);
+                    } else {
+                        return prop;
+                    }
+                }
+            }
+
+            if (subContents.length > 0) {
+                return merge(...subContents);
+            } else {
+                return undefined;
+            }
+        },
+        getOwnPropertyDescriptor(target, property) {
+            for (const item of target.contents) {
+                if (property in item) {
+                    return Object.getOwnPropertyDescriptor(item, property);
+                }
+            }
+
+            return undefined;
+        },
+        getPrototypeOf: () => ({}),
+        has: (target, property) => target.contents.some((item) => property in item),
+        isExtensible: () => true,
+        ownKeys(target) {
+            const output = new Set<string | number | symbol>();
+
+            for (const item of target.contents) {
+                for (const key of Reflect.ownKeys(item)) {
+                    output.add(key);
+                }
+            }
+
+            return Array.from(output);
+        },
+        preventExtensions: unsupportedOperation('preventExtensions'),
+        set(target, property, value, receiver) {
+            for (const item of target.contents) {
+                if (property in item) {
+                    return Reflect.set(item, property, value, receiver);
+                }
+            }
+
+            if (target.contents.length === 0) {
+                return false;
+            } else {
+                return Reflect.set(target.contents[0], property, value, receiver);
+            }
+        },
+        setPrototypeOf: unsupportedOperation('setPrototypeOf'),
+    }) as unknown as Merged<Exclude<T, any[]>>;
+}

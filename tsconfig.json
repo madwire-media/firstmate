@@ -1,13 +1,14 @@
 {
     "compilerOptions": {
         "module": "commonjs",
-        "target": "es2017",
+        "target": "es2018",
         "noImplicitAny": true,
         "moduleResolution": "node",
         "sourceMap": true,
         "strict": true,
         "outDir": "dist",
-        "resolveJsonModule": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
         // "sourceRoot": "src"
     },
     "include": [

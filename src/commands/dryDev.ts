@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 
+import * as t from 'io-ts';
+
 import { Config } from '../config';
 import { a } from '../helpers/cli';
 import * as docker from '../helpers/commands/docker';
@@ -9,10 +11,7 @@ import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies, resolveBranchName,
     SigIntHandler, testServiceFiles,
 } from '../helpers/service';
-import * as buildContainer from '../serviceTypes/buildContainer/module';
-import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
-import * as dockerImage from '../serviceTypes/dockerImage/module';
-import * as pureHelm from '../serviceTypes/pureHelm/module';
+import { tagged } from '../config/types/branch';
 
 export function dryDevReqs(
     config: Config,
@@ -41,19 +40,19 @@ export function dryDevReqs(
 
     let reqsMet = true;
 
-    if (branch instanceof dockerImage.DevBranch) {
+    if (tagged(branch, 'dockerImage')) {
         reqsMet = needsCommand(context, 'docker');
-    } else if (branch instanceof pureHelm.DevBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster);
-    } else if (branch instanceof dockerDeployment.DevBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         reqsMet = needsCommand(context, 'docker');
         // Check for helm regardless of if docker is installed, but
         // don't check for cluster if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster) &&
             reqsMet;
-    } else if (branch instanceof buildContainer.DevBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         reqsMet = needsCommand(context, 'docker');
     }
 
@@ -76,7 +75,7 @@ export async function dryDev(
     alreadyRunBranches: Set<string>,
     isAsync: () => void,
     params: {[arg: string]: any},
-    ): Promise<undefined | false> {
+): Promise<undefined | false> {
     const service = config.services[serviceName];
 
     const serviceFolder = getServiceDir(serviceName);
@@ -92,12 +91,12 @@ export async function dryDev(
         return false;
     }
 
-    if (branch instanceof dockerImage.DevBranch) {
+    if (tagged(branch, 'dockerImage')) {
         // Docker build
         if (!docker.build(serviceFolder, `${config.project}/${branch.imageName}`, undefined, branch.dockerArgs)) {
             return false;
         }
-    } else if (branch instanceof pureHelm.DevBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Helm chart dry run w/ vars
         const helmContext = {
             dryrun: true,
@@ -108,7 +107,7 @@ export async function dryDev(
         if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
             return false;
         }
-    } else if (branch instanceof dockerDeployment.DevBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         const containers = fs.readdirSync(`${serviceFolder}/docker`)
             .filter((dir) => fs.statSync(`${serviceFolder}/docker/${dir}`).isDirectory());
         const containerDirs = containers.map((dir) => `${serviceFolder}/docker/${dir}`);
@@ -124,7 +123,7 @@ export async function dryDev(
 
             dockerImages[dirname] = `${branch.registry}/${image}:dev`;
 
-            if (dirname in branch.containers) {
+            if (branch.containers && dirname in branch.containers) {
                 args = branch.containers[dirname].dockerArgs;
             }
 
@@ -144,7 +143,7 @@ export async function dryDev(
         if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
             return false;
         }
-    } else if (branch instanceof buildContainer.DevBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         const image = `fmbuild-${serviceName}`;
 
         if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {

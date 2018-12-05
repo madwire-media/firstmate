@@ -9,10 +9,7 @@ import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
     resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/service';
-import * as buildContainer from '../serviceTypes/buildContainer/module';
-import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
-import * as dockerImage from '../serviceTypes/dockerImage/module';
-import * as pureHelm from '../serviceTypes/pureHelm/module';
+import { tagged } from '../config/types/branch';
 
 export function runStageReqs(
     config: Config,
@@ -41,13 +38,13 @@ export function runStageReqs(
 
     let reqsMet = true;
 
-    if (branch instanceof dockerImage.StageBranch) {
+    if (tagged(branch, 'dockerImage')) {
         reqsMet = needsCommand(context, 'docker');
-    } else if (branch instanceof pureHelm.StageBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Don't check for cluster if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster);
-    } else if (branch instanceof dockerDeployment.StageBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         reqsMet = needsCommand(context, 'docker');
 
         // Check for helm regardless of if docker is installed, but
@@ -55,7 +52,7 @@ export function runStageReqs(
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster) &&
             reqsMet;
-    } else if (branch instanceof buildContainer.StageBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         reqsMet = needsCommand(context, 'docker');
     }
 
@@ -90,7 +87,7 @@ export async function runStage(
         return false;
     }
 
-    if (branch instanceof dockerImage.StageBranch) {
+    if (tagged(branch, 'dockerImage')) {
         const image = `${config.project}/${branch.imageName}`;
 
         // Docker build
@@ -104,7 +101,7 @@ export async function runStage(
                 return false;
             }
         }
-    } else if (branch instanceof pureHelm.StageBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Create namespace if it doesn't exist
         if (!needsNamespace(branch.cluster, branch.namespace)) {
             return false;
@@ -119,7 +116,7 @@ export async function runStage(
         if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-stage`, serviceName)) {
             return false;
         }
-    } else if (branch instanceof dockerDeployment.StageBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         const containers = fs.readdirSync(`${serviceFolder}/docker`)
             .filter((dir) => fs.statSync(`${serviceFolder}/docker/${dir}`).isDirectory());
         const containerDirs = containers.map((dir) => `${serviceFolder}/docker/${dir}`);
@@ -163,7 +160,7 @@ export async function runStage(
         if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-stage`, serviceName)) {
             return false;
         }
-    } else if (branch instanceof buildContainer.StageBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         const image = `fmbuild-${serviceName}`;
 
         if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {

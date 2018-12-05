@@ -11,10 +11,7 @@ import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
     resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/service';
-import * as buildContainer from '../serviceTypes/buildContainer/module';
-import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
-import * as dockerImage from '../serviceTypes/dockerImage/module';
-import * as pureHelm from '../serviceTypes/pureHelm/module';
+import { tagged } from '../config/types/branch';
 
 export function runDevReqs(
     config: Config,
@@ -48,13 +45,13 @@ export function runDevReqs(
 
     let reqsMet = true;
 
-    if (branch instanceof dockerImage.DevBranch) {
+    if (tagged(branch, 'dockerImage')) {
         reqsMet = needsCommand(context, 'docker');
-    } else if (branch instanceof pureHelm.DevBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         // Don't check for cluster if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster);
-    } else if (branch instanceof dockerDeployment.DevBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         reqsMet = needsCommand(context, 'docker');
 
         if (branch.mode === 'proxy') {
@@ -68,7 +65,7 @@ export function runDevReqs(
                 reqsMet = reqsMet && needsCommand(context, 'telepresence');
             }
         }
-    } else if (branch instanceof buildContainer.DevBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         reqsMet = needsCommand(context, 'docker');
     }
 
@@ -108,7 +105,7 @@ export async function runDev(
         return false;
     }
 
-    if (branch instanceof dockerImage.DevBranch) {
+    if (tagged(branch, 'dockerImage')) {
         const image = `${config.project}/${branch.imageName}`;
 
         if (debugContainer !== undefined) {
@@ -126,7 +123,7 @@ export async function runDev(
                 return false;
             }
         }
-    } else if (branch instanceof pureHelm.DevBranch) {
+    } else if (tagged(branch, 'pureHelm')) {
         if (debugContainer !== undefined) {
             console.log(a`\{ly Warn:\} ignoring 'debug' parameter`);
         }
@@ -145,7 +142,7 @@ export async function runDev(
         if (!helm.install(helmContext, branch.releaseName || `${config.project}-${serviceName}-dev`, serviceName)) {
             return false;
         }
-    } else if (branch instanceof dockerDeployment.DevBranch) {
+    } else if (tagged(branch, 'dockerDeployment')) {
         const containers = fs.readdirSync(`${serviceFolder}/docker`)
             .filter((dir) => fs.statSync(`${serviceFolder}/docker/${dir}`).isDirectory());
         const containerDirs = containers.map((dir) => `${serviceFolder}/docker/${dir}`);
@@ -349,7 +346,7 @@ export async function runDev(
 
             isAsync();
         }
-    } else if (branch instanceof buildContainer.DevBranch) {
+    } else if (tagged(branch, 'buildContainer')) {
         if (debugContainer !== undefined) {
             console.log(a`\{ly Warn:\} ignoring 'debug' parameter`);
         }

@@ -6,7 +6,7 @@ import leven = require('leven');
 import * as mkdirp from 'mkdirp';
 import { ncp } from 'ncp';
 
-import { Config, ConfigBase } from '../config';
+import { Config } from '../config';
 import { a } from '../helpers/cli';
 import { loadConfig, loadConfigRaw, loadUser } from '../helpers/config';
 import { getGitOrigin } from '../helpers/git';
@@ -66,7 +66,7 @@ export async function addService(context: any, service: string, type: string, te
     const project = process.cwd().substr(process.cwd().lastIndexOf('/') + 1);
 
     const result = await addSingleService({
-        templatesRootDir, rawConfig, config, user, type, template, context,
+        templatesRootDir, config, user, type, template, context,
         name: service, remote, project, noSource,
     });
     if (result === false) {
@@ -86,15 +86,15 @@ export async function addService(context: any, service: string, type: string, te
 }
 
 async function addSingleService({
-    templatesRootDir, rawConfig, config, type, template, context, name,
+    templatesRootDir, config, type, template, context, name,
     inheritedSource, user, remote, project, noSource,
 }: {
-    templatesRootDir: string, rawConfig: ConfigBase, config: Config,
+    templatesRootDir: string, config: Config,
     type: string, template: string, context: any, name: string,
     inheritedSource?: string, user: User, remote: string, project: string,
     noSource: boolean,
 }) {
-    if (name in rawConfig) {
+    if (name in config) {
         console.error(a`\{lr Service '${name}' already exists!\}`);
         return false;
     }
@@ -167,7 +167,7 @@ async function addSingleService({
 
         for (const dep of deps) {
             const result = await addSingleService({
-                templatesRootDir, rawConfig, config, context, user, remote, project,
+                templatesRootDir, config, context, user, remote, project,
                 type: dep.type,
                 template: dep.template,
                 name: name + dep.suffix,
@@ -187,11 +187,7 @@ async function addSingleService({
         const serviceFile = fs.readFileSync(`${templateDir}/service.hjson`, 'utf8');
         const service = Hjson.rt.parse(processTemplateS(serviceFile, templateVals));
 
-        if (typeof rawConfig.services !== 'object') {
-            rawConfig.services = {};
-        }
-
-        rawConfig.services[name] = service;
+        config.services[name] = service;
     }
 
     // Copy source files if not inheriting source

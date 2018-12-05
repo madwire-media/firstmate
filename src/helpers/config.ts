@@ -6,10 +6,10 @@ import * as mkdirp from 'mkdirp';
 
 import { a } from './cli';
 
-import { Config, ConfigBase } from '../config';
+import { Config, parseRaw } from '../config';
 import { parseUserConfig, User } from '../user';
 
-export function loadConfigRaw(context: any, dir = '.'): [ConfigBase, string, boolean] | undefined {
+export function loadConfigRaw(context: any, dir = '.'): [{}, string, boolean] | undefined {
     let filename;
     let isHjson;
     const filename1 = `${dir}/firstmate.hjson`;
@@ -74,9 +74,9 @@ export function loadConfig(context: any, dir = '.'): Config | undefined {
     }
     const [data, filename] = raw;
 
-    let parseResult;
+    let parseResult: Config | string[];
     try {
-        parseResult = Config.parseRaw(data);
+        parseResult = parseRaw(data);
     } catch (error) {
         if (context) {
             context.cliMessage(a`\{lr,t Could not parse \{nt,m ${filename}\} file: \{nt ${error.message}\}\}`);
@@ -86,7 +86,7 @@ export function loadConfig(context: any, dir = '.'): Config | undefined {
         return;
     }
 
-    if (!(parseResult instanceof Config)) {
+    if (parseResult instanceof Array) {
         if (context) {
             context.cliMessage(a`\{lr,t Could not parse \{nt,m ${filename}\} file: \{nt Invalid schema\}`);
         } else {
@@ -95,10 +95,9 @@ export function loadConfig(context: any, dir = '.'): Config | undefined {
 
         for (const error of parseResult) {
             if (context) {
-                context.cliMessage(a`${a.e}  at \{c ${error.dataPath
-                    }\}: \{lr ${error.message}\} (${error.schemaPath})`);
+                context.cliMessage(a`  at \{c ${error}\}`);
             } else {
-                console.error(a`  at \{c ${error.dataPath}\}: \{lr ${error.message}\} (${error.schemaPath})`);
+                console.log(a`  at \{c ${error}\}`);
             }
         }
 

@@ -1,126 +1,224 @@
 import * as fs from 'fs';
 
-import { stringifyProps } from './helpers/transform';
-import { BranchBase, Port } from './serviceTypes/base/branch';
-import * as buildContainer from './serviceTypes/buildContainer/module';
-import * as dockerDeployment from './serviceTypes/dockerDeployment/module';
-import * as dockerImage from './serviceTypes/dockerImage/module';
-import * as pureHelm from './serviceTypes/pureHelm/module';
+import * as buildContainer from './config/buildContainer';
+import * as dockerDeployment from './config/dockerDeployment';
+import * as dockerImage from './config/dockerImage';
+import * as pureHelm from './config/pureHelm';
+import { projectType, IProject } from './config/types/project';
 
-import { parseBuildContainerBranches } from './config/buildContainer';
-import { parseDockerDeploymentBranches } from './config/dockerDeployment';
-import { parseDockerImageBranches } from './config/dockerImage';
-import { makeError } from './config/helpers';
-import { parsePureHelmBranches } from './config/pureHelm';
-import { Branch, ConfigBase, ConfigContext, ConfigParams, ConfigService, Service } from './config/types';
+import * as t from 'io-ts';
+import { PathReporter } from 'io-ts/lib/PathReporter';
+import { ServiceType, IService } from './config/types/service';
+import { BranchType } from './config/types/branch';
+import { applyDefaults } from './config/types/serviceDefaults';
+import { ServiceName } from './config/types/strings';
+import { Left } from 'fp-ts/lib/Either';
+import { IoContext } from './util/io-context';
+import { merge } from './util/mergable';
 
-export {ConfigBase, Service, Branch};
+const project = projectType([
+    buildContainer.service,
+    dockerDeployment.service,
+    dockerImage.service,
+    pureHelm.service,
+], 'FirstmateProject');
 
-import * as Ajv from 'ajv';
-const configSchema = JSON.parse(fs.readFileSync(`${__dirname}/../assets/schema.json`, 'utf8'));
+type StrictService<
+    S extends ServiceType<any, any>,
+    BS extends BranchType<any, any, any, any>
+> = IService<
+    S['type'],
+    BS
+>;
 
-const ajv = new Ajv();
-const validateConfig = ajv.compile(configSchema);
+type BuildContainerServiceStrict = StrictService<
+    typeof buildContainer.service,
+    typeof buildContainer.branch.strict
+>;
+type PureHelmServiceStrict = StrictService<
+    typeof pureHelm.service,
+    typeof pureHelm.branch.strict
+>;
+type DockerImageServiceStrict = StrictService<
+    typeof dockerImage.service,
+    typeof dockerImage.branch.strict
+>;
+type DockerDeploymentServiceStrict = StrictService<
+    typeof dockerDeployment.service,
+    typeof dockerDeployment.branch.strict
+>;
 
-type ValidationErrors = Ajv.ErrorObject[];
+export type Service =
+    | BuildContainerServiceStrict
+    | PureHelmServiceStrict
+    | DockerImageServiceStrict
+    | DockerDeploymentServiceStrict;
 
-export class Config {
-    public static parseRaw(json: {}): Config | ValidationErrors {
-        const isValid = validateConfig(json);
+export type Config = IProject<
+    | ServiceType<typeof buildContainer.branch.type, typeof buildContainer.branch.strict>
+    | ServiceType<typeof pureHelm.branch.type, typeof pureHelm.branch.strict>
+    | ServiceType<typeof dockerImage.branch.type, typeof dockerImage.branch.strict>
+    | ServiceType<typeof dockerDeployment.branch.type, typeof dockerDeployment.branch.strict>
+>;
 
-        if (!isValid) {
-            return validateConfig.errors!;
-        }
+export type Branch =
+    | t.TypeOf<typeof buildContainer.branch.strict>
+    | t.TypeOf<typeof pureHelm.branch.strict>
+    | t.TypeOf<typeof dockerImage.branch.strict>
+    | t.TypeOf<typeof dockerDeployment.branch.strict>;
 
-        const data = json as ConfigBase;
-        const context: ConfigContext = {
-            registry: data.defaults && data.defaults.registry,
-            chartmuseum: data.defaults && data.defaults.chartmuseum,
+export type BranchEnv = NonNullable<
+    | Branch['dev']
+    | Branch['stage']
+    | Branch['prod']
+>;
+
+export function parseRaw(json: {}): Config | string[] {
+    const result = project.decode(json);
+
+    if (result.isLeft()) {
+        return PathReporter.report(result);
+    }
+
+    const configPartial = result.value;
+    const servicesPartial = configPartial.services;
+    const strictServices: {[serviceName: string]: Service} = {};
+    const baseContext = {
+        registry: configPartial.defaults && configPartial.defaults.registry,
+        chartmuseum: configPartial.defaults && configPartial.defaults.chartmuseum,
+        project: configPartial.project,
+    };
+    const errors = [];
+    const baseTContext = new IoContext()
+        .sub('services', t.dictionary(ServiceName, project.serviceTypes['_A']));
+
+    for (const serviceName in servicesPartial) {
+        const servicePartial = servicesPartial[serviceName];
+        const serviceContext = {
+            service: serviceName,
+            ...baseContext
         };
 
-        const project = data.project;
-        const defaultService = data.defaults && data.defaults.service;
-        const services = parseServices(context, data.services);
-
-        return new Config({
-            project,
-            defaultService,
-            services,
-        });
-    }
-
-    public project: string;
-    public defaultService?: string;
-    public services: {[serviceName: string]: Service};
-
-    private constructor(params: ConfigParams) {
-        this.project = params.project;
-        this.defaultService = params.defaultService;
-        this.services = params.services;
-    }
-}
-
-function parseServices(context: ConfigContext,
-                       data: {[serviceName: string]: ConfigService},
-): {[serviceName: string]: Service} {
-    const services: {[serviceName: string]: Service} = {};
-
-    // JSON schema already checks service names
-
-    for (const serviceName in data) {
-        const rawService = data[serviceName];
-        const serviceContext = {...context, serviceName};
-
-        let service: Service;
-
-        switch (rawService.type) {
-            case 'dockerImage':
-                service = new dockerImage.Service();
-                service.branches = parseDockerImageBranches(serviceContext, rawService.branches);
-                break;
-
-            case 'dockerDeployment':
-                service = new dockerDeployment.Service();
-                service.branches = parseDockerDeploymentBranches(serviceContext, rawService.branches);
-                break;
-
-            case 'buildContainer':
-                service = new buildContainer.Service();
-                service.branches = parseBuildContainerBranches(serviceContext, rawService.branches);
-                break;
-
-            case 'pureHelm':
-                service = new pureHelm.Service();
-                service.branches = parsePureHelmBranches(serviceContext, rawService.branches);
-                break;
-
-            default:
-                throw new Error(`Reached the unreachable: parsing service ${serviceName}`);
-        }
-
-        // Check service's dependsOn properties all exist
-        for (const branchName in service.branches) {
-            const branch = service.branches[branchName] as any as {[envName: string]: BranchBase | undefined};
-
-            for (const envName of ['dev', 'stage', 'prod']) {
-                const env = branch[envName];
-
-                if (env === undefined) {
-                    continue;
-                }
-                if (env.dependsOn !== undefined) {
-                    for (const dependency of env.dependsOn) {
-                        if (!(dependency in data)) {
-                            throw makeError({...serviceContext, branchName},
-                                `cannot depend on nonexistent service ${env.dependsOn}`);
-                        }
-                    }
-                }
+        if (servicePartial.type === 'buildContainer') {
+            const serviceValid = applyDefaults<
+                'buildContainer',
+                typeof buildContainer.branch.exact.dev,
+                typeof buildContainer.branch.exact.stage,
+                typeof buildContainer.branch.exact.prod,
+                typeof buildContainer.branch.strict.dev,
+                typeof buildContainer.branch.strict.stage,
+                typeof buildContainer.branch.strict.prod,
+                typeof buildContainer.branch.exact,
+                typeof buildContainer.branch.strict,
+                typeof buildContainer.branch.defaults,
+                typeof servicePartial
+            >(
+                buildContainer.branch.defaults,
+                servicePartial,
+                serviceContext,
+                baseTContext
+                    .sub(serviceName, buildContainer.branch.strict),
+            );
+            if (serviceValid.isLeft()) {
+                errors.push(...serviceValid.value);
+            } else {
+                strictServices[serviceName] = serviceValid.value;
+            }
+        } else if (servicePartial.type === 'pureHelm') {
+            const serviceValid = applyDefaults<
+                'pureHelm',
+                typeof pureHelm.branch.exact.dev,
+                typeof pureHelm.branch.exact.stage,
+                typeof pureHelm.branch.exact.prod,
+                typeof pureHelm.branch.strict.dev,
+                typeof pureHelm.branch.strict.stage,
+                typeof pureHelm.branch.strict.prod,
+                typeof pureHelm.branch.exact,
+                typeof pureHelm.branch.strict,
+                typeof pureHelm.branch.defaults,
+                typeof servicePartial
+            >(
+                pureHelm.branch.defaults,
+                servicePartial,
+                serviceContext,
+                baseTContext
+                    .sub(serviceName, pureHelm.branch.strict),
+            );
+            if (serviceValid.isLeft()) {
+                errors.push(...serviceValid.value);
+            } else {
+                strictServices[serviceName] = serviceValid.value;
+            }
+        } else if (servicePartial.type === 'dockerImage') {
+            const serviceValid = applyDefaults<
+                'dockerImage',
+                typeof dockerImage.branch.exact.dev,
+                typeof dockerImage.branch.exact.stage,
+                typeof dockerImage.branch.exact.prod,
+                typeof dockerImage.branch.strict.dev,
+                typeof dockerImage.branch.strict.stage,
+                typeof dockerImage.branch.strict.prod,
+                typeof dockerImage.branch.exact,
+                typeof dockerImage.branch.strict,
+                typeof dockerImage.branch.defaults,
+                typeof servicePartial
+            >(
+                dockerImage.branch.defaults,
+                servicePartial,
+                serviceContext,
+                baseTContext
+                    .sub(serviceName, dockerImage.branch.strict),
+            );
+            if (serviceValid.isLeft()) {
+                errors.push(...serviceValid.value);
+            } else {
+                strictServices[serviceName] = serviceValid.value;
+            }
+        } else if (servicePartial.type === 'dockerDeployment') {
+            const serviceValid = applyDefaults<
+                'dockerDeployment',
+                typeof dockerDeployment.branch.exact.dev,
+                typeof dockerDeployment.branch.exact.stage,
+                typeof dockerDeployment.branch.exact.prod,
+                typeof dockerDeployment.branch.strict.dev,
+                typeof dockerDeployment.branch.strict.stage,
+                typeof dockerDeployment.branch.strict.prod,
+                typeof dockerDeployment.branch.exact,
+                typeof dockerDeployment.branch.strict,
+                typeof dockerDeployment.branch.defaults,
+                typeof servicePartial
+            >(
+                dockerDeployment.branch.defaults,
+                servicePartial,
+                serviceContext,
+                baseTContext
+                    .sub(serviceName, dockerDeployment.branch.strict),
+            );
+            if (serviceValid.isLeft()) {
+                errors.push(...serviceValid.value);
+            } else {
+                strictServices[serviceName] = serviceValid.value;
             }
         }
-
-        services[serviceName] = service;
     }
 
-    return services;
+    if (errors.length > 0) {
+        return PathReporter.report(new Left(errors));
+    }
+
+    if (Object.keys(strictServices).length > 0) {
+        return merge(
+            {
+                services: strictServices,
+            },
+            {
+                // Prevent configPartial.services from merging with strictServices
+                services: null,
+            },
+            configPartial as any,
+        );
+    } else {
+        return configPartial as any;
+    }
+
 }

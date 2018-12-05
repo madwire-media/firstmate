@@ -83,7 +83,8 @@
         "array-type": [
             true,
             "array"
-        ]
+        ],
+        "no-namespace": false,
     },
     "rulesDirectory": []
 }

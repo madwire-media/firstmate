@@ -7,7 +7,9 @@ import {
     getServiceDir, resolveBranchName, runDependencies, runService,
     SigIntHandler, testServiceDir, testServiceFiles,
 } from '../helpers/service';
-import { BranchBase } from '../serviceTypes/base/branch';
+import * as base from '../config/base/branch';
+import { branch } from '../config/buildContainer';
+import { BranchModeEnum } from '../config/types/common';
 
 export async function validate(params: {[arg: string]: any}, service?: string): Promise<boolean> {
     let isOk =
@@ -53,7 +55,7 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
         const service = config.services[serviceName];
         const usedBranchName = resolveBranchName(branchName, service.branches);
         const branchBase = service.branches[usedBranchName];
-        const branchBaseIter = branchBase as any as {[key: string]: BranchBase | undefined};
+        // const branchBaseIter = branchBase as any as {[key: string]: typeof branch.basic | undefined};
 
         // Check that certain files exist
         if (serviceFolder !== undefined && needsFolder(serviceFolder)) {
@@ -61,8 +63,8 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
         }
 
         // Check all dependencies for all environments
-        for (const envName of ['dev', 'stage', 'prod']) {
-            const branch = branchBaseIter[envName];
+        for (const envName of ['dev', 'stage', 'prod'] as (keyof typeof BranchModeEnum)[]) {
+            const branch = branchBase[envName];
 
             if (branch !== undefined) {
                 await runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, {}, handler);

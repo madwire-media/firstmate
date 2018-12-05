@@ -6,10 +6,7 @@ import {
     getDependencies, getServiceDir, initBranch,
     maybeTryBranch, resolveBranchName, SigIntHandler,
 } from '../helpers/service';
-import * as buildContainer from '../serviceTypes/buildContainer/module';
-import * as dockerDeployment from '../serviceTypes/dockerDeployment/module';
-import * as dockerImage from '../serviceTypes/dockerImage/module';
-import * as pureHelm from '../serviceTypes/pureHelm/module';
+import { tagged } from '../config/types/branch';
 
 export function purgeProdReqs(
     config: Config,
@@ -36,9 +33,9 @@ export function purgeProdReqs(
 
     let reqsMet = true;
 
-    if ((branch instanceof dockerImage.ProdBranch) || (branch instanceof buildContainer.ProdBranch)) {
+    if (tagged(branch, 'dockerImage') || tagged(branch, 'buildContainer')) {
         // N/A
-    } else if ((branch instanceof dockerDeployment.ProdBranch) || (branch instanceof pureHelm.ProdBranch)) {
+    } else if (tagged(branch, 'dockerDeployment') || tagged(branch, 'pureHelm')) {
         // Don't check for cluster if helm isn't installed
         reqsMet = needsCommand(context, 'helm') &&
             needsCluster(context, branch.cluster);
@@ -73,9 +70,9 @@ export async function purgeProd(
         return false;
     }
 
-    if ((branch instanceof dockerImage.ProdBranch) || (branch instanceof buildContainer.ProdBranch)) {
+    if (tagged(branch, 'dockerImage') || tagged(branch, 'buildContainer')) {
         console.log(a`\{ld (not applicable)\}`);
-    } else if ((branch instanceof dockerDeployment.ProdBranch) || (branch instanceof pureHelm.ProdBranch)) {
+    } else if (tagged(branch, 'dockerDeployment') || tagged(branch, 'pureHelm')) {
         // Confirm deletion
         while (true) {
             let answer = await question(

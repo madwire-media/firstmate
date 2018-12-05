@@ -1,4 +1,4 @@
-declare module "hjson" {
+declare module 'hjson' {
 
 // Type definitions for hjson 2.4
 // Project: https://github.com/hjson/hjson-js
