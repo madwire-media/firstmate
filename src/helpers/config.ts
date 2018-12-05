@@ -60,6 +60,7 @@ export function loadConfigRaw(context: any, dir = '.'): [{}, string, boolean] | 
         } else {
             console.error(a`\{lr Could not parse \{m ${filename}\} file\}: ${error.message}`);
         }
+        throw error;
         return;
     }
 
@@ -83,6 +84,7 @@ export function loadConfig(context: any, dir = '.'): Config | undefined {
         } else {
             console.error(a`\{lr Could not parse \{m ${filename}\} file\}: ${error.message}`);
         }
+        throw error;
         return;
     }
 
@@ -94,10 +96,12 @@ export function loadConfig(context: any, dir = '.'): Config | undefined {
         }
 
         for (const error of parseResult) {
+            const pts = error.match(/(Invalid value )(.+?)( supplied to : )(.+)/)!;
+
             if (context) {
-                context.cliMessage(a`  at \{c ${error}\}`);
+                context.cliMessage(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
             } else {
-                console.log(a`  at \{c ${error}\}`);
+                console.log(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
             }
         }
 

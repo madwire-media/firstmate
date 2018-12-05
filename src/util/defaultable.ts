@@ -51,11 +51,15 @@ export function setDefault<
                     return inputProp;
                 }
             } else {
-                return target.contents.def;
+                return (target.contents.def as any)[property];
             }
         },
         getOwnPropertyDescriptor(target, property) {
-            return Object.getOwnPropertyDescriptor(target.contents.input, property);
+            if (property in target.contents.input) {
+                return Object.getOwnPropertyDescriptor(target.contents.input, property);
+            } else {
+                return Object.getOwnPropertyDescriptor(target.contents.def, property);
+            }
         },
         getPrototypeOf: () => ({}),
         has: (target, property) =>

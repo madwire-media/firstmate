@@ -1,6 +1,5 @@
-import { serviceType, ServiceType } from '../types/service';
-import { branch, env } from './branch';
-import { BranchType } from '../types/branch';
+import { serviceType } from '../types/service';
+import { branch } from './branch';
 
 export const service = serviceType(
     branch.exact,

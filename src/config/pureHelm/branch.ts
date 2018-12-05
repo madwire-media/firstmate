@@ -31,10 +31,10 @@ export namespace env {
             recreatePods?: boolean;
         }
 
-        export interface ProdReq {
+        export interface ProdReq {}
+        export interface ProdOpt {
             chartmuseum: ChartMuseum;
         }
-        export interface ProdOpt {}
 
         export const _allReq = t.type({
             cluster: ClusterName,
@@ -56,10 +56,10 @@ export namespace env {
             recreatePods: t.boolean,
         });
 
-        export const _prodReq = t.type({
+        export const _prodReq = t.type({});
+        export const _prodOpt = t.partial({
             chartmuseum: ChartMuseum,
         });
-        export const _prodOpt = t.partial({});
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
         export const allOpt = t.alias(_allOpt)<AllOpt, AllOpt>();
@@ -112,10 +112,10 @@ export namespace env {
 
             atoms.devReq,
             atoms.devOpt,
-        ]);
-        export const _devStrict = t.type(getProps(_dev));
-        export const _devPartial = t.partial(getProps(_dev));
-        export const _devExact = t.exact(_dev);
+        ], 'PureHelmDev');
+        export const _devStrict = t.type(getProps(_dev), 'PureHelmDevStrict');
+        export const _devPartial = t.partial(getProps(_dev), 'PureHelmDevPartial');
+        export const _devExact = t.exact(_dev, 'PureHelmDevExact');
 
         export const _stage = t.intersection([
             base.env.comp._all,
@@ -125,10 +125,10 @@ export namespace env {
 
             atoms.stageReq,
             atoms.stageOpt,
-        ]);
-        export const _stageStrict = t.type(getProps(_stage));
-        export const _stagePartial = t.partial(getProps(_stage));
-        export const _stageExact = t.exact(_stage);
+        ], 'PureHelmStage');
+        export const _stageStrict = t.type(getProps(_stage), 'PureHelmStageStrict');
+        export const _stagePartial = t.partial(getProps(_stage), 'PureHelmStagePartial');
+        export const _stageExact = t.exact(_stage, 'PureHelmStageExact');
 
         export const _prod = t.intersection([
             base.env.comp._all,
@@ -138,10 +138,10 @@ export namespace env {
 
             atoms.prodReq,
             atoms.prodOpt,
-        ]);
-        export const _prodStrict = t.type(getProps(_prod));
-        export const _prodPartial = t.partial(getProps(_prod));
-        export const _prodExact = t.exact(_prod);
+        ], 'PureHelmProd');
+        export const _prodStrict = t.type(getProps(_prod), 'PureHelmProdStrict');
+        export const _prodPartial = t.partial(getProps(_prod), 'PureHelmProdPartial');
+        export const _prodExact = t.exact(_prod, 'PureHelmProdExact');
 
         export const dev = t.clean<Dev>(_dev);
         export const devStrict = t.clean<Required<Dev>>(_devStrict as any);
@@ -170,6 +170,8 @@ export namespace env {
         export function all(input: stageType, context: ParsingContext): stageType;
         export function all(input: prodType, context: ParsingContext): prodType;
         export function all(input: allTypes, context: ParsingContext): allTypes {
+            input = base.env.defaults.all(input, context) as any;
+
             return setDefault(input, {
                 releaseName: `${context.project}-${context.service}-${context.env}`,
                 helmArgs: {},

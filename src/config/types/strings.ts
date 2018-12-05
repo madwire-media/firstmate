@@ -9,7 +9,7 @@ export const ProjectName = refineRgx(
     'ProjectName',
 );
 
-export const rgxBranchName = /^[^/\000-\037\117 ~^:]+$/;
+export const rgxBranchName = /^~?[^/\000-\037\117 ~^:]+$/;
 export type BranchName = string;
 export const BranchName = refineRgx(
     rgxBranchName,

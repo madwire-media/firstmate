@@ -48,6 +48,10 @@ export function merge<T extends object>(...items: (Exclude<T, any[]>)[]): Merged
                 return target.contents;
             }
 
+            if (property === '__COMMENTS__') {
+                return undefined;
+            }
+
             const subContents: object[] = [];
 
             for (const item of target.contents) {
@@ -71,6 +75,10 @@ export function merge<T extends object>(...items: (Exclude<T, any[]>)[]): Merged
             }
         },
         getOwnPropertyDescriptor(target, property) {
+            if (property === '__COMMENTS__') {
+                return undefined;
+            }
+
             for (const item of target.contents) {
                 if (property in item) {
                     return Object.getOwnPropertyDescriptor(item, property);
@@ -80,14 +88,18 @@ export function merge<T extends object>(...items: (Exclude<T, any[]>)[]): Merged
             return undefined;
         },
         getPrototypeOf: () => ({}),
-        has: (target, property) => target.contents.some((item) => property in item),
+        has: (target, property) =>
+            property !== '__COMMENTS__' &&
+            target.contents.some((item) => property in item),
         isExtensible: () => true,
         ownKeys(target) {
             const output = new Set<string | number | symbol>();
 
             for (const item of target.contents) {
                 for (const key of Reflect.ownKeys(item)) {
-                    output.add(key);
+                    if (key !== '__COMMENTS__') {
+                        output.add(key);
+                    }
                 }
             }
 
@@ -95,6 +107,10 @@ export function merge<T extends object>(...items: (Exclude<T, any[]>)[]): Merged
         },
         preventExtensions: unsupportedOperation('preventExtensions'),
         set(target, property, value, receiver) {
+            if (property === '__COMMENTS__') {
+                return false;
+            }
+
             for (const item of target.contents) {
                 if (property in item) {
                     return Reflect.set(item, property, value, receiver);

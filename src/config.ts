@@ -1,5 +1,3 @@
-import * as fs from 'fs';
-
 import * as buildContainer from './config/buildContainer';
 import * as dockerDeployment from './config/dockerDeployment';
 import * as dockerImage from './config/dockerImage';
@@ -15,6 +13,7 @@ import { ServiceName } from './config/types/strings';
 import { Left } from 'fp-ts/lib/Either';
 import { IoContext } from './util/io-context';
 import { merge } from './util/mergable';
+import { inspect } from 'util';
 
 const project = projectType([
     buildContainer.service,
@@ -90,7 +89,9 @@ export function parseRaw(json: {}): Config | string[] {
     };
     const errors = [];
     const baseTContext = new IoContext()
-        .sub('services', t.dictionary(ServiceName, project.serviceTypes['_A']));
+        .sub('services', t.dictionary(ServiceName, t.union(project.serviceTypes, 'AnyService')));
+
+    console.log(inspect(configPartial, {depth: 10, colors: true}));
 
     for (const serviceName in servicesPartial) {
         const servicePartial = servicesPartial[serviceName];

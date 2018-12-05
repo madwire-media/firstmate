@@ -17,11 +17,15 @@ export interface IService<T extends string, B extends BranchType<any, any, any, 
 export class ServiceType<
     TN extends string,
     B extends BranchType<any, any, any, TN>,
-> extends t.Type<
+> extends t.InterfaceType<
+    {
+        type: t.LiteralType<TN>,
+        branches: t.DictionaryType<t.StringType, B>
+    },
     IService<TN, B>
 > {
     // tslint:disable-next-line:variable-name
-    public readonly _tag: 'ServiceType' = 'ServiceType';
+    // public readonly _tag: 'ServiceType' = 'ServiceType';
     constructor(
         name: string,
         is: ServiceType<TN, B>['is'],
@@ -30,7 +34,10 @@ export class ServiceType<
         readonly type: TN,
         readonly branch: B,
     ) {
-        super(name, is, validate, encode);
+        super(name, is, validate, encode, {
+            type: t.literal(type),
+            branches: t.dictionary(t.string, branch),
+        });
     }
 }
 
@@ -240,6 +247,7 @@ export function serviceType<
                     dev?: {},
                     stage?: {},
                     prod?: {},
+                    allowedModes: keyof typeof BranchModeEnum,
                 },
             } = {};
 
@@ -251,8 +259,8 @@ export function serviceType<
                 for (const branchName in branches) {
                     const branch = branches[branchName];
 
-                    if (env in branch) {
-                        branchesEnv[branchName] = branch;
+                    if (branch[env]) {
+                        branchesEnv[branchName] = branch[env]!;
                     }
                 }
 
@@ -273,7 +281,9 @@ export function serviceType<
                     const mergedBranchEnv = mergedBranchesEnv[branchName];
 
                     if (!(branchName in mergedBranches)) {
-                        mergedBranches[branchName] = {};
+                        mergedBranches[branchName] = {
+                            allowedModes: (m as any).branches[branchName].allowedModes,
+                        };
                     }
 
                     mergedBranches[branchName][env] = mergedBranchEnv;

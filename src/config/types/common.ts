@@ -7,7 +7,7 @@ export enum BranchModeEnum {
     prod,
 }
 export const BranchMode = t.keyof(BranchModeEnum, 'BranchMode');
-export const branchModes = Object.keys(BranchModeEnum) as (keyof typeof BranchModeEnum)[];
+export const branchModes = Object.keys(BranchModeEnum).filter((k) => isNaN(+k)) as (keyof typeof BranchModeEnum)[];
 
 export type PortNumber = number;
 export const PortNumber = t.refinement(
@@ -35,3 +35,6 @@ export const CopyFiles = t.dictionary(LocalFilePath, LocalFilePath);
 
 export type AllowedModes = BranchModeEnum[];
 export const AllowedModes = t.array(BranchMode);
+
+export type Primitive = string | number | boolean;
+export const Primitive = t.union([t.string, t.number, t.boolean]);

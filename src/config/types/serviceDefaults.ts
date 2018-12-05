@@ -1,9 +1,10 @@
 import * as t from 'io-ts';
 
-import { BranchType } from './branch';
+import { BranchType, typeName } from './branch';
 import { ParsingContext } from './parsingContext';
 import { IService } from './service';
 import { Left, Right } from 'fp-ts/lib/Either';
+import { defaultContents } from '../../util/defaultable';
 
 type DefaultFunc<T> = (input: T, context: ParsingContext) => T;
 
@@ -83,7 +84,7 @@ export function applyDefaults<
                 }
             );
 
-            const devValid = defaults.devType.decode(devDefault);
+            const devValid = defaults.devType.validate(devDefault, tContext); // TODO: Fix the context here
             if (devValid.isLeft()) {
                 errors.push(...devValid.value);
             } else {
@@ -102,7 +103,7 @@ export function applyDefaults<
                 }
             );
 
-            const stageValid = defaults.stageType.decode(stageDefault);
+            const stageValid = defaults.stageType.validate(stageDefault, tContext); // TODO: Fix the context here
             if (stageValid.isLeft()) {
                 errors.push(...stageValid.value);
             } else {
@@ -121,7 +122,7 @@ export function applyDefaults<
                 }
             );
 
-            const prodValid = defaults.prodType.decode(prodDefault);
+            const prodValid = defaults.prodType.validate(prodDefault, tContext); // TODO: Fix the context here
             if (prodValid.isLeft()) {
                 errors.push(...prodValid.value);
             } else {
@@ -130,12 +131,26 @@ export function applyDefaults<
         }
 
         if (errors.length === 0) {
-            strictBranches[branchName] = {
+            const thisBranch: O['_A'] = {
                 type: branch.type,
-                dev,
-                stage,
-                prod
             };
+
+            if (dev) {
+                thisBranch.dev = dev;
+                console.log(dev[typeName]);
+            }
+            if (stage) {
+                thisBranch.stage = stage;
+                console.log(stage[typeName]);
+            }
+            if (prod) {
+                thisBranch.prod = prod;
+                console.log(prod[typeName]);
+            }
+
+            console.log(thisBranch);
+
+            strictBranches[branchName] = thisBranch;
         }
     }
 

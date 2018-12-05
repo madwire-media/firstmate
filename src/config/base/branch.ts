@@ -86,7 +86,7 @@ export namespace branch {
         env.comp.allPartial,
         env.comp.allPartial,
         '' as any,
-        'BranchBaseOpt'
+        'BranchBasePartial'
     )
 
     // No exact branch

@@ -10,6 +10,7 @@ import {
 import * as base from '../config/base/branch';
 import { branch } from '../config/buildContainer';
 import { BranchModeEnum } from '../config/types/common';
+import { inspect } from 'util';
 
 export async function validate(params: {[arg: string]: any}, service?: string): Promise<boolean> {
     let isOk =
@@ -99,6 +100,8 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
 
     if (isOk) {
         console.log(a`\{g No issues detected\}`);
+
+        console.log(inspect(config, {depth: 10, colors: true}));
         return true;
     } else {
         return false;

@@ -37,7 +37,11 @@ export function projectType<
     const project = t.intersection([
         t.type({
             project: ProjectName,
-            services: t.dictionary(ServiceName, t.union(services)),
+            services: t.dictionary(
+                ServiceName,
+                t.taggedUnion('type', services, 'AnyService'),
+                'Services'
+            ),
         }),
         t.partial({
             defaults: t.partial({

@@ -107,10 +107,10 @@ export namespace env {
 
             atoms.devReq,
             atoms.devOpt,
-        ]);
-        export const _devStrict = t.type(getProps(_dev));
-        export const _devPartial = t.partial(getProps(_dev));
-        export const _devExact = t.exact(_dev);
+        ], 'DockerDeploymentDev');
+        export const _devStrict = t.type(getProps(_dev), 'DockerDeploymentDevStrict');
+        export const _devPartial = t.partial(getProps(_dev), 'DockerDeploymentDevPartial');
+        export const _devExact = t.exact(_dev, 'DockerDeploymentDevExact');
 
         // using custom definition of intersection for more types
         export const _stage = intersection([
@@ -123,10 +123,10 @@ export namespace env {
 
             atoms.stageReq,
             atoms.stageOpt,
-        ]);
-        export const _stageStrict = t.type(getProps(_stage));
-        export const _stagePartial = t.partial(getProps(_stage));
-        export const _stageExact = t.exact(_stage);
+        ], 'DockerDeploymentStage');
+        export const _stageStrict = t.type(getProps(_stage), 'DockerDeploymentStageStrict');
+        export const _stagePartial = t.partial(getProps(_stage), 'DockerDeploymentStagePartial');
+        export const _stageExact = t.exact(_stage, 'DockerDeploymentStageExact');
 
         // using custom definition of intersection for more types
         export const _prod = intersection([
@@ -139,10 +139,10 @@ export namespace env {
 
             atoms.prodReq,
             atoms.prodOpt,
-        ]);
-        export const _prodStrict = t.type(getProps(_prod));
-        export const _prodPartial = t.partial(getProps(_prod));
-        export const _prodExact = t.exact(_prod);
+        ], 'DockerDeploymentProd');
+        export const _prodStrict = t.type(getProps(_prod), 'DockerDeploymentProdStrict');
+        export const _prodPartial = t.partial(getProps(_prod), 'DockerDeploymentProdPartial');
+        export const _prodExact = t.exact(_prod, 'DockerDeploymentProdExact');
 
         export const dev = t.clean<Dev>(_dev);
         export const devStrict = t.clean<Required<Dev>>(_devStrict as any);
@@ -171,6 +171,8 @@ export namespace env {
         export function all(input: stageType, context: ParsingContext): stageType;
         export function all(input: prodType, context: ParsingContext): prodType;
         export function all(input: allTypes, context: ParsingContext): allTypes {
+            input = base.env.defaults.all(input, context) as any;
+
             return setDefault(input, {
                 registry: context.registry,
                 imageNamePrefix: context.service,

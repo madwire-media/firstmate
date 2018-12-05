@@ -84,6 +84,8 @@ export function branchType<
         }),
     ]);
 
+    console.log(type); // TODO: Figure out why type isn't being set properly
+
     return new BranchType(
         name,
         branch.is,
@@ -102,7 +104,7 @@ export function branchType<
 
             if ('allowedModes' in dict) {
                 const validModes = AllowedModes.validate(
-                    m,
+                    dict.allowedModes,
                     c.sub('allowedModes', AllowedModes),
                 );
                 if (validModes.isLeft()) {

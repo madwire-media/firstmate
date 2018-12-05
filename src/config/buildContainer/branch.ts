@@ -39,10 +39,10 @@ export namespace env {
 
             atoms.allReq,
             atoms.allOpt,
-        ]);
-        export const _allStrict = t.type(getProps(_all));
-        export const _allPartial = t.partial(getProps(_all));
-        export const _allExact = t.exact(_all);
+        ], 'BuildContainerEnv');
+        export const _allStrict = t.type(getProps(_all), 'BuildContainerEnvStrict');
+        export const _allPartial = t.partial(getProps(_all), 'BuildContainerEnvPartial');
+        export const _allExact = t.exact(_all, 'BuildContainerEnvExact');
 
         export const all = t.clean<All>(_all);
         export const allStrict = t.clean<Required<All>>(_allStrict as any);
@@ -54,6 +54,8 @@ export namespace env {
         type allTypes = t.TypeOf<typeof comp.all>;
 
         export function all(input: allTypes, context: ParsingContext): allTypes {
+            input = base.env.defaults.all(input, context) as any;
+
             return setDefault(input, {
                 volumes: {},
             });
