@@ -137,18 +137,14 @@ export function applyDefaults<
 
             if (dev) {
                 thisBranch.dev = dev;
-                console.log(dev[typeName]);
             }
             if (stage) {
                 thisBranch.stage = stage;
-                console.log(stage[typeName]);
             }
             if (prod) {
                 thisBranch.prod = prod;
-                console.log(prod[typeName]);
             }
 
-            console.log(thisBranch);
 
             strictBranches[branchName] = thisBranch;
         }

@@ -91,7 +91,6 @@ export function parseRaw(json: {}): Config | string[] {
     const baseTContext = new IoContext()
         .sub('services', t.dictionary(ServiceName, t.union(project.serviceTypes, 'AnyService')));
 
-    console.log(inspect(configPartial, {depth: 10, colors: true}));
 
     for (const serviceName in servicesPartial) {
         const servicePartial = servicesPartial[serviceName];

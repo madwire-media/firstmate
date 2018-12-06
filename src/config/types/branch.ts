@@ -84,8 +84,6 @@ export function branchType<
         }),
     ]);
 
-    console.log(type); // TODO: Figure out why type isn't being set properly
-
     return new BranchType(
         name,
         branch.is,

@@ -204,7 +204,7 @@ export function serviceType<
 
     const baseBranches = t.dictionary(t.string, base.branch.partial);
     const partialBranches = t.dictionary(BranchName, branchTypePartial);
-    const strictBranches = t.dictionary(UsedBranchName, branchTypeExact);
+    const exactBranches = t.dictionary(UsedBranchName, branchTypeExact);
 
     const service = t.type({
         type: serviceType,
@@ -214,14 +214,14 @@ export function serviceType<
         type: serviceType,
         branches: partialBranches,
     });
-    const serviceStrict = t.type({
+    const serviceExact = t.type({
         type: serviceType,
-        branches: strictBranches,
+        branches: exactBranches,
     });
 
     return new ServiceType(
         `Service (${serviceTypeName})`,
-        serviceStrict.is,
+        serviceExact.is,
         (m, cr) => {
             const c = IoContext.from(cr);
 
@@ -232,7 +232,7 @@ export function serviceType<
             }
 
             // And get strictly-typed results
-            const {type, branches} = validServiceBasic.value;
+            let {type, branches} = validServiceBasic.value;
 
             const errors: IoErrors = [];
 
@@ -240,6 +240,8 @@ export function serviceType<
             const validServicePartial = servicePartial.validate(m, c);
             if (validServicePartial.isLeft()) {
                 errors.push(...validServicePartial.value);
+            } else {
+                branches = validServicePartial.value.branches;
             }
 
             const mergedBranches: {
@@ -306,12 +308,16 @@ export function serviceType<
                 branches: usedBranches,
             };
 
-            // Do a final strict check on used merged branches
+            // Do a final exact check on used merged branches
             if (errors.length === 0) {
-                const validServiceStrict = serviceStrict.validate(output, c);
-                if (validServiceStrict.isLeft()) {
-                    errors.push(...validServiceStrict.value);
+                const validServiceExact = serviceExact.validate(output, c);
+                if (validServiceExact.isLeft()) {
+                    errors.push(...validServiceExact.value);
                 }
+            }
+
+            for (const branchName in output.branches) {
+                (output.branches[branchName] as {type: string}).type = type;
             }
 
             if (errors.length > 0) {
