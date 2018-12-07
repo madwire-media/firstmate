@@ -84,7 +84,7 @@
             true,
             "array"
         ],
-        "no-namespace": false,
+        "no-namespace": false
     },
     "rulesDirectory": []
 }
