@@ -93,7 +93,7 @@ export function needsHelmPlugin(context: any, plugin: string, installUrl: string
         return false;
     }
 
-    const stdout = result.stdout.toString().split('\n').slice(1);
+    const stdout = result.stdout.toString().split(/\s/).slice(1);
 
     if (stdout.length < 1 || !stdout.some((s) => s.split(' ')[0] === plugin)) {
         if (context) {
