@@ -6,7 +6,7 @@ import leven = require('leven');
 import * as mkdirp from 'mkdirp';
 import { ncp } from 'ncp';
 
-import { Config } from '../config';
+import { RawConfig, rawProject } from '../config';
 import { a } from '../helpers/cli';
 import { loadConfig, loadConfigRaw, loadUser } from '../helpers/config';
 import { getGitOrigin } from '../helpers/git';
@@ -47,10 +47,11 @@ export async function addService(context: any, service: string, type: string, te
     }
     const [rawConfig, configFile, configIsHjson] = raw;
 
-    const config = loadConfig(context);
-    if (config === undefined) {
+    const configValid = rawProject.decode(rawConfig);
+    if (configValid.isLeft()) {
         return false;
     }
+    const config = configValid.value;
 
     const user = await loadUser();
     if (user === undefined) {
@@ -89,7 +90,7 @@ async function addSingleService({
     templatesRootDir, config, type, template, context, name,
     inheritedSource, user, remote, project, noSource,
 }: {
-    templatesRootDir: string, config: Config,
+    templatesRootDir: string, config: RawConfig,
     type: string, template: string, context: any, name: string,
     inheritedSource?: string, user: User, remote: string, project: string,
     noSource: boolean,

@@ -15,12 +15,17 @@ import { IoContext } from './util/io-context';
 import { merge } from './util/mergable';
 import { inspect } from 'util';
 
-const project = projectType([
+export const project = projectType([
     buildContainer.service,
     dockerDeployment.service,
     dockerImage.service,
     pureHelm.service,
 ], 'FirstmateProject');
+
+export const rawProject = t.type({
+    project: t.string,
+    services: t.dictionary(t.string, t.object),
+});
 
 type StrictService<
     S extends ServiceType<any, any>,
@@ -59,6 +64,8 @@ export type Config = IProject<
     | ServiceType<typeof dockerImage.branch.type, typeof dockerImage.branch.strict>
     | ServiceType<typeof dockerDeployment.branch.type, typeof dockerDeployment.branch.strict>
 >;
+
+export type RawConfig = t.TypeOf<typeof rawProject>;
 
 export type Branch =
     | t.TypeOf<typeof buildContainer.branch.strict>
