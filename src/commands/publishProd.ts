@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 
 import { Config } from '../config';
+import { tagged } from '../config/types/branch';
 import { a } from '../helpers/cli';
 import * as docker from '../helpers/commands/docker';
 import * as helm from '../helpers/commands/helm';
@@ -9,7 +10,6 @@ import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
     resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/service';
-import { tagged } from '../config/types/branch';
 
 export function publishProdReqs(
     config: Config,
@@ -55,9 +55,9 @@ export function publishProdReqs(
             needsHelmPlugin(context, 'push', 'https://github.com/chartmuseum/helm-push') && reqsMet;
     }
 
-    if (reqsMet) {
-        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, publishProdReqs, params, context);
-    }
+    // if (reqsMet) {
+    //     reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, publishProdReqs, params, context);
+    // }
 
     return reqsMet;
 }
@@ -81,7 +81,7 @@ export async function publishProd(
     const initResult = await initBranch({
         branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
         handlers, config, branchType: branchBase.type, alreadyRunBranches, params,
-    }, publishProd, 'prod');
+    }, publishProd, 'prod', false);
     if (initResult === false) {
         return false;
     }
