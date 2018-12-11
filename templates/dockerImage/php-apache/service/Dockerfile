@@ -11,6 +11,8 @@ ADD ports.conf /etc/apache2/ports.conf
 # Enable a couple useful apache modules
 RUN a2enmod rewrite headers
 
+ADD html /var/www/html
+
 # Expose http port
 EXPOSE 80
 
