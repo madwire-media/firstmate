@@ -13,7 +13,7 @@
                         php.ini: 'fm/[[service]]/php/php.prod.ini'
                         apache2.conf: 'fm/[[service]]/apache2/apache2.prod.conf'
                         ports.conf: 'fm/[[service]]/apache2/ports.conf'
-                        html: '[[source]]'
+                        html: '[[source]]/src'
                     }
 
                     dev: {

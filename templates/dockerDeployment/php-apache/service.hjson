@@ -16,7 +16,7 @@
                         docker/main/php.ini: 'fm/[[service]]/docker/main/php/php.prod.ini'
                         docker/main/apache2.conf: 'fm/[[service]]/docker/main/apache/apache2.prod.conf'
                         docker/main/ports.conf: 'fm/[[service]]/docker/main/apache/ports.conf'
-                        docker/main/html: '[[source]]'
+                        docker/main/html: '[[source]]/src'
                     }
 
                     dev: {
