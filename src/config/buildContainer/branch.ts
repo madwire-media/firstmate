@@ -1,26 +1,29 @@
 import * as t from 'io-ts';
 
-import * as base from '../base/branch';
-import { getProps } from '../../util/io-util';
-import { DockerVolumes, DockerArgs } from '../types/docker';
-import { branchType } from '../types/branch';
-import { ParsingContext } from '../types/parsingContext';
 import { setDefault } from '../../util/defaultable';
+import { getProps } from '../../util/io-util';
+import * as base from '../base/branch';
+import { branchType } from '../types/branch';
+import { DockerArgs, DockerVolumes } from '../types/docker';
+import { ParsingContext } from '../types/parsingContext';
 import { Defaults, defaultsFrom } from '../types/serviceDefaults';
 
 export namespace env {
     export namespace atoms {
+        // tslint:disable-next-line:no-empty-interface
         export interface AllReq {}
         export interface AllOpt {
             volumes?: DockerVolumes;
-            dockerArgs?: DockerArgs,
+            dockerArgs?: DockerArgs;
         }
 
+        // tslint:disable:variable-name
         export const _allReq = t.type({});
         export const _allOpt = t.partial({
             volumes: DockerVolumes,
             dockerArgs: DockerArgs,
         });
+        // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
         export const allOpt = t.alias(_allOpt)<AllOpt, AllOpt>();
@@ -31,9 +34,9 @@ export namespace env {
         extends
             base.env.comp.All,
             atoms.AllReq,
-            atoms.AllOpt
-        {}
+            atoms.AllOpt {}
 
+        // tslint:disable:variable-name
         export const _all = t.intersection([
             base.env.comp._all,
 
@@ -43,6 +46,7 @@ export namespace env {
         export const _allStrict = t.type(getProps(_all), 'BuildContainerEnvStrict');
         export const _allPartial = t.partial(getProps(_all), 'BuildContainerEnvPartial');
         export const _allExact = t.exact(_all, 'BuildContainerEnvExact');
+        // tslint:enable:variable-name
 
         export const all = t.clean<All>(_all);
         export const allStrict = t.clean<Required<All>>(_allStrict as any);

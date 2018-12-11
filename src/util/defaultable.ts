@@ -23,7 +23,7 @@ export function setDefault<
 
     const contents = {
         input,
-        def
+        def,
     };
 
     return new Proxy({contents}, {

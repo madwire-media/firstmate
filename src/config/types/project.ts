@@ -1,6 +1,6 @@
 import * as t from 'io-ts';
 import { ServiceType } from './service';
-import { Registry, ChartMuseum, ServiceName, ProjectName } from './strings';
+import { ChartMuseum, ProjectName, Registry, ServiceName } from './strings';
 
 export interface IProject<S extends ServiceType<any, any>> {
     defaults?: {
@@ -40,7 +40,7 @@ export function projectType<
             services: t.dictionary(
                 ServiceName,
                 t.taggedUnion('type', services, 'AnyService'),
-                'Services'
+                'Services',
             ),
         }),
         t.partial({
@@ -62,5 +62,5 @@ export function projectType<
             throw new Error('Cannot be decoded');
         },
         services,
-    )
+    );
 }

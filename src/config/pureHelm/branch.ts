@@ -1,13 +1,13 @@
 import * as t from 'io-ts';
 
+import { setDefault } from '../../util/defaultable';
 import { getProps } from '../../util/io-util';
 import * as base from '../base/branch';
-import { setDefault } from '../../util/defaultable';
 import { branchType } from '../types/branch';
 import { HelmArgs } from '../types/helm';
-import { ChartMuseum, ClusterName, Namespace, ReleaseName } from '../types/strings';
 import { ParsingContext } from '../types/parsingContext';
 import { defaultsFrom } from '../types/serviceDefaults';
+import { ChartMuseum, ClusterName, Namespace, ReleaseName } from '../types/strings';
 
 export namespace env {
     export namespace atoms {
@@ -21,21 +21,25 @@ export namespace env {
             chartmuseum?: ChartMuseum;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface DevReq {}
         export interface DevOpt {
             recreatePods?: boolean;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface StageReq {}
         export interface StageOpt {
             recreatePods?: boolean;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface ProdReq {}
         export interface ProdOpt {
             chartmuseum: ChartMuseum;
         }
 
+        // tslint:disable:variable-name
         export const _allReq = t.type({
             cluster: ClusterName,
             namespace: Namespace,
@@ -60,6 +64,7 @@ export namespace env {
         export const _prodOpt = t.partial({
             chartmuseum: ChartMuseum,
         });
+        // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
         export const allOpt = t.alias(_allOpt)<AllOpt, AllOpt>();
@@ -81,8 +86,7 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.DevReq,
-            atoms.DevOpt
-        {}
+            atoms.DevOpt {}
 
         export interface Stage
         extends
@@ -90,8 +94,7 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.StageReq,
-            atoms.StageOpt
-        {}
+            atoms.StageOpt {}
 
         export interface Prod
         extends
@@ -99,11 +102,11 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.ProdReq,
-            atoms.ProdOpt
-        {
+            atoms.ProdOpt {
             chartmuseum: ChartMuseum;
         }
 
+        // tslint:disable:variable-name
         export const _dev = t.intersection([
             base.env.comp._all,
 
@@ -142,6 +145,7 @@ export namespace env {
         export const _prodStrict = t.type(getProps(_prod), 'PureHelmProdStrict');
         export const _prodPartial = t.partial(getProps(_prod), 'PureHelmProdPartial');
         export const _prodExact = t.exact(_prod, 'PureHelmProdExact');
+        // tslint:enable:variable-name
 
         export const dev = t.clean<Dev>(_dev);
         export const devStrict = t.clean<Required<Dev>>(_devStrict as any);
@@ -179,7 +183,7 @@ export namespace env {
             });
         }
 
-        export function dev(input: devType,context: ParsingContext): devType {
+        export function dev(input: devType, context: ParsingContext): devType {
             input = all(input, context);
 
             return setDefault(input, {

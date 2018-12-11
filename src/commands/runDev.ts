@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 
 import { Config } from '../config';
+import { tagged } from '../config/types/branch';
 import { a } from '../helpers/cli';
 import * as docker from '../helpers/commands/docker';
 import * as helm from '../helpers/commands/helm';
@@ -11,7 +12,6 @@ import {
     getServiceDir, initBranch, maybeTryBranch, reqDependencies,
     resolveBranchName, SigIntHandler, testServiceFiles,
 } from '../helpers/service';
-import { tagged } from '../config/types/branch';
 
 export function runDevReqs(
     config: Config,

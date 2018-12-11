@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as util from 'util';
 
-import { Config, BranchEnv, Service, Branch } from '../config';
+import { Branch, BranchEnv, Config, Service } from '../config';
 
 import { a, colors, events } from './cli';
 import { loadConfig } from './config';
@@ -231,7 +231,7 @@ export function maybeTryBranch(
     if (!service.branches[usedBranchName][mode]) {
         const defaultGood = mode in service.branches['~default'];
         const branches = getGitBranches();
-        const possibleModes: Array<'dev' | 'stage' | 'prod'> = ['dev', 'stage', 'prod'];
+        const possibleModes: ('dev' | 'stage' | 'prod')[] = ['dev', 'stage', 'prod'];
         const modes = possibleModes.filter((m) => !!service.branches[usedBranchName][m]);
         let foundOption = false;
 

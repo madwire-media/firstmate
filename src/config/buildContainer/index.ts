@@ -1,4 +1,4 @@
-import { env, branch } from './branch';
+import { branch, env } from './branch';
 import { service } from './service';
 
 export {

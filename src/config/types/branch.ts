@@ -3,9 +3,9 @@ import { IoContext } from '../../util/io-context';
 import { intoFailure, intoSuccess, IoErrors } from '../../util/io-errors';
 import { AllowedModes } from './common';
 
+import { setDefault } from '../../util/defaultable';
 import { mask } from '../../util/maskable';
 import { merge } from '../../util/mergable';
-import { setDefault } from '../../util/defaultable';
 
 export const typeName = Symbol('branchTypeName');
 

@@ -2,18 +2,18 @@ import * as buildContainer from './config/buildContainer';
 import * as dockerDeployment from './config/dockerDeployment';
 import * as dockerImage from './config/dockerImage';
 import * as pureHelm from './config/pureHelm';
-import { projectType, IProject } from './config/types/project';
+import { IProject, projectType } from './config/types/project';
 
+import { Left } from 'fp-ts/lib/Either';
 import * as t from 'io-ts';
 import { PathReporter } from 'io-ts/lib/PathReporter';
-import { ServiceType, IService } from './config/types/service';
+import { inspect } from 'util';
 import { BranchType } from './config/types/branch';
+import { IService, ServiceType } from './config/types/service';
 import { applyDefaults } from './config/types/serviceDefaults';
 import { ServiceName } from './config/types/strings';
-import { Left } from 'fp-ts/lib/Either';
 import { IoContext } from './util/io-context';
 import { merge } from './util/mergable';
-import { inspect } from 'util';
 
 export const project = projectType([
     buildContainer.service,
@@ -98,12 +98,11 @@ export function parseRaw(json: {}): Config | string[] {
     const baseTContext = new IoContext()
         .sub('services', t.dictionary(ServiceName, t.union(project.serviceTypes, 'AnyService')));
 
-
     for (const serviceName in servicesPartial) {
         const servicePartial = servicesPartial[serviceName];
         const serviceContext = {
             service: serviceName,
-            ...baseContext
+            ...baseContext,
         };
 
         if (servicePartial.type === 'buildContainer') {

@@ -20,7 +20,7 @@ export class ServiceType<
 > extends t.InterfaceType<
     {
         type: t.LiteralType<TN>,
-        branches: t.DictionaryType<t.StringType, B>
+        branches: t.DictionaryType<t.StringType, B>,
     },
     IService<TN, B>
 > {
@@ -232,7 +232,8 @@ export function serviceType<
             }
 
             // And get strictly-typed results
-            let {type, branches} = validServiceBasic.value;
+            let {branches} = validServiceBasic.value;
+            const {type} = validServiceBasic.value;
 
             const errors: IoErrors = [];
 

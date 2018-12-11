@@ -1,13 +1,13 @@
 import * as t from 'io-ts';
 
+import { setDefault } from '../../util/defaultable';
 import { getProps } from '../../util/io-util';
 import * as base from '../base/branch';
 import { branchType } from '../types/branch';
-import { ImageName, Registry } from '../types/strings';
 import { DockerArgs } from '../types/docker';
 import { ParsingContext } from '../types/parsingContext';
-import { setDefault } from '../../util/defaultable';
 import { defaultsFrom } from '../types/serviceDefaults';
+import { ImageName, Registry } from '../types/strings';
 
 export namespace env {
     export namespace atoms {
@@ -19,19 +19,24 @@ export namespace env {
             dockerArgs?: DockerArgs;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface DevReq {}
         export interface DevOpt {
             pushImage?: boolean;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface StageReq {}
         export interface StageOpt {
             pushImage?: boolean;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface ProdReq {}
-        export interface ProdOpt{}
+        // tslint:disable-next-line:no-empty-interface
+        export interface ProdOpt {}
 
+        // tslint:disable:variable-name
         export const _allReq = t.type({
             imageName: ImageName,
         });
@@ -52,6 +57,7 @@ export namespace env {
 
         export const _prodReq = t.type({});
         export const _prodOpt = t.partial({});
+        // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
         export const allOpt = t.alias(_allOpt)<AllOpt, AllOpt>();
@@ -73,8 +79,7 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.DevReq,
-            atoms.DevOpt
-        {}
+            atoms.DevOpt {}
 
         export interface Stage
         extends
@@ -82,8 +87,7 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.StageReq,
-            atoms.StageOpt
-        {}
+            atoms.StageOpt {}
 
         export interface Prod
         extends
@@ -91,9 +95,9 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.ProdReq,
-            atoms.ProdOpt
-        {}
+            atoms.ProdOpt {}
 
+        // tslint:disable:variable-name
         export const _dev = t.intersection([
             base.env.comp._all,
 
@@ -132,6 +136,7 @@ export namespace env {
         export const _prodStrict = t.type(getProps(_prod), 'DockerImageProdStrict');
         export const _prodPartial = t.partial(getProps(_prod), 'DockerImageProdPartial');
         export const _prodExact = t.exact(_prod, 'DockerImageProdExact');
+        // tslint:enable:variable-name
 
         export const dev = t.clean<Dev>(_dev);
         export const devStrict = t.clean<Required<Dev>>(_devStrict as any);
@@ -168,7 +173,7 @@ export namespace env {
             });
         }
 
-        export function dev(input: devType,context: ParsingContext): devType {
+        export function dev(input: devType, context: ParsingContext): devType {
             input = all(input, context);
 
             return setDefault(input, {

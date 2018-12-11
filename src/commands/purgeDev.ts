@@ -1,4 +1,5 @@
 import { Config } from '../config';
+import { tagged } from '../config/types/branch';
 import { a } from '../helpers/cli';
 import * as helm from '../helpers/commands/helm';
 import { needsCluster, needsCommand } from '../helpers/require';
@@ -6,7 +7,6 @@ import {
     getDependencies, getServiceDir, initBranch,
     maybeTryBranch, resolveBranchName, SigIntHandler,
 } from '../helpers/service';
-import { tagged } from '../config/types/branch';
 
 export function purgeDevReqs(
     config: Config,

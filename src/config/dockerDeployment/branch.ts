@@ -1,17 +1,18 @@
 import * as t from 'io-ts';
 
+import { setDefault } from '../../util/defaultable';
+import { getProps, intersection } from '../../util/io-util';
 import * as base from '../base/branch';
 import * as pureHelm from '../pureHelm/branch';
-import { getProps, intersection } from '../../util/io-util';
 import { branchType } from '../types/branch';
-import { Registry, ImageName } from '../types/strings';
 import { Containers, DeploymentMode } from '../types/other';
 import { ParsingContext } from '../types/parsingContext';
-import { setDefault } from '../../util/defaultable';
 import { defaultsFrom } from '../types/serviceDefaults';
+import { ImageName, Registry } from '../types/strings';
 
 export namespace env {
     export namespace atoms {
+        // tslint:disable-next-line:no-empty-interface
         export interface AllReq {}
         export interface AllOpt {
             registry?: Registry;
@@ -19,6 +20,7 @@ export namespace env {
             containers?: Containers;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface DevReq {}
         export interface DevOpt {
             mode?: DeploymentMode;
@@ -26,12 +28,17 @@ export namespace env {
             autodelete?: boolean;
         }
 
+        // tslint:disable-next-line:no-empty-interface
         export interface StageReq {}
+        // tslint:disable-next-line:no-empty-interface
         export interface StageOpt {}
 
+        // tslint:disable-next-line:no-empty-interface
         export interface ProdReq {}
+        // tslint:disable-next-line:no-empty-interface
         export interface ProdOpt {}
 
+        // tslint:disable:variable-name
         export const _allReq = t.type({});
         export const _allOpt = t.partial({
             registry: Registry,
@@ -51,6 +58,7 @@ export namespace env {
 
         export const _prodReq = t.type({});
         export const _prodOpt = t.type({});
+        // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
         export const allOpt = t.alias(_allOpt)<AllOpt, AllOpt>();
@@ -73,8 +81,7 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.DevReq,
-            atoms.DevOpt
-        {}
+            atoms.DevOpt {}
 
         export interface Stage
         extends
@@ -83,8 +90,7 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.StageReq,
-            atoms.StageOpt
-        {}
+            atoms.StageOpt {}
 
         export interface Prod
         extends
@@ -93,10 +99,10 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.ProdReq,
-            atoms.ProdOpt
-        {}
+            atoms.ProdOpt {}
 
         // using custom definition of intersection for more types
+        // tslint:disable:variable-name
         export const _dev = intersection([
             base.env.comp._all,
 
@@ -143,6 +149,7 @@ export namespace env {
         export const _prodStrict = t.type(getProps(_prod), 'DockerDeploymentProdStrict');
         export const _prodPartial = t.partial(getProps(_prod), 'DockerDeploymentProdPartial');
         export const _prodExact = t.exact(_prod, 'DockerDeploymentProdExact');
+        // tslint:enable:variable-name
 
         export const dev = t.clean<Dev>(_dev);
         export const devStrict = t.clean<Required<Dev>>(_devStrict as any);

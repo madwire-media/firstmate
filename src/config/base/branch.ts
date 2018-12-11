@@ -2,11 +2,11 @@ import * as t from 'io-ts';
 
 import { branchType } from '../types/branch';
 
+import { setDefault } from '../../util/defaultable';
 import { getProps } from '../../util/io-util';
 import { CopyFiles } from '../types/common';
-import { BranchName, ServiceName } from '../types/strings';
 import { ParsingContext } from '../types/parsingContext';
-import { setDefault } from '../../util/defaultable';
+import { BranchName, ServiceName } from '../types/strings';
 
 export namespace env {
     export namespace atoms {
@@ -21,6 +21,7 @@ export namespace env {
             inheritFrom?: BranchName | BranchName[];
         }
 
+        // tslint:disable:variable-name
         export const _allReq = t.type({
             version: t.string,
         });
@@ -34,6 +35,7 @@ export namespace env {
                 BranchName,
             ]),
         });
+        // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
         export const allOpt = t.alias(_allOpt)<AllOpt, AllOpt>();
@@ -44,15 +46,16 @@ export namespace env {
         export interface All
         extends
             atoms.AllOpt,
-            atoms.AllReq
-        {}
+            atoms.AllReq {}
 
+        // tslint:disable:variable-name
         export const _all = t.intersection([
             atoms.allReq,
             atoms.allOpt,
         ]);
         export const _allStrict = t.type(getProps(_all));
         export const _allPartial = t.partial(getProps(_all));
+        // tslint:enable:variable-name
 
         export const all = t.clean<All>(_all);
         export const allStrict = t.clean<Required<All>>(_allStrict as any);
@@ -86,8 +89,8 @@ export namespace branch {
         env.comp.allPartial,
         env.comp.allPartial,
         '' as any,
-        'BranchBasePartial'
-    )
+        'BranchBasePartial',
+    );
 
     // No exact branch
 }

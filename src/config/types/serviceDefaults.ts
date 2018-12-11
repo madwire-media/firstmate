@@ -1,10 +1,10 @@
 import * as t from 'io-ts';
 
+import { Left, Right } from 'fp-ts/lib/Either';
+import { defaultContents } from '../../util/defaultable';
 import { BranchType, typeName } from './branch';
 import { ParsingContext } from './parsingContext';
 import { IService } from './service';
-import { Left, Right } from 'fp-ts/lib/Either';
-import { defaultContents } from '../../util/defaultable';
 
 type DefaultFunc<T> = (input: T, context: ParsingContext) => T;
 
@@ -63,10 +63,10 @@ export function applyDefaults<
     defaults: DF,
     service: SV,
     context: PartialContext,
-    tContext: t.Context
+    tContext: t.Context,
 ): t.Validation<IService<TN, O>> {
     const strictBranches: {
-        [branchName: string]: t.TypeOf<O>
+        [branchName: string]: t.TypeOf<O>,
     } = {};
     const errors: t.Errors = [];
 
@@ -80,8 +80,8 @@ export function applyDefaults<
                 {
                     branch: branchName,
                     env: 'dev',
-                    ...context
-                }
+                    ...context,
+                },
             );
 
             const devValid = defaults.devType.validate(devDefault, tContext); // TODO: Fix the context here
@@ -99,8 +99,8 @@ export function applyDefaults<
                 {
                     branch: branchName,
                     env: 'stage',
-                    ...context
-                }
+                    ...context,
+                },
             );
 
             const stageValid = defaults.stageType.validate(stageDefault, tContext); // TODO: Fix the context here
@@ -118,8 +118,8 @@ export function applyDefaults<
                 {
                     branch: branchName,
                     env: 'prod',
-                    ...context
-                }
+                    ...context,
+                },
             );
 
             const prodValid = defaults.prodType.validate(prodDefault, tContext); // TODO: Fix the context here
@@ -145,7 +145,6 @@ export function applyDefaults<
                 thisBranch.prod = prod;
             }
 
-
             strictBranches[branchName] = thisBranch;
         }
     }
@@ -157,7 +156,7 @@ export function applyDefaults<
             {
                 type: service.type,
                 branches: strictBranches,
-            }
+            },
         );
     }
 }

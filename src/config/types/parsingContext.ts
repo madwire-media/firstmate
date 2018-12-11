@@ -1,4 +1,4 @@
-import { PartialContext } from "./serviceDefaults";
+import { PartialContext } from './serviceDefaults';
 
 export interface ParsingContext extends PartialContext {
     branch: string;

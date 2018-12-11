@@ -120,7 +120,7 @@ export function intersection<
     G extends t.Mixed
 >(
     types: [A, B, C, D, E, F, G],
-    name?: string
+    name?: string,
 ): t.IntersectionType<
     [A, B, C, D, E, F, G],
     t.Compact<
@@ -142,7 +142,7 @@ export function intersection<
         t.OutputOf<G>
     >,
     t.mixed
->
+>;
 export function intersection<
     A extends t.Mixed,
     B extends t.Mixed,
@@ -152,7 +152,7 @@ export function intersection<
     F extends t.Mixed
 >(
     types: [A, B, C, D, E, F],
-    name?: string
+    name?: string,
 ): t.IntersectionType<
     [A, B, C, D, E, F],
     t.Compact<
@@ -172,7 +172,7 @@ export function intersection<
         t.OutputOf<F>
     >,
     t.mixed
->
+>;
 export function intersection<
     A extends t.Mixed,
     B extends t.Mixed,
@@ -181,7 +181,7 @@ export function intersection<
     E extends t.Mixed
 >(
     types: [A, B, C, D, E],
-    name?: string
+    name?: string,
 ): t.IntersectionType<
     [A, B, C, D, E],
     t.Compact<
@@ -199,7 +199,7 @@ export function intersection<
         t.OutputOf<E>
     >,
     t.mixed
->
+>;
 export function intersection<
     A extends t.Mixed,
     B extends t.Mixed,
@@ -207,7 +207,7 @@ export function intersection<
     D extends t.Mixed
 >(
     types: [A, B, C, D],
-    name?: string
+    name?: string,
 ): t.IntersectionType<
     [A, B, C, D],
     t.Compact<
@@ -223,14 +223,14 @@ export function intersection<
         t.OutputOf<D>
     >,
     t.mixed
->
+>;
 export function intersection<
     A extends t.Mixed,
     B extends t.Mixed,
     C extends t.Mixed
 >(
     types: [A, B, C],
-name?: string
+    name?: string,
 ): t.IntersectionType<
     [A, B, C],
     t.Compact<
@@ -244,13 +244,13 @@ name?: string
         t.OutputOf<C>
     >,
     t.mixed
->
+>;
 export function intersection<
     A extends t.Mixed,
     B extends t.Mixed
 >(
     types: [A, B],
-    name?: string
+    name?: string,
 ): t.IntersectionType<
     [A, B],
     t.Compact<
@@ -261,21 +261,21 @@ export function intersection<
         t.OutputOf<B>
     >,
     t.mixed
->
+>;
 export function intersection<
     A extends t.Mixed
 >(
     types: [A],
-    name?: string
+    name?: string,
 ): t.IntersectionType<
     [A],
     t.TypeOf<A>,
     t.OutputOf<A>,
     t.mixed
->
-export function intersection<RTS extends Array<t.Mixed>>(
+>;
+export function intersection<RTS extends t.Mixed[]>(
     types: RTS,
-    name: string = `(${types.map(type => type.name).join(' & ')})`
+    name: string = `(${types.map((type) => type.name).join(' & ')})`,
 ): t.IntersectionType<RTS, any, any, t.mixed> {
     return t.intersection(types as any, name) as any;
 }

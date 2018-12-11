@@ -1,4 +1,8 @@
+import { inspect } from 'util';
 import { Config } from '../config';
+import * as base from '../config/base/branch';
+import { branch } from '../config/buildContainer';
+import { BranchModeEnum } from '../config/types/common';
 import { a } from '../helpers/cli';
 import { loadConfig } from '../helpers/config';
 import { getGitBranch } from '../helpers/git';
@@ -7,10 +11,6 @@ import {
     getServiceDir, resolveBranchName, runDependencies, runService,
     SigIntHandler, testServiceDir, testServiceFiles,
 } from '../helpers/service';
-import * as base from '../config/base/branch';
-import { branch } from '../config/buildContainer';
-import { BranchModeEnum } from '../config/types/common';
-import { inspect } from 'util';
 
 export async function validate(params: {[arg: string]: any}, service?: string): Promise<boolean> {
     let isOk =
