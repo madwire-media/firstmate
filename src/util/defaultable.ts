@@ -55,6 +55,10 @@ export function setDefault<
             }
         },
         getOwnPropertyDescriptor(target, property) {
+            if (property === '__COMMENTS__') {
+                return undefined;
+            }
+
             if (property in target.contents.input) {
                 return Object.getOwnPropertyDescriptor(target.contents.input, property);
             } else {
@@ -76,7 +80,7 @@ export function setDefault<
                 output.add(key);
             }
 
-            return Array.from(output);
+            return Array.from(output).filter((k) => k !== '__COMMENTS__');
         },
         preventExtensions: unsupportedOperation('preventExtensions'),
         set(target, property, value, receiver) {

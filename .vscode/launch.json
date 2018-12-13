@@ -7,17 +7,30 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}/dist/main.js",
-            "outFiles": [
-                "${workspaceFolder}/**/*.js"
-            ]
+            "name": "Launch via NPM",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug-test"
+            ],
+            "port": 9229,
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         },
         {
             "type": "node",
             "request": "attach",
             "name": "Attach by Process ID",
-            "processId": "${command:PickProcess}"
-        }
+            "processId": "${command:PickProcess}",
+            "sourceMaps": false,
+        },
+        // {
+        //     "name": "Debug Jest Tests",
+        //     "type": "node",
+        //     "request": "launch",
+        //     // "runtimeArgs": ["${workspaceRoot}/node_modules/.bin/jest", "--runInBand", "--coverage", "false"],
+        //     "console": "integratedTerminal",
+        //     "internalConsoleOptions": "neverOpen"
+        // }
     ]
 }
