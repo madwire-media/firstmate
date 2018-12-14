@@ -41,13 +41,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/mahna',
                                         },
                                         ports: [
+                                            3548,
                                             {
-                                                local: 3548,
-                                                remote: 3548,
-                                            },
-                                            {
-                                                local: 6247,
-                                                remote: 1337,
+                                                outer: 6247,
+                                                inner: 1337,
                                             },
                                         ],
                                         debugCMD: 'echo hello',
@@ -66,13 +63,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/moo',
                                         },
                                         ports: [
+                                            8453,
                                             {
-                                                local: 8453,
-                                                remote: 8453,
-                                            },
-                                            {
-                                                local: 7331,
-                                                remote: 7426,
+                                                outer: 7331,
+                                                inner: 7426,
                                             },
                                         ],
                                         debugCMD: 'echo hola',
@@ -83,6 +77,8 @@ describe('schema tests - dockerDeployment', () => {
                                 pushDebugContainer: false,
                                 autodelete: true,
                                 recreatePods: true,
+
+                                version: 'test',
                             },
                             stage: {
                                 registry: 'registry.com',
@@ -112,13 +108,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/mahna',
                                         },
                                         ports: [
+                                            3548,
                                             {
-                                                local: 3548,
-                                                remote: 3548,
-                                            },
-                                            {
-                                                local: 6247,
-                                                remote: 1337,
+                                                outer: 6247,
+                                                inner: 1337,
                                             },
                                         ],
                                         debugCMD: 'echo hello',
@@ -137,13 +130,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/moo',
                                         },
                                         ports: [
+                                            8453,
                                             {
-                                                local: 8453,
-                                                remote: 8453,
-                                            },
-                                            {
-                                                local: 7331,
-                                                remote: 7426,
+                                                outer: 7331,
+                                                inner: 7426,
                                             },
                                         ],
                                         debugCMD: 'echo hola',
@@ -151,6 +141,8 @@ describe('schema tests - dockerDeployment', () => {
                                 },
 
                                 recreatePods: false,
+
+                                version: 'test',
                             },
                             prod: {
                                 registry: 'registry.com',
@@ -180,13 +172,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/mahna',
                                         },
                                         ports: [
+                                            3548,
                                             {
-                                                local: 3548,
-                                                remote: 3548,
-                                            },
-                                            {
-                                                local: 6247,
-                                                remote: 1337,
+                                                outer: 6247,
+                                                inner: 1337,
                                             },
                                         ],
                                         debugCMD: 'echo hello',
@@ -205,13 +194,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/moo',
                                         },
                                         ports: [
+                                            8453,
                                             {
-                                                local: 8453,
-                                                remote: 8453,
-                                            },
-                                            {
-                                                local: 7331,
-                                                remote: 7426,
+                                                outer: 7331,
+                                                inner: 7426,
                                             },
                                         ],
                                         debugCMD: 'echo hola',

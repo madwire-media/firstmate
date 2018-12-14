@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 
 import { setDefault } from '../../util/defaultable';
-import { getProps } from '../../util/io-util';
+import { exact, getProps } from '../../util/io-util';
 import * as base from '../base/branch';
 import { branchType } from '../types/branch';
 import { DockerArgs, DockerVolumes } from '../types/docker';
@@ -45,13 +45,13 @@ export namespace env {
         ], 'BuildContainerEnv');
         export const _allStrict = t.type(getProps(_all), 'BuildContainerEnvStrict');
         export const _allPartial = t.partial(getProps(_all), 'BuildContainerEnvPartial');
-        export const _allExact = t.exact(_all, 'BuildContainerEnvExact');
+        export const _allExact = exact(_all, 'BuildContainerEnvExact');
         // tslint:enable:variable-name
 
         export const all = t.clean<All>(_all);
         export const allStrict = t.clean<Required<All>>(_allStrict as any);
         export const allPartial = t.clean<Partial<All>>(_allPartial);
-        export const allExact = t.exact(_all);
+        export const allExact = exact(_all);
     }
 
     export namespace defaults {
@@ -62,6 +62,7 @@ export namespace env {
 
             return setDefault(input, {
                 volumes: {},
+                dockerArgs: {},
             });
         }
     }

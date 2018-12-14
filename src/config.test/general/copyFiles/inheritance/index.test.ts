@@ -15,6 +15,7 @@ describe('schema tests - general', () => {
                         '~default': {
                             dev: {
                                 cluster: 'cluster',
+                                chartmuseum: 'museum',
                                 namespace: 'test',
                                 copyFiles: {
                                     'to/location/1': 'from/1',
@@ -25,6 +26,7 @@ describe('schema tests - general', () => {
                         'inheritTest': {
                             dev: {
                                 cluster: 'cluster',
+                                chartmuseum: 'museum',
                                 namespace: 'test',
                                 copyFiles: {
                                     'to/location/1': 'from/overridden',

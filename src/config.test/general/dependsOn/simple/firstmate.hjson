@@ -6,6 +6,7 @@
             branches: {
                 ~default: {
                     cluster: cluster
+                    chartmuseum: museum
                     namespace: test
                     version: test
 

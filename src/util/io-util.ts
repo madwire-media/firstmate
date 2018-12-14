@@ -1,5 +1,6 @@
 import * as t from 'io-ts';
 import { createError, intoFailure, intoSuccess } from './io-errors';
+import { only } from './maskable';
 
 export function refineRgx<T extends t.Type<string>>(
     rgx: RegExp,
@@ -278,4 +279,26 @@ export function intersection<RTS extends t.Mixed[]>(
     name: string = `(${types.map((type) => type.name).join(' & ')})`,
 ): t.IntersectionType<RTS, any, any, t.mixed> {
     return t.intersection(types as any, name) as any;
+}
+
+export function exact<RT extends t.HasProps>(
+    type: RT,
+    name: string = `ExactType<${type.name}>`,
+): t.ExactType<RT, t.TypeOf<RT>, t.OutputOf<RT>, t.InputOf<RT>> {
+    const props: t.Props = getProps(type);
+    return new t.ExactType(
+        name,
+        (m): m is t.TypeOf<RT> => type.is(m),
+        (m, c) => {
+            const looseValidation = type.validate(m, c);
+
+            if (looseValidation.isLeft()) {
+                return looseValidation;
+            } else {
+                return intoSuccess(only(looseValidation.value, props));
+            }
+        },
+        type.encode,
+        type,
+    );
 }

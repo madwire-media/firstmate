@@ -22,6 +22,7 @@ describe('schema tests - buildContainer', () => {
                                     foo: 'bar',
                                     mahna: 'mahna',
                                 },
+                                version: 'test',
                             },
                             stage: {
                                 volumes: {
@@ -32,6 +33,7 @@ describe('schema tests - buildContainer', () => {
                                     foo: 'bar',
                                     mahna: 'mahna',
                                 },
+                                version: 'test',
                             },
                             prod: {
                                 volumes: {

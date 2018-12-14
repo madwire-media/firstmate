@@ -20,7 +20,7 @@
                         // Copy the development configurations and source code over
                         copyFiles: {
                             php.ini: 'fm/[[service]]/php/php.dev.ini'
-                            apache2.conf: 'fm/[[service]]/apache2/apache2.dev.conf',
+                            apache2.conf: 'fm/[[service]]/apache2/apache2.dev.conf'
                         }
                     }
                 }

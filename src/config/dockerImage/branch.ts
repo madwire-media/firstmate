@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 
 import { setDefault } from '../../util/defaultable';
-import { getProps } from '../../util/io-util';
+import { exact, getProps } from '../../util/io-util';
 import * as base from '../base/branch';
 import { branchType } from '../types/branch';
 import { DockerArgs } from '../types/docker';
@@ -109,7 +109,7 @@ export namespace env {
         ], 'DockerImageDev');
         export const _devStrict = t.type(getProps(_dev), 'DockerImageDevStrict');
         export const _devPartial = t.partial(getProps(_dev), 'DockerImageDevPartial');
-        export const _devExact = t.exact(_dev, 'DockerImageDevExact');
+        export const _devExact = exact(_dev, 'DockerImageDevExact');
 
         export const _stage = t.intersection([
             base.env.comp._all,
@@ -122,7 +122,7 @@ export namespace env {
         ], 'DockerImageStage');
         export const _stageStrict = t.type(getProps(_stage), 'DockerImageStageStrict');
         export const _stagePartial = t.partial(getProps(_stage), 'DockerImageStagePartial');
-        export const _stageExact = t.exact(_stage, 'DockerImageStageExact');
+        export const _stageExact = exact(_stage, 'DockerImageStageExact');
 
         export const _prod = t.intersection([
             base.env.comp._all,
@@ -135,7 +135,7 @@ export namespace env {
         ], 'DockerImageProd');
         export const _prodStrict = t.type(getProps(_prod), 'DockerImageProdStrict');
         export const _prodPartial = t.partial(getProps(_prod), 'DockerImageProdPartial');
-        export const _prodExact = t.exact(_prod, 'DockerImageProdExact');
+        export const _prodExact = exact(_prod, 'DockerImageProdExact');
         // tslint:enable:variable-name
 
         export const dev = t.clean<Dev>(_dev);

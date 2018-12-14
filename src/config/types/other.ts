@@ -12,19 +12,19 @@ export type DeploymentMode = keyof typeof DeploymentModeEnum;
 export const DeploymentMode = t.keyof(DeploymentModeEnum, 'DeploymentMode');
 
 export interface Container {
-    volumes: DockerVolumes;
-    dockerArgs: DockerArgs;
-    k8sVolumes: KubernetesVolumes;
-    ports: Port[];
-    debugCMD: string;
+    volumes?: DockerVolumes;
+    dockerArgs?: DockerArgs;
+    k8sVolumes?: KubernetesVolumes;
+    ports?: Port[];
+    debugCMD?: string;
 }
 export const Container = t.partial({
     volumes: DockerVolumes,
     dockerArgs: DockerArgs,
     k8sVolumes: KubernetesVolumes,
     ports: t.array(Port),
-    debugCmd: t.string,
-});
+    debugCMD: t.string,
+}, 'Container');
 
 export interface Containers {
     [name: string]: Container;

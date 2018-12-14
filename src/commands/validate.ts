@@ -55,20 +55,23 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
 
         const service = config.services[serviceName];
         const usedBranchName = resolveBranchName(branchName, service.branches);
-        const branchBase = service.branches[usedBranchName];
-        // const branchBaseIter = branchBase as any as {[key: string]: typeof branch.basic | undefined};
 
-        // Check that certain files exist
-        if (serviceFolder !== undefined && needsFolder(serviceFolder)) {
-            testServiceFiles(serviceName, branchBase.type);
-        }
+        if (usedBranchName in service.branches) {
+            const branchBase = service.branches[usedBranchName];
+            // const branchBaseIter = branchBase as any as {[key: string]: typeof branch.basic | undefined};
 
-        // Check all dependencies for all environments
-        for (const envName of ['dev', 'stage', 'prod'] as (keyof typeof BranchModeEnum)[]) {
-            const branch = branchBase[envName];
+            // Check that certain files exist
+            if (serviceFolder !== undefined && needsFolder(serviceFolder)) {
+                testServiceFiles(serviceName, branchBase.type);
+            }
 
-            if (branch !== undefined) {
-                await runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, {}, handler);
+            // Check all dependencies for all environments
+            for (const envName of ['dev', 'stage', 'prod'] as (keyof typeof BranchModeEnum)[]) {
+                const branch = branchBase[envName];
+
+                if (branch !== undefined) {
+                    await runDependencies(config, branchName, branch, [], alreadyRunBranches, isAsync, {}, handler);
+                }
             }
         }
     };

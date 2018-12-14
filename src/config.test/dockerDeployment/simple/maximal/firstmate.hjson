@@ -35,8 +35,8 @@
                                 ports: [
                                     3548
                                     {
-                                        local: 6247
-                                        remote: 1337
+                                        outer: 6247
+                                        inner: 1337
                                     }
                                 ]
                                 debugCMD: echo hello
@@ -57,8 +57,8 @@
                                 ports: [
                                     8453
                                     {
-                                        local: 7331
-                                        remote: 7426
+                                        outer: 7331
+                                        inner: 7426
                                     }
                                 ]
                                 debugCMD: echo hola
@@ -69,6 +69,8 @@
                         pushDebugContainer: false
                         autodelete: true
                         recreatePods: true
+
+                        version: test
                     }
                     stage: {
                         registry: registry.com
@@ -100,8 +102,8 @@
                                 ports: [
                                     3548
                                     {
-                                        local: 6247
-                                        remote: 1337
+                                        outer: 6247
+                                        inner: 1337
                                     }
                                 ]
                                 debugCMD: echo hello
@@ -122,8 +124,8 @@
                                 ports: [
                                     8453
                                     {
-                                        local: 7331
-                                        remote: 7426
+                                        outer: 7331
+                                        inner: 7426
                                     }
                                 ]
                                 debugCMD: echo hola
@@ -131,6 +133,8 @@
                         }
 
                         recreatePods: false
+
+                        version: test
                     }
                     prod: {
                         registry: registry.com
@@ -162,8 +166,8 @@
                                 ports: [
                                     3548
                                     {
-                                        local: 6247
-                                        remote: 1337
+                                        outer: 6247
+                                        inner: 1337
                                     }
                                 ]
                                 debugCMD: echo hello
@@ -184,8 +188,8 @@
                                 ports: [
                                     8453
                                     {
-                                        local: 7331
-                                        remote: 7426
+                                        outer: 7331
+                                        inner: 7426
                                     }
                                 ]
                                 debugCMD: echo hola

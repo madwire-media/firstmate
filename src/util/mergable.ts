@@ -9,11 +9,27 @@ const isOnlyObject = <T>(input: T): input is Exclude<T, any[] | boolean | string
 
 const unsupportedOperation = (op: string) => () => {throw new TypeError(`unsupported operation: ${op}`); };
 
-export function merge<T extends object>(...items: (Exclude<T, any[]>)[]): Merged<Exclude<T, any[]>> {
+export function merge<
+    T extends object
+>(
+    // tslint:disable-next-line:trailing-comma
+    ...items: (Exclude<T, any[]> | Exclude<T, any[]>[])[]
+): Merged<Exclude<T, any[]>> {
     const contents: Exclude<T, any[]>[] = [];
 
     for (const item of items) {
-        if (mergedContents in item) {
+        if (item instanceof Array) {
+            for (const subItem of item) {
+                if (isOnlyObject(subItem)) {
+                    contents.push(subItem);
+                } else if (subItem === null && contents.length === 0) {
+                    // Null shouldn't have been an input in the first place
+                    return null!;
+                } else {
+                    break;
+                }
+            }
+        } else if (mergedContents in item) {
             for (const subItem of (item as Merged<typeof item>)[mergedContents]) {
                 if (isOnlyObject(subItem)) {
                     contents.push(subItem);

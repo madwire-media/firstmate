@@ -25,6 +25,8 @@ describe('schema tests - pureHelm', () => {
                                 },
 
                                 recreatePods: true,
+
+                                version: 'test',
                             },
                             stage: {
                                 chartmuseum: 'museum.com',
@@ -38,6 +40,8 @@ describe('schema tests - pureHelm', () => {
                                 },
 
                                 recreatePods: true,
+
+                                version: 'test',
                             },
                             prod: {
                                 chartmuseum: 'museum.com',
@@ -66,6 +70,8 @@ describe('schema tests - pureHelm', () => {
                                 },
 
                                 recreatePods: true,
+
+                                version: 'test',
                             },
                             stage: null,
                             prod: null,
@@ -84,6 +90,8 @@ describe('schema tests - pureHelm', () => {
                                 },
 
                                 recreatePods: true,
+
+                                version: 'test',
                             },
                             prod: null,
                         },

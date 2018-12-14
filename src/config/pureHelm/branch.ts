@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 
 import { setDefault } from '../../util/defaultable';
-import { getProps } from '../../util/io-util';
+import { exact, getProps } from '../../util/io-util';
 import * as base from '../base/branch';
 import { branchType } from '../types/branch';
 import { HelmArgs } from '../types/helm';
@@ -118,7 +118,7 @@ export namespace env {
         ], 'PureHelmDev');
         export const _devStrict = t.type(getProps(_dev), 'PureHelmDevStrict');
         export const _devPartial = t.partial(getProps(_dev), 'PureHelmDevPartial');
-        export const _devExact = t.exact(_dev, 'PureHelmDevExact');
+        export const _devExact = exact(_dev, 'PureHelmDevExact');
 
         export const _stage = t.intersection([
             base.env.comp._all,
@@ -131,7 +131,7 @@ export namespace env {
         ], 'PureHelmStage');
         export const _stageStrict = t.type(getProps(_stage), 'PureHelmStageStrict');
         export const _stagePartial = t.partial(getProps(_stage), 'PureHelmStagePartial');
-        export const _stageExact = t.exact(_stage, 'PureHelmStageExact');
+        export const _stageExact = exact(_stage, 'PureHelmStageExact');
 
         export const _prod = t.intersection([
             base.env.comp._all,
@@ -144,7 +144,7 @@ export namespace env {
         ], 'PureHelmProd');
         export const _prodStrict = t.type(getProps(_prod), 'PureHelmProdStrict');
         export const _prodPartial = t.partial(getProps(_prod), 'PureHelmProdPartial');
-        export const _prodExact = t.exact(_prod, 'PureHelmProdExact');
+        export const _prodExact = exact(_prod, 'PureHelmProdExact');
         // tslint:enable:variable-name
 
         export const dev = t.clean<Dev>(_dev);

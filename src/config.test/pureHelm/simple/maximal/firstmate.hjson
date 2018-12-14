@@ -16,7 +16,9 @@
                             mahna: mahna
                         }
 
-                        recreatePods: true,
+                        recreatePods: true
+
+                        version: test
                     }
                     stage: {
                         chartmuseum: museum.com
@@ -29,7 +31,9 @@
                             mahna: mahna
                         }
 
-                        recreatePods: true,
+                        recreatePods: true
+
+                        version: test
                     }
                     prod: {
                         chartmuseum: museum.com

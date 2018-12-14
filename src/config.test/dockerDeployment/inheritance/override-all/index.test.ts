@@ -41,13 +41,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/mahna',
                                         },
                                         ports: [
+                                            3548,
                                             {
-                                                local: 3548,
-                                                remote: 3548,
-                                            },
-                                            {
-                                                local: 6247,
-                                                remote: 1337,
+                                                outer: 6247,
+                                                inner: 1337,
                                             },
                                         ],
                                         debugCMD: 'echo hello',
@@ -66,13 +63,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/moo',
                                         },
                                         ports: [
+                                            8453,
                                             {
-                                                local: 8453,
-                                                remote: 8453,
-                                            },
-                                            {
-                                                local: 7331,
-                                                remote: 7426,
+                                                outer: 7331,
+                                                inner: 7426,
                                             },
                                         ],
                                         debugCMD: 'echo hola',
@@ -112,13 +106,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/mahna',
                                         },
                                         ports: [
+                                            3548,
                                             {
-                                                local: 3548,
-                                                remote: 3548,
-                                            },
-                                            {
-                                                local: 6247,
-                                                remote: 1337,
+                                                outer: 6247,
+                                                inner: 1337,
                                             },
                                         ],
                                         debugCMD: 'echo hello',
@@ -137,13 +128,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/moo',
                                         },
                                         ports: [
+                                            8453,
                                             {
-                                                local: 8453,
-                                                remote: 8453,
-                                            },
-                                            {
-                                                local: 7331,
-                                                remote: 7426,
+                                                outer: 7331,
+                                                inner: 7426,
                                             },
                                         ],
                                         debugCMD: 'echo hola',
@@ -180,13 +168,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/mahna',
                                         },
                                         ports: [
+                                            3548,
                                             {
-                                                local: 3548,
-                                                remote: 3548,
-                                            },
-                                            {
-                                                local: 6247,
-                                                remote: 1337,
+                                                outer: 6247,
+                                                inner: 1337,
                                             },
                                         ],
                                         debugCMD: 'echo hello',
@@ -205,13 +190,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/moo',
                                         },
                                         ports: [
+                                            8453,
                                             {
-                                                local: 8453,
-                                                remote: 8453,
-                                            },
-                                            {
-                                                local: 7331,
-                                                remote: 7426,
+                                                outer: 7331,
+                                                inner: 7426,
                                             },
                                         ],
                                         debugCMD: 'echo hola',
@@ -250,13 +232,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/unmahna',
                                         },
                                         ports: [
+                                            4835,
                                             {
-                                                local: 4835,
-                                                remote: 4835,
-                                            },
-                                            {
-                                                local: 4762,
-                                                remote: 3713,
+                                                outer: 4762,
+                                                inner: 3713,
                                             },
                                         ],
                                         debugCMD: 'echo unhello',
@@ -275,13 +254,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/unmoo',
                                         },
                                         ports: [
+                                            5384,
                                             {
-                                                local: 5384,
-                                                remote: 5384,
-                                            },
-                                            {
-                                                local: 3173,
-                                                remote: 2674,
+                                                outer: 3173,
+                                                inner: 2674,
                                             },
                                         ],
                                         debugCMD: 'echo unhola',
@@ -321,13 +297,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/unmahna',
                                         },
                                         ports: [
+                                            4835,
                                             {
-                                                local: 4835,
-                                                remote: 4835,
-                                            },
-                                            {
-                                                local: 4762,
-                                                remote: 3713,
+                                                outer: 4762,
+                                                inner: 3713,
                                             },
                                         ],
                                         debugCMD: 'echo unhello',
@@ -346,13 +319,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/unmoo',
                                         },
                                         ports: [
+                                            5384,
                                             {
-                                                local: 5384,
-                                                remote: 5384,
-                                            },
-                                            {
-                                                local: 3173,
-                                                remote: 2674,
+                                                outer: 3173,
+                                                inner: 2674,
                                             },
                                         ],
                                         debugCMD: 'echo unhola',
@@ -389,13 +359,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/mahna': '/unmahna',
                                         },
                                         ports: [
+                                            4835,
                                             {
-                                                local: 4835,
-                                                remote: 4835,
-                                            },
-                                            {
-                                                local: 4762,
-                                                remote: 3713,
+                                                outer: 4762,
+                                                inner: 3713,
                                             },
                                         ],
                                         debugCMD: 'echo unhello',
@@ -414,13 +381,10 @@ describe('schema tests - dockerDeployment', () => {
                                             '/k8s/moo': '/unmoo',
                                         },
                                         ports: [
+                                            5384,
                                             {
-                                                local: 5384,
-                                                remote: 5384,
-                                            },
-                                            {
-                                                local: 3173,
-                                                remote: 2674,
+                                                outer: 3173,
+                                                inner: 2674,
                                             },
                                         ],
                                         debugCMD: 'echo unhola',

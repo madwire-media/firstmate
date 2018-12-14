@@ -21,6 +21,7 @@ describe('schema tests - dockerImage', () => {
                                     mahna: 'mahna',
                                 },
                                 pushImage: true,
+                                version: 'test',
                             },
                             stage: {
                                 registry: 'registry.com',
@@ -30,6 +31,7 @@ describe('schema tests - dockerImage', () => {
                                     mahna: 'mahna',
                                 },
                                 pushImage: true,
+                                version: 'test',
                             },
                             prod: {
                                 registry: 'registry.com',

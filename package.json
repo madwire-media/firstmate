@@ -14,7 +14,7 @@
     "scripts": {
         "start": "node dist/main.js",
         "debug": "npm run build && node --inspect-brk dist/main.js",
-        "debug-test": "node --inspect-brk node_modules/.bin/jest --runInBand --coverage false",
+        "debug-test": "node --inspect-brk node_modules/.bin/jest --runInBand --coverage false general/inheritFrom/modes",
         "build": "npm run build-ts && npm run tslint",
         "build-ts": "tsc",
         "watch": "tsc --watch",

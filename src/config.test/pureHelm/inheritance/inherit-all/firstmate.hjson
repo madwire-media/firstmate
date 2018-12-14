@@ -15,7 +15,7 @@
                         mahna: mahna
                     }
 
-                    recreatePods: true,
+                    recreatePods: true
                     version: test
                 }
                 inherited: {

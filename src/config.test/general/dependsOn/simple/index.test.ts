@@ -15,6 +15,7 @@ describe('schema tests - general', () => {
                         '~default': {
                             dev: {
                                 cluster: 'cluster',
+                                chartmuseum: 'museum',
                                 namespace: 'test',
                                 dependsOn: ['dep1', 'dep2'],
                             },

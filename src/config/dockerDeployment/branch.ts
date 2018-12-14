@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 
 import { setDefault } from '../../util/defaultable';
-import { getProps, intersection } from '../../util/io-util';
+import { exact, getProps, intersection } from '../../util/io-util';
 import * as base from '../base/branch';
 import * as pureHelm from '../pureHelm/branch';
 import { branchType } from '../types/branch';
@@ -116,7 +116,7 @@ export namespace env {
         ], 'DockerDeploymentDev');
         export const _devStrict = t.type(getProps(_dev), 'DockerDeploymentDevStrict');
         export const _devPartial = t.partial(getProps(_dev), 'DockerDeploymentDevPartial');
-        export const _devExact = t.exact(_dev, 'DockerDeploymentDevExact');
+        export const _devExact = exact(_dev, 'DockerDeploymentDevExact');
 
         // using custom definition of intersection for more types
         export const _stage = intersection([
@@ -132,7 +132,7 @@ export namespace env {
         ], 'DockerDeploymentStage');
         export const _stageStrict = t.type(getProps(_stage), 'DockerDeploymentStageStrict');
         export const _stagePartial = t.partial(getProps(_stage), 'DockerDeploymentStagePartial');
-        export const _stageExact = t.exact(_stage, 'DockerDeploymentStageExact');
+        export const _stageExact = exact(_stage, 'DockerDeploymentStageExact');
 
         // using custom definition of intersection for more types
         export const _prod = intersection([
@@ -148,7 +148,7 @@ export namespace env {
         ], 'DockerDeploymentProd');
         export const _prodStrict = t.type(getProps(_prod), 'DockerDeploymentProdStrict');
         export const _prodPartial = t.partial(getProps(_prod), 'DockerDeploymentProdPartial');
-        export const _prodExact = t.exact(_prod, 'DockerDeploymentProdExact');
+        export const _prodExact = exact(_prod, 'DockerDeploymentProdExact');
         // tslint:enable:variable-name
 
         export const dev = t.clean<Dev>(_dev);

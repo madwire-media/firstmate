@@ -34,8 +34,8 @@
                             ports: [
                                 3548
                                 {
-                                    local: 6247
-                                    remote: 1337
+                                    outer: 6247
+                                    inner: 1337
                                 }
                             ]
                             debugCMD: echo hello
@@ -56,8 +56,8 @@
                             ports: [
                                 8453
                                 {
-                                    local: 7331
-                                    remote: 7426
+                                    outer: 7331
+                                    inner: 7426
                                 }
                             ]
                             debugCMD: echo hola
@@ -103,8 +103,8 @@
                             ports: [
                                 4835
                                 {
-                                    local: 4762
-                                    remote: 3713
+                                    outer: 4762
+                                    inner: 3713
                                 }
                             ]
                             debugCMD: echo unhello
@@ -125,8 +125,8 @@
                             ports: [
                                 5384
                                 {
-                                    local: 3173
-                                    remote: 2674
+                                    outer: 3173
+                                    inner: 2674
                                 }
                             ]
                             debugCMD: echo unhola

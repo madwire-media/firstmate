@@ -38,7 +38,7 @@
                     inheritFrom: ['~default', '~defaultRelease']
                 }
                 newRelease: {
-                    inheritFrom: ['~default', '~defaultRelease'],
+                    inheritFrom: ['~default', '~defaultRelease']
 
                     releaseName: overridden
                 }
