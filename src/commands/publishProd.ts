@@ -83,7 +83,7 @@ export async function publishProd(
     const initResult = await initBranch({
         branch, branchName, serviceName, serviceFolder, isAsync, usedBranchName,
         handlers, config, branchType: branchBase.type, alreadyRunBranches, params,
-    }, publishProd, 'prod', false);
+    }, publishProd, 'prod');
     if (initResult === false) {
         return false;
     }
