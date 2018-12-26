@@ -11,8 +11,8 @@
                     // Copy the production configurations and source code over
                     copyFiles: {
                         php.ini: 'fm/[[service]]/php/php.prod.ini'
-                        apache2.conf: 'fm/[[service]]/apache2/apache2.prod.conf'
-                        ports.conf: 'fm/[[service]]/apache2/ports.conf'
+                        apache2.conf: 'fm/[[service]]/apache/apache2.prod.conf'
+                        ports.conf: 'fm/[[service]]/apache/ports.conf'
                         html: '[[source]]/src'
                     }
 
@@ -20,7 +20,7 @@
                         // Copy the development configurations and source code over
                         copyFiles: {
                             php.ini: 'fm/[[service]]/php/php.dev.ini'
-                            apache2.conf: 'fm/[[service]]/apache2/apache2.dev.conf'
+                            apache2.conf: 'fm/[[service]]/apache/apache2.dev.conf'
                         }
                     }
                 }
