@@ -55,9 +55,11 @@ export function publishProdReqs(
             needsHelmPlugin(context, 'push', 'https://github.com/chartmuseum/helm-push') && reqsMet;
     }
 
-    // if (reqsMet) {
-    //     reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, publishProdReqs, params, context);
-    // }
+    // TODO: Figure out how to ignore re-publishing certain services, especially
+    // pureHelm services that haven't had a version bump
+    if (reqsMet) {
+        reqsMet = reqDependencies(config, branchName, branch, alreadyRunBranches, publishProdReqs, params, context);
+    }
 
     return reqsMet;
 }
