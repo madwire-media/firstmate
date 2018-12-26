@@ -90,7 +90,7 @@ export async function publishProd(
         const image = `${config.project}/${branch.imageName}`;
 
         // Docker build
-        if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {
+        if (!docker.build(serviceFolder, image, ['latest', branch.version], branch.dockerArgs)) {
             return false;
         }
 

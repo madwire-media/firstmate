@@ -7,13 +7,25 @@ import { SigIntHandler } from '../service';
 export function build(
     cwd: string,
     imageName: string,
-    tag: string = 'latest',
+    tags: string | string[] = 'latest',
     buildArgs?: {[key: string]: string},
 ): boolean {
-    const localTag = `${imageName}:${tag}`;
+    const args = [];
+    let argsText = '';
 
-    const args = [localTag];
-    let argsText = `${fmt(localTag)}`;
+    if (typeof tags === 'string') {
+        const localTag = `${imageName}:${tags}`;
+
+        args.push('-t', localTag);
+        argsText = ` -t ${fmt(localTag)}`;
+    } else {
+        for (const tag of tags) {
+            const localTag = `${imageName}:${tag}`;
+
+            args.push('-t', localTag);
+            argsText += ` -t ${fmt(localTag)}`;
+        }
+    }
 
     if (buildArgs !== undefined) {
         for (const key in buildArgs) {
@@ -25,9 +37,9 @@ export function build(
     }
 
     console.log();
-    console.log(a`\{lb,u cd ${cwd} && docker build -t ${argsText} .\}`);
+    console.log(a`\{lb,u cd ${cwd} && docker build${argsText} .\}`);
     const result = ChildProcess.spawnSync(
-        'docker', ['build', '-t'].concat(args).concat(['.']),
+        'docker', ['build'].concat(args).concat(['.']),
         {
             cwd,
             stdio: 'inherit',
