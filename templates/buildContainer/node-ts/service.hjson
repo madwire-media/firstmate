@@ -11,7 +11,7 @@
                         /root: '[[source]]'
                         /root/dist: 'fm/[[service]]/output'
                         /root/node_modules: 'fm/[[service]]/node_modules'
-                        /cache: fm/[[service]]-build/cache
+                        /cache: fm/[[service]]/cache
                     }
                 }
             }
