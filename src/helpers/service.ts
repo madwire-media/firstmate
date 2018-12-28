@@ -163,29 +163,28 @@ export async function initBranch(
     options: InitBranchOptions,
     fn: SvcCommandHandler,
     env: string,
-    runDeps = true,
+    runAllDeps = true,
 ): Promise<boolean> {
     const {
         branch, branchName, serviceName, serviceFolder, usedBranchName,
         handlers, config, branchType, isAsync, alreadyRunBranches, params,
     } = options;
 
-    if (runDeps) {
-        const depResults = await runDependencies(
-            config,
-            branchName,
-            branch,
-            handlers,
-            alreadyRunBranches,
-            isAsync,
-            params,
-            fn,
-        );
-        if (depResults === false) {
-            return false;
-        } else {
-            handlers.push(...depResults);
-        }
+    const depResults = await runDependencies(
+        config,
+        branchName,
+        branch,
+        handlers,
+        alreadyRunBranches,
+        isAsync,
+        params,
+        fn,
+        runAllDeps,
+    );
+    if (depResults === false) {
+        return false;
+    } else {
+        handlers.push(...depResults);
     }
 
     console.log(a`Running service \{lw ${serviceName}\} on branch \{lg ${usedBranchName}\} in ${env} mode`);
@@ -309,9 +308,14 @@ export async function runDependencies(
     isAsync: () => void,
     params: {[arg: string]: any},
     cb: SvcCommandHandler,
+    runAllDeps = true,
 ): Promise<SigIntHandler[] | false> {
     if (branch.dependsOn !== undefined) {
         for (const dependency of branch.dependsOn) {
+            if (!runAllDeps && config.services[dependency].type !== 'buildContainer') {
+                continue;
+            }
+
             if (alreadyRunBranches.has(dependency)) {
                 continue;
             }
@@ -341,9 +345,14 @@ export function reqDependencies(
     cb: SvcCommandReqHandler,
     params: {[arg: string]: any},
     context: any,
+    runAllDeps = true,
 ): boolean {
     if (branch.dependsOn !== undefined) {
         for (const dependency of branch.dependsOn) {
+            if (!runAllDeps && config.services[dependency].type !== 'buildContainer') {
+                continue;
+            }
+
             if (alreadyRunBranches.has(dependency)) {
                 continue;
             }
