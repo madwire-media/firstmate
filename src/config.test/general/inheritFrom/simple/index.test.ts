@@ -32,7 +32,7 @@ describe('schema tests - general', () => {
                         },
                     },
                 },
-            }, config!.services);
+            }, config!.parsed.services);
         });
     });
 });

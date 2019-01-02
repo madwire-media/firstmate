@@ -29,7 +29,7 @@ describe('schema tests - dockerImage', () => {
                         },
                     },
                 },
-            }, config!.services);
+            }, config!.parsed.services);
         });
     });
 });

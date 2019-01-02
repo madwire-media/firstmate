@@ -8,7 +8,7 @@ import { ncp } from 'ncp';
 
 import { RawConfig, rawProject } from '../config';
 import { a } from '../helpers/cli';
-import { loadConfig, loadConfigRaw, loadUser } from '../helpers/config';
+import { loadConfig, loadConfigRaw, loadUser, saveConfig } from '../helpers/config';
 import { getGitOrigin } from '../helpers/git';
 import { processTemplateS, TemplateProcessor } from '../helpers/template';
 import { User } from '../user';
@@ -74,16 +74,7 @@ export async function addService(context: any, service: string, type: string, te
         return false;
     }
 
-    if (configIsHjson) {
-        fs.writeFileSync(configFile, Hjson.rt.stringify(rawConfig, {
-            bracesSameLine: true,
-            space: 4,
-        } as any));
-    } else {
-        fs.writeFileSync(configFile, JSON.stringify(rawConfig, null, 2));
-    }
-
-    return true;
+    return saveConfig([rawConfig, configFile, configIsHjson], context);
 }
 
 async function addSingleService({

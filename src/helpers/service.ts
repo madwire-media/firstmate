@@ -28,6 +28,15 @@ export type SvcCommandReqHandler = (
     params: {[arg: string]: any},
     context: any,
 ) => boolean;
+export type SvcCommandMutHandler = (
+    config: Config,
+    rawConfig: [{}, string, boolean],
+    serviceName: string,
+    branchName: string,
+    alreadyRunBranches: Set<string>,
+    params: {[arg: string]: any},
+    context: any,
+) => boolean;
 
 export interface ServiceRunOpts {
     liveRun?: boolean;
@@ -36,6 +45,7 @@ export interface ServiceRunOpts {
 export async function runService(
     fn: SvcCommandHandler,
     reqFn: SvcCommandReqHandler,
+    mutFn: SvcCommandMutHandler | undefined,
     context: any,
     params: {[arg: string]: any},
     serviceName?: string,
@@ -45,11 +55,18 @@ export async function runService(
     await uncopyFiles();
 
     let {config} = opts;
+    let rawConfig: [{}, string, boolean] = [{}, '', false];
     const {liveRun} = opts;
 
-    config = config || loadConfig(context);
     if (config === undefined) {
-        return false;
+        const loadedConfig = loadConfig(context);
+
+        if (loadedConfig === undefined) {
+            return false;
+        }
+
+        config = loadedConfig.parsed;
+        rawConfig = loadedConfig.raw;
     }
 
     serviceName = serviceName || (config.defaults && config.defaults.service);
@@ -83,6 +100,13 @@ export async function runService(
     if (liveRun) {
         console.log(a`Detected git branch \{lg ${branchName}\}`);
         console.log();
+    }
+
+    if (mutFn !== undefined) {
+        const mutResult = mutFn(config, rawConfig, serviceName, branchName, new Set([branchName]), params, context);
+        if (!mutResult) {
+            return false;
+        }
     }
 
     const reqsMet = reqFn(config, serviceName, branchName, new Set([branchName]), params, context);

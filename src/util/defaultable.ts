@@ -29,7 +29,9 @@ export function setDefault<
     return new Proxy({contents}, {
         apply: unsupportedOperation('apply'),
         construct: unsupportedOperation('construct'),
-        defineProperty: unsupportedOperation('defineProperty'),
+        defineProperty(target, property, descriptor) {
+            return Reflect.defineProperty(target.contents.input, property, descriptor);
+        },
         deleteProperty: unsupportedOperation('deleteProperty'),
         get(target, property, receiver) {
             if (property === defaultContents) {

@@ -57,7 +57,9 @@ export function merge<
     return new Proxy({contents}, {
         apply: unsupportedOperation('apply'),
         construct: unsupportedOperation('construct'),
-        defineProperty: unsupportedOperation('defineProperty'),
+        defineProperty(target, property, descriptor) {
+            return Reflect.defineProperty(target.contents[0], property, descriptor);
+        },
         deleteProperty: unsupportedOperation('deleteProperty'),
         get(target, property, receiver) {
             if (property === mergedContents) {

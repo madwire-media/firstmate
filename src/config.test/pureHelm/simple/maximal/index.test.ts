@@ -59,7 +59,7 @@ describe('schema tests - pureHelm', () => {
                         },
                     },
                 },
-            }, config!.services);
+            }, config!.parsed.services);
         });
     });
 });

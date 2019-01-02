@@ -49,7 +49,7 @@ describe('schema tests - buildContainer', () => {
                         },
                     },
                 },
-            }, config!.services);
+            }, config!.parsed.services);
         });
     });
 });

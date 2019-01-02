@@ -1,10 +1,9 @@
 declare module 'hjson' {
-
-// Type definitions for hjson 2.4
-// Project: https://github.com/hjson/hjson-js
-// Definitions by: Mark van Straten <https://github.com/crunchie84>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-export interface DeserializeOptions {
+  // Type definitions for hjson 2.4
+  // Project: https://github.com/hjson/hjson-js
+  // Definitions by: Mark van Straten <https://github.com/crunchie84>
+  // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+  export interface DeserializeOptions {
     /**
      * keep white space and comments. This is useful if
      * you want to edit an hjson file and save it while preserving comments (default false)

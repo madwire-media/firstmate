@@ -35,7 +35,7 @@ describe('schema tests - dockerDeployment', () => {
                         },
                     },
                 },
-            }, config!.services);
+            }, config!.parsed.services);
         });
     });
 });

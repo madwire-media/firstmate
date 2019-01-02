@@ -33,6 +33,7 @@
         "parse-git-config": "^2.0.3",
         "request": "^2.88.0",
         "rimraf": "^2.6.2",
+        "semver": "^5.6.0",
         "short-ansi": "^1.0.1",
         "sywac": "^1.2.1",
         "ta-json": "^2.5.0"
@@ -46,6 +47,7 @@
         "@types/parse-git-config": "^2.0.1",
         "@types/request": "^2.48.1",
         "@types/rimraf": "^2.0.2",
+        "@types/semver": "^5.5.0",
         "concurrently": "^3.6.1",
         "jest": "^23.6.0",
         "jest-cli": "^23.6.0",

@@ -3,14 +3,15 @@ import 'source-map-support/register';
 
 import * as fs from 'fs';
 
+import { ncp } from 'ncp';
+
 import { a, cleanup } from './helpers/cli';
 import { runService } from './helpers/service';
 
-import { ncp } from 'ncp';
 import { addService } from './commands/addService';
 import { dryDev } from './commands/dryDev';
 import { newProject } from './commands/newProject';
-import { publishProd, publishProdReqs } from './commands/publishProd';
+import { publishProd, publishProdConfig, publishProdReqs } from './commands/publishProd';
 import { purgeDev, purgeDevReqs } from './commands/purgeDev';
 import { purgeProd, purgeProdReqs } from './commands/purgeProd';
 import { purgeStage, purgeStageReqs } from './commands/purgeStage';
@@ -79,7 +80,80 @@ function helpOnError(self: any, context: any) {
 }
 
 // tslint:disable-next-line:no-var-requires
-require('sywac')
+const sywac = require('sywac');
+
+export enum VersionChangeKind {
+    major,
+    minor,
+    patch,
+    prerelease,
+    tag,
+}
+export class VersionChange<K extends VersionChangeKind> {
+    public kind: K;
+    public value: K extends VersionChangeKind.tag ? string : undefined;
+
+    constructor(
+        kind: K,
+        value: K extends VersionChangeKind.tag ? string : undefined,
+    ) {
+        this.kind = kind;
+        this.value = value;
+    }
+}
+class TypeVersion extends require('sywac/types/string') {
+    constructor(opts: any) {
+        super(opts);
+    }
+
+    get datatype() {
+        return 'version';
+    }
+
+    public getValue(context: any) {
+        const v: string | undefined | null = context.lookupValue(this.id);
+
+        if (typeof v === 'undefined' || v === null) {
+            return undefined;
+        }
+
+        let change;
+
+        if (
+            v === 'major' ||
+            v === 'minor' ||
+            v === 'patch' ||
+            v === 'prerelease'
+        ) {
+            change = new VersionChange(VersionChangeKind[v], undefined);
+        } else if (v.startsWith('-')) {
+            change = new VersionChange(VersionChangeKind.tag, v);
+        } else {
+            return undefined;
+        }
+
+        return change;
+    }
+
+    public setValue(context: any, value: any) {
+        context.assignValue(this.id, typeof value === 'boolean' ? undefined : value);
+    }
+
+    public validateValue(value: any) {
+        return typeof value === 'string' && (
+            ['major', 'minor', 'patch', 'prerelease'].includes(value) ||
+            value.startsWith('-')
+        );
+    }
+
+    public buildInvalidMessage(context: any, msgAndArgs: any) {
+        super.buildInvalidMessage(context, msgAndArgs);
+        msgAndArgs.msg += "Please specify 'major', 'minor', 'patch', 'prerelease', or '-[tag]'";
+    }
+}
+sywac.registerFactory('version', (opts: any) => new TypeVersion(opts));
+
+sywac
     .configure({name: 'fm'})
     .style(styleHooks)
     .preface(logo)
@@ -152,15 +226,15 @@ require('sywac')
             switch (argv.mode) {
                 case 'dev':
                     const devService = argv.dry ? dryDev : runDev;
-                    await runService(devService, runDevReqs, context, argv, argv.service, {});
+                    await runService(devService, runDevReqs, undefined, context, argv, argv.service, {});
                     break;
 
                 case 'stage':
-                    await runService(runStage, runStageReqs, context, argv, argv.service);
+                    await runService(runStage, runStageReqs, undefined, context, argv, argv.service);
                     break;
 
                 case 'prod':
-                    await runService(runProd, runProdReqs, context, argv, argv.service);
+                    await runService(runProd, runProdReqs, undefined, context, argv, argv.service);
                     break;
 
                 default:
@@ -171,7 +245,7 @@ require('sywac')
             helpOnError(this, context);
         },
     })
-    .command('publish <mode:enum> [service]', {
+    .command('publish <mode:enum> [service] [version:version]', {
         desc: "Publish a service's images and charts",
         hints: [
             '[docker] [helm]',
@@ -184,11 +258,12 @@ require('sywac')
         paramsDesc: [
             'Environment to publish for',
             'Service to publish',
+            'Semver version change or tag to publish',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
             switch (argv.mode) {
                 case 'prod':
-                    await runService(publishProd, publishProdReqs, context, argv, argv.service);
+                    await runService(publishProd, publishProdReqs, publishProdConfig, context, argv, argv.service);
                     break;
 
                 default:
@@ -216,15 +291,15 @@ require('sywac')
         async run(argv: {[arg: string]: any}, context: any) {
             switch (argv.mode) {
                 case 'dev':
-                    await runService(purgeDev, purgeDevReqs, context, argv, argv.service, {});
+                    await runService(purgeDev, purgeDevReqs, undefined, context, argv, argv.service, {});
                     break;
 
                 case 'stage':
-                    await runService(purgeStage, purgeStageReqs, context, argv, argv.service);
+                    await runService(purgeStage, purgeStageReqs, undefined, context, argv, argv.service);
                     break;
 
                 case 'prod':
-                    await runService(purgeProd, purgeProdReqs, context, argv, argv.service);
+                    await runService(purgeProd, purgeProdReqs, undefined, context, argv, argv.service);
                     break;
 
                 default:

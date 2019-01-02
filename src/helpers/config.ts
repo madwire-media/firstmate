@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as readline from 'readline';
 
 import * as Hjson from 'hjson';
@@ -61,13 +62,17 @@ export function loadConfigRaw(context: any, dir = '.'): [{}, string, boolean] | 
             console.error(a`\{lr Could not parse \{m ${filename}\} file\}: ${error.message}`);
         }
         throw error;
-        return;
     }
 
     return [data, filename, isHjson];
 }
 
-export function loadConfig(context: any, dir = '.'): Config | undefined {
+export interface LoadedConfig {
+    raw: [{}, string, boolean];
+    parsed: Config;
+}
+
+export function loadConfig(context: any, dir = '.'): LoadedConfig | undefined {
     const raw = loadConfigRaw(context, dir);
 
     if (raw === undefined) {
@@ -108,7 +113,31 @@ export function loadConfig(context: any, dir = '.'): Config | undefined {
         return;
     }
 
-    return parseResult;
+    return {raw, parsed: parseResult};
+}
+
+export function saveConfig(raw: [{}, string, boolean], context: any) {
+    const [data, filename, isHjson] = raw;
+
+    try {
+        if (isHjson) {
+            fs.writeFileSync(filename, Hjson.rt.stringify(data, {
+                bracesSameLine: true,
+                space: 4,
+            } as any));
+        } else {
+            fs.writeFileSync(filename, JSON.stringify(data, null, 2));
+        }
+    } catch (error) {
+        if (context) {
+            context.cliMessage(a`\{lr,t Could not write \{nt,m ${filename}\} file: \{nt ${error.message}\}\}`);
+        } else {
+            console.error(a`\{lr Could not read \{m ${filename}\} file\}: ${error.message}`);
+        }
+        return false;
+    }
+
+    return true;
 }
 
 export async function loadUser(): Promise<User | undefined> {

@@ -18,11 +18,13 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
         needsCommand(undefined, 'helm') &&
         wantsCommand(undefined, 'telepresence');
 
-    const config = loadConfig(undefined);
-    if (config === undefined) {
+    const loadedConfig = loadConfig(undefined);
+    if (loadedConfig === undefined) {
         // Need to have configuration loaded for anything else to work
         return false;
     }
+
+    const config = loadedConfig.parsed;
 
     const branchName = getGitBranch(undefined);
     if (branchName === false) {
@@ -78,7 +80,7 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
     // const fn = runServiceBase(handler, false);
 
     if (service !== undefined) {
-        const result = await runService(handler, () => true, undefined, params, service, {
+        const result = await runService(handler, () => true, undefined, undefined, params, service, {
             config,
             liveRun: false,
         });
@@ -89,7 +91,7 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
     } else {
         for (const serviceName in config.services) {
             if (!checkedServices.has(serviceName)) {
-                const result = await runService(handler, () => true, undefined, params, serviceName, {
+                const result = await runService(handler, () => true, undefined, undefined, params, serviceName, {
                     config,
                     liveRun: false,
                 });

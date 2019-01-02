@@ -34,7 +34,7 @@ describe('schema tests - general', () => {
                         '~default': {},
                     },
                 },
-            }, config!.services);
+            }, config!.parsed.services);
         });
     });
 });
