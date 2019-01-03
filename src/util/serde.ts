@@ -159,8 +159,8 @@ export class SerdeContext {
     }
 
     public parse<
-        C extends {new (...args: any[]): any},
-    >(input: SerdeType, type: C): C extends {new (...args: any[]): infer T} ? T : never {
+        C extends new (...args: any[]) => any,
+    >(input: SerdeType, type: C): C extends new (...args: any[]) => infer T ? T : never {
         if ((type as any)[isSerde] === true) {
             return new type(input, this, isSerde);
         } else {
@@ -282,7 +282,7 @@ export abstract class StrictSerde<I> {
 }
 
 // Class Decorator - extend class with serde functionality
-export function serde<T extends {new (...args: any[]): {}}>(constructor: T) {
+export function serde<T extends new (...args: any[]) => {}>(constructor: T) {
     const ExtendedClass = (() => class extends constructor {
         public static [serdeParsers]: Parsers<T>;
         public static [isSerde] = true;
@@ -354,7 +354,7 @@ serde.from = {
 serde.infer = {
     prop<
         T extends {},
-        C extends {new (...args: any[]): T[K]},
+        C extends new (...args: any[]) => T[K],
         K extends keyof T & string,
     >(cls: C) {
         return (target: T, key: K) => {
@@ -376,8 +376,8 @@ serde.infer = {
 
 // Runtime serde parsing entry-point
 serde.parse = <
-    C extends {new (...args: any[]): any},
->(input: SerdeType, type: C): C extends {new (...args: any[]): infer T} ? T : never => {
+    C extends new (...args: any[]) => any,
+>(input: SerdeType, type: C): C extends new (...args: any[]) => infer T ? T : never => {
     if ((type as any)[isSerde] === true) {
         return new type(input, new SerdeContext(), isSerde);
     } else {
