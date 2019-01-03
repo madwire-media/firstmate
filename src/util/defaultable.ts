@@ -86,7 +86,7 @@ export function setDefault<
         },
         preventExtensions: unsupportedOperation('preventExtensions'),
         set(target, property, value, receiver) {
-            return Reflect.set(target.contents.input, property, value, receiver);
+            return Reflect.set(target.contents.input, property, value/*, receiver*/);
         },
         setPrototypeOf: unsupportedOperation('setPrototypeOf'),
     }) as unknown as Merged<Exclude<T, any[]>>;

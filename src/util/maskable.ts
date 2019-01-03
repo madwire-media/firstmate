@@ -50,7 +50,7 @@ export function mask<
             if (property in mask) {
                 return false;
             } else {
-                return Reflect.set(target, property, value, receiver);
+                return Reflect.set(target, property, value/*, receiver*/);
             }
         },
         setPrototypeOf: (target, proto) => Reflect.setPrototypeOf(target, proto),

@@ -138,7 +138,7 @@ export function merge<
             if (target.contents.length === 0) {
                 return false;
             } else {
-                return Reflect.set(target.contents[0], property, value, receiver);
+                return Reflect.set(target.contents[0], property, value/*, receiver*/);
             }
         },
         setPrototypeOf: unsupportedOperation('setPrototypeOf'),

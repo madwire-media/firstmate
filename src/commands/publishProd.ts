@@ -35,8 +35,6 @@ export function publishProdConfig(
     }
     const branch = branchBase.prod;
 
-    console.log(params.version);
-
     if (params.version !== undefined) {
         const versionChange = params.version as VersionChange<VersionChangeKind>;
         let version: string | null = branch.version;
