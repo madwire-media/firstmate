@@ -1,6 +1,7 @@
 import * as ChildProcess from 'child_process';
 
 import { Port } from '../../config/types/common';
+import { DockerVolumes } from '../../config/types/docker';
 import { a, fmt, interrupt } from '../cli';
 import { SigIntHandler } from '../service';
 
@@ -216,7 +217,7 @@ export function removeContainer(containerName: string): boolean {
 export interface RunOptions {
     image: string;
     name: string;
-    volumes?: {[dest: string]: string};
+    volumes?: DockerVolumes;
     network?: string;
     ports?: Port[];
     command?: string;
@@ -359,8 +360,8 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
                 ({inner, outer} = port);
             }
 
-            argsText += ` -p ${inner}:${outer}`;
-            args.push('-p', `${inner}:${outer}`);
+            argsText += ` -p ${outer}:${inner}`;
+            args.push('-p', `${outer}:${inner}`);
         }
     }
 
