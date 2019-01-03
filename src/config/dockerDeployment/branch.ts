@@ -34,14 +34,16 @@ export namespace env {
         export interface StageOpt {}
 
         // tslint:disable-next-line:no-empty-interface
-        export interface ProdReq {}
+        export interface ProdReq {
+            registry: Registry;
+        }
         // tslint:disable-next-line:no-empty-interface
         export interface ProdOpt {}
 
         // tslint:disable:variable-name
         export const _allReq = t.type({});
         export const _allOpt = t.partial({
-            registry: Registry,
+            registry: t.union([Registry, t.undefined]),
             imageNamePrefix: ImageName,
             containers: Containers,
         });
@@ -56,7 +58,9 @@ export namespace env {
         export const _stageReq = t.type({});
         export const _stageOpt = t.type({});
 
-        export const _prodReq = t.type({});
+        export const _prodReq = t.type({
+            registry: Registry,
+        });
         export const _prodOpt = t.type({});
         // tslint:enable:variable-name
 
@@ -99,7 +103,9 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.ProdReq,
-            atoms.ProdOpt {}
+            atoms.ProdOpt {
+            registry: Registry;
+        }
 
         // using custom definition of intersection for more types
         // tslint:disable:variable-name
@@ -208,7 +214,7 @@ export namespace env {
 
         export function prod(input: prodType, context: ParsingContext): prodType {
             input = all(input, context) as prodType;
-            input = pureHelm.env.defaults.prod(input, context);
+            input = pureHelm.env.defaults.prod(input, context) as prodType;
 
             return setDefault(input, {
             });

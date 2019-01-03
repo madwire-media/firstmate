@@ -33,11 +33,11 @@ export namespace env {
             recreatePods?: boolean;
         }
 
-        // tslint:disable-next-line:no-empty-interface
-        export interface ProdReq {}
-        export interface ProdOpt {
+        export interface ProdReq {
             chartmuseum: ChartMuseum;
         }
+        // tslint:disable-next-line:no-empty-interface
+        export interface ProdOpt {}
 
         // tslint:disable:variable-name
         export const _allReq = t.type({
@@ -47,7 +47,7 @@ export namespace env {
         export const _allOpt = t.partial({
             releaseName: ReleaseName,
             helmArgs: HelmArgs,
-            chartmuseum: ChartMuseum,
+            chartmuseum: t.union([ChartMuseum, t.undefined]), // force partial
         });
 
         export const _devReq = t.type({});
@@ -60,10 +60,10 @@ export namespace env {
             recreatePods: t.boolean,
         });
 
-        export const _prodReq = t.type({});
-        export const _prodOpt = t.partial({
+        export const _prodReq = t.type({
             chartmuseum: ChartMuseum,
         });
+        export const _prodOpt = t.partial({});
         // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();

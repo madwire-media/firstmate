@@ -101,7 +101,7 @@ export function loadConfig(context: any, dir = '.'): LoadedConfig | undefined {
         }
 
         for (const error of parseResult) {
-            const pts = error.match(/(Invalid value )(.+?)( supplied to \w*: )(.+)/)!;
+            const pts = error.match(/(Invalid value )(.+?)( supplied to )(.+)/)!;
 
             if (context) {
                 context.cliMessage(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);

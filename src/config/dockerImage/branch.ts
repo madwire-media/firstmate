@@ -31,8 +31,9 @@ export namespace env {
             pushImage?: boolean;
         }
 
-        // tslint:disable-next-line:no-empty-interface
-        export interface ProdReq {}
+        export interface ProdReq {
+            registry: Registry;
+        }
         // tslint:disable-next-line:no-empty-interface
         export interface ProdOpt {}
 
@@ -41,7 +42,7 @@ export namespace env {
             imageName: ImageName,
         });
         export const _allOpt = t.partial({
-            registry: Registry,
+            registry: t.union([Registry, t.undefined]),
             dockerArgs: DockerArgs,
         });
 
@@ -55,7 +56,9 @@ export namespace env {
             pushImage: t.boolean,
         });
 
-        export const _prodReq = t.type({});
+        export const _prodReq = t.type({
+            registry: Registry,
+        });
         export const _prodOpt = t.partial({});
         // tslint:enable:variable-name
 
@@ -95,7 +98,9 @@ export namespace env {
             atoms.AllReq,
             atoms.AllOpt,
             atoms.ProdReq,
-            atoms.ProdOpt {}
+            atoms.ProdOpt {
+            registry: Registry;
+        }
 
         // tslint:disable:variable-name
         export const _dev = t.intersection([
