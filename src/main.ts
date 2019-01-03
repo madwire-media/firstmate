@@ -126,7 +126,7 @@ class TypeVersion extends require('sywac/types/string') {
             v === 'prerelease'
         ) {
             change = new VersionChange(VersionChangeKind[v], undefined);
-        } else if (v.startsWith('-')) {
+        } else if (v.startsWith('_')) {
             change = new VersionChange(VersionChangeKind.tag, v);
         } else {
             return undefined;
@@ -142,13 +142,13 @@ class TypeVersion extends require('sywac/types/string') {
     public validateValue(value: any) {
         return typeof value === 'string' && (
             ['major', 'minor', 'patch', 'prerelease'].includes(value) ||
-            value.startsWith('-')
+            value.startsWith('_')
         );
     }
 
     public buildInvalidMessage(context: any, msgAndArgs: any) {
         super.buildInvalidMessage(context, msgAndArgs);
-        msgAndArgs.msg += "Please specify 'major', 'minor', 'patch', 'prerelease', or '-[tag]'";
+        msgAndArgs.msg += "Please specify 'major', 'minor', 'patch', 'prerelease', or '_[tag]'";
     }
 }
 sywac.registerFactory('version', (opts: any) => new TypeVersion(opts));

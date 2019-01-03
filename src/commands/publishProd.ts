@@ -62,7 +62,7 @@ export function publishProdConfig(
                 if (coerced === null) {
                     version = null;
                 } else {
-                    version = coerced.version + versionChange.value;
+                    version = `${coerced.version}-${versionChange.value!.substr(1)}`;
                 }
                 break;
         }
