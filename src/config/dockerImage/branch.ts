@@ -31,11 +31,11 @@ export namespace env {
             pushImage?: boolean;
         }
 
-        export interface ProdReq {
-            registry: Registry;
-        }
         // tslint:disable-next-line:no-empty-interface
-        export interface ProdOpt {}
+        export interface ProdReq {}
+        export interface ProdOpt {
+            registry?: Registry;
+        }
 
         // tslint:disable:variable-name
         export const _allReq = t.type({
@@ -56,10 +56,10 @@ export namespace env {
             pushImage: t.boolean,
         });
 
-        export const _prodReq = t.type({
+        export const _prodReq = t.type({});
+        export const _prodOpt = t.partial({
             registry: Registry,
         });
-        export const _prodOpt = t.partial({});
         // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
@@ -99,7 +99,7 @@ export namespace env {
             atoms.AllOpt,
             atoms.ProdReq,
             atoms.ProdOpt {
-            registry: Registry;
+            registry?: Registry;
         }
 
         // tslint:disable:variable-name

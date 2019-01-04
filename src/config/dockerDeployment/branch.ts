@@ -34,11 +34,10 @@ export namespace env {
         export interface StageOpt {}
 
         // tslint:disable-next-line:no-empty-interface
-        export interface ProdReq {
-            registry: Registry;
+        export interface ProdReq {}
+        export interface ProdOpt {
+            registry?: Registry;
         }
-        // tslint:disable-next-line:no-empty-interface
-        export interface ProdOpt {}
 
         // tslint:disable:variable-name
         export const _allReq = t.type({});
@@ -56,12 +55,12 @@ export namespace env {
         });
 
         export const _stageReq = t.type({});
-        export const _stageOpt = t.type({});
+        export const _stageOpt = t.partial({});
 
-        export const _prodReq = t.type({
+        export const _prodReq = t.type({});
+        export const _prodOpt = t.partial({
             registry: Registry,
         });
-        export const _prodOpt = t.type({});
         // tslint:enable:variable-name
 
         export const allReq = t.alias(_allReq)<AllReq, AllReq>();
@@ -104,7 +103,7 @@ export namespace env {
             atoms.AllOpt,
             atoms.ProdReq,
             atoms.ProdOpt {
-            registry: Registry;
+            registry?: Registry;
         }
 
         // using custom definition of intersection for more types
