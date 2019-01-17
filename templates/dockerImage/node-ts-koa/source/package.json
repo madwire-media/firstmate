@@ -25,6 +25,7 @@
     "koa-helmet": "*",
     "koa-logger": "*",
     "koa-router": "*",
+    "koa-error": "*",
     "source-map-support": "*"
   },
   "devDependencies": {
@@ -36,7 +37,6 @@
     "@types/koa-router": "*",
     "@types/jest": "*",
     "@types/supertest": "*",
-    "koa-error": "*",
     "tslint": "*",
     "typescript": "*",
     "ts-jest": "*",
