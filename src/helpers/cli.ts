@@ -80,6 +80,7 @@ if (tty.isatty(0)) {
 
             _rl.on('SIGINT', () => {
                 process.emit('SIGINT', 'SIGINT');
+                cleanup();
             });
         }
 
