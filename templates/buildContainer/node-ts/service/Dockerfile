@@ -2,7 +2,7 @@
 FROM node:10
 
 # Set the current working directory (CWD) to /root (also $HOME or ~)
-WORKDIR /root
+WORKDIR /root/app
 
 # Add in the bootstrap code
 ADD build.sh /scripts/build.sh
