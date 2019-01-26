@@ -22,7 +22,7 @@ export class ProjectType<
         is: ProjectType<S>['is'],
         validate: ProjectType<S>['validate'],
         encode: ProjectType<S>['encode'],
-        readonly serviceTypes: S[],
+        readonly serviceTypes: [S, S, ...S[]],
     ) {
         super(name, is, validate, encode);
     }
@@ -31,7 +31,7 @@ export class ProjectType<
 export function projectType<
     S extends ServiceType<any, any>
 >(
-    services: S[],
+    services: [S, S, ...S[]],
     name: string,
 ) {
     const project = t.intersection([

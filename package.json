@@ -22,11 +22,11 @@
         "test": "jest"
     },
     "dependencies": {
-        "ajv": "^6.6.2",
+        "ajv": "^6.7.0",
         "dockerfile-ast": "0.0.12",
-        "fp-ts": "^1.12.2",
+        "fp-ts": "^1.13.0",
         "hjson": "git+https://github.com/dqsully/hjson-js.git",
-        "io-ts": "^1.5.1",
+        "io-ts": "^1.7.0",
         "leven": "^2.1.0",
         "mkdirp": "^0.5.1",
         "ncp": "^2.0.0",
@@ -34,12 +34,12 @@
         "request": "^2.88.0",
         "rimraf": "^2.6.3",
         "semver": "^5.6.0",
-        "short-ansi": "^1.0.1",
+        "short-ansi": "^1.0.2",
         "sywac": "^1.2.1",
         "ta-json": "^2.5.0"
     },
     "devDependencies": {
-        "@types/jest": "^23.3.11",
+        "@types/jest": "^23.3.13",
         "@types/leven": "^2.1.1",
         "@types/mkdirp": "^0.5.2",
         "@types/ncp": "^2.0.1",
@@ -53,7 +53,7 @@
         "jest-cli": "^23.6.0",
         "ts-jest": "^23.10.5",
         "ts-node": "^7.0.1",
-        "tslint": "^5.12.0",
-        "typescript": "^3.2.2"
+        "tslint": "^5.12.1",
+        "typescript": "^3.2.4"
     }
 }
