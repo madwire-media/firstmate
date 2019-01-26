@@ -21,23 +21,43 @@ interface ServiceDep {
 }
 
 function notATemplate(template: string, templates: string[]) {
-    console.log(a`\{lr Template \{w '${template}'\} is not a valid template`);
+    console.log(a`\{lr Template \{w '${template}'\} is not a valid template\}`);
 
-    let shortest: {t: string | undefined, s: number} = {t: undefined, s: 3};
+    const similar: string[] = [];
 
     for (const t of templates) {
         const distance = leven(t, template);
 
-        if (distance < shortest.s) {
-            shortest = {t, s: distance};
+        if (distance <= 3) {
+            similar.push(t);
         }
     }
 
-    if (shortest.s) {
-        console.log(a`Did you mean \{lw '${shortest.t}'\}?`);
+    if (similar.length > 0) {
+        let msg = a`\{b Did you mean `;
+
+        for (let i = 0; i < similar.length; i++) {
+            if (i === similar.length - 1) {
+                if (i > 1) {
+                    msg += ', ';
+                } else {
+                    msg += ' ';
+                }
+
+                msg += 'or ';
+            } else if (i > 0) {
+                msg += ', ';
+            }
+
+            msg += a`\{b \{lw '${similar[i]}'\}`;
+        }
+
+        msg += '?';
+
+        console.log(msg);
     }
 
-    console.log(a`\{ld (You can run \{w fm templates\} to list all templates\}`);
+    console.log(a`\{ld (You can run \{w fm templates\} to list all templates)\}`);
 }
 
 export async function addService(context: any, service: string, type: string, template: string, noSource: boolean) {
