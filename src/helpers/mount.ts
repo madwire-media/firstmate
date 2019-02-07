@@ -213,6 +213,10 @@ export function generateMountsScript(
     const text = lines.join('\n');
     const filename = `.fm/${service}.${container}.bootstrap.sh`;
 
+    if (fs.existsSync(filename)) {
+        fs.unlinkSync(filename);
+    }
+
     fs.writeFileSync(filename, text, {mode: 0o777});
 
     return filename;
