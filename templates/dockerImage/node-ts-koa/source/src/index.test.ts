@@ -1,6 +1,4 @@
 // Tell typescript that 'expect' exists
-declare var expect: any;
-
 import * as request from "supertest";
 import app from "./app";
 
