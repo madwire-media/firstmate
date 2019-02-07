@@ -270,7 +270,7 @@ export async function runDev(
                             container.debugCMD,
                         );
 
-                        runOpts.volumes![bootstrapFile] = '/tmp/debugRun.sh';
+                        runOpts.volumes!['/tmp/debugRun.sh'] = bootstrapFile;
                         runOpts.command = '/tmp/debugRun.sh';
                     } else if (container.debugCMD !== undefined) {
                         runOpts.command = container.debugCMD;
