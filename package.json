@@ -4,7 +4,7 @@
     "description": "A tool to make development on kubernetes easy",
     "repository": {
         "type": "git",
-        "url": "https://github.com/madwire-media/sergeant"
+        "url": "https://github.com/madwire-media/firstmate"
     },
     "author": "Dakota Sullivan",
     "license": "MIT",
