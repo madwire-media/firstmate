@@ -263,7 +263,7 @@ export async function runDev(
                         runOpts.ports = container.ports;
                     }
                     if (container.k8sVolumes !== undefined && container.debugCMD !== undefined) {
-                        const bootstrapFile = generateMountsScript(
+                        const bootstrapFile = await generateMountsScript(
                             serviceName,
                             debugContainer,
                             container.k8sVolumes,

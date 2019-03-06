@@ -1,9 +1,8 @@
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 
 import * as Hjson from 'hjson';
 import leven = require('leven');
-import * as mkdirp from 'mkdirp';
 import { ncp } from 'ncp';
 
 import { RawConfig, rawProject } from '../config';
@@ -204,7 +203,7 @@ async function addSingleService({
 
     // Copy source files if not inheriting source
     if (fs.existsSync(`${templateDir}/source`) && !inheritedSource && !noSource) {
-        mkdirp.sync('source');
+        fs.mkdirpSync('source');
 
         console.log(a`\{ld Copying from ${prettyTemplateDir}/source to \}\{m ${sourceDir}\}`);
         await new Promise((resolve, reject) => {
@@ -228,7 +227,7 @@ async function addSingleService({
 
     // Copy service files if not inheriting source
     if (fs.existsSync(`${templateDir}/service`)) {
-        mkdirp.sync('fm');
+        fs.mkdirpSync('fm');
 
         console.log(a`\{ld Copying from ${prettyTemplateDir}/service to \}\{m fm/${name}\}`);
         await new Promise((resolve, reject) => {

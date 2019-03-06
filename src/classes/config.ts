@@ -1,9 +1,7 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'fs-extra';
 import * as readline from 'readline';
 
 import * as Hjson from 'hjson';
-import * as mkdirp from 'mkdirp';
 
 import { a } from './cli';
 
@@ -103,10 +101,18 @@ export function loadConfig(context: any, dir = '.'): LoadedConfig | undefined {
         for (const error of parseResult) {
             const pts = error.match(/(Invalid value )(.+?)( supplied to )(.+)/)!;
 
-            if (context) {
-                context.cliMessage(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+            if (pts) {
+                if (context) {
+                    context.cliMessage(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+                } else {
+                    console.log(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+                }
             } else {
-                console.log(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+                if (context) {
+                    context.cliMessage(a`\{lr ${error}\}`);
+                } else {
+                    console.log(a`\{lr ${error}\}`);
+                }
             }
         }
 
@@ -145,7 +151,7 @@ export async function loadUser(): Promise<User | undefined> {
     const file = `${dir}/user.json`;
 
     if (!fs.existsSync(dir)) {
-        mkdirp.sync(dir);
+        fs.mkdirpSync(dir);
     }
 
     if (!fs.existsSync(file)) {

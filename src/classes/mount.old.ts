@@ -1,11 +1,9 @@
-import * as fs from 'fs';
+import * as fs from 'fs-extra';
 import * as path from 'path';
 import { promisify } from 'util';
 
 import * as Hjson from 'hjson';
-import { ncp } from 'ncp';
 import * as request from 'request';
-import * as rimraf from 'rimraf';
 
 import { a, fmt } from './cli';
 import { defer } from './promise';
@@ -45,15 +43,17 @@ export async function mount(source: string, dest: string): Promise<boolean> {
     }
 
     let mountedUnderneath = false;
-    let relative;
+    let relative: string;
     for (const mount of mounts) {
-        relative = path.relative(dest, mount);
+        relative = path.relative(path.dirname(dest), mount);
 
-        if (relative === '.' || /^(?:\.\.\/)*\.\.$/.test(relative)) {
+        if (relative === '.' || /(^|\/)\.\.\//.test(relative)) {
             mountedUnderneath = true;
             break;
         }
     }
+
+    ensureDotFm();
 
     // We don't care if we are copying into a directory that we already modified
     if (!mountedUnderneath) {
@@ -89,6 +89,10 @@ export async function mount(source: string, dest: string): Promise<boolean> {
         }
     }
 
+    if (fs.pathExistsSync(dest)) {
+        fs.removeSync(dest);
+    }
+
     if (isHttp) {
         const {promise, resolve, reject} = defer();
 
@@ -100,7 +104,7 @@ export async function mount(source: string, dest: string): Promise<boolean> {
         await promise;
     } else {
         // Copy new contents in
-        await promisify(ncp)(source, dest);
+        await fs.copy(source, dest);
     }
 
     console.log(a`\{ld Copied \{m ${source}\} to \{m ${dest}\}\}`);
@@ -114,7 +118,7 @@ export async function unmount(mount: Mount): Promise<boolean> {
         replaced,
     } = mount;
 
-    await promisify(rimraf)(dest);
+    fs.removeSync(dest);
 
     if (replaced) {
         fs.renameSync(`.fm/${replaced}`, dest);
@@ -132,9 +136,7 @@ export async function copyFiles(
     const serviceRoot = `fm/${serviceName}`;
     const mountedDirs: {[dest: string]: boolean} = {};
 
-    if (!fs.existsSync('.fm')) {
-        fs.mkdirSync('.fm');
-    }
+    ensureDotFm();
 
     for (let dest in paths) {
         const source = paths[dest];
@@ -158,7 +160,7 @@ export async function copyFiles(
 export async function uncopyFiles(): Promise<boolean> {
     let returnCode: boolean = true;
 
-    if (fs.existsSync('.fm') && fs.statSync('.fm').isDirectory()) {
+    if (await hasDotFm()) {
         const mountIds = fs.readdirSync('.fm')
             .filter((s) => s.endsWith('.mount'))
             .map((s) => s.slice(0, -6))
@@ -191,21 +193,19 @@ export function generateMountsScript(
     k8sVolumes: {[dest: string]: string},
     command: string,
 ) {
-    if (!fs.existsSync('.fm')) {
-        fs.mkdirSync('.fm');
-    }
-
-    if (!fs.statSync('.fm').isDirectory()) {
-        fs.unlinkSync('.fm');
-        fs.mkdirSync('.fm');
-    }
+    ensureDotFm();
 
     const lines = ['#!/bin/sh'];
 
     for (const dest in k8sVolumes) {
         const src = k8sVolumes[dest];
 
-        lines.push(`ln -s ${fmt(src)} ${fmt(dest)}`);
+        lines.push(
+            `if [ -e ${fmt(dest)} ]; then`,
+            `  rm -r ${fmt(dest)}`,
+            `fi`,
+            `ln -s ${fmt(src)} ${fmt(dest)}`,
+        );
     }
 
     lines.push(`exec ${command}`);
@@ -220,4 +220,25 @@ export function generateMountsScript(
     fs.writeFileSync(filename, text, {mode: 0o777});
 
     return filename;
+}
+
+async function hasDotFm() {
+    return await fs.stat('.fm')
+        .then(
+            (stats) => stats.isDirectory(),
+            () => false,
+        );
+}
+
+function ensureDotFm() {
+    try {
+        const stats = fs.statSync('.fm');
+
+        if (!stats.isDirectory()) {
+            fs.removeSync('.fm');
+            fs.mkdirSync('.fm');
+        }
+    } catch (e) {
+        fs.mkdirSync('.fm');
+    }
 }

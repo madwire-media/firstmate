@@ -93,11 +93,6 @@ export async function runProd(
             return false;
         }
     } else if (tagged(branch, 'pureHelm')) {
-        // Create namespace if it doesn't exist
-        if (!needsNamespace(branch.cluster, branch.namespace)) {
-            return false;
-        }
-
         // Helm chart run w/ vars
         const helmContext = {
             branch,

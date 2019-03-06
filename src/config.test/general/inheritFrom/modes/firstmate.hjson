@@ -22,9 +22,9 @@
                 one: {
                     inheritFrom: ['~default', '~dev']
                 }
-                two: {
-                    inheritFrom: ['~default', '~dev', '~stage']
-                }
+                // two: {
+                //     inheritFrom: ['~default', '~dev', '~stage']
+                // }
             }
         }
     }

@@ -7,7 +7,7 @@ import { a, colors, events } from './cli';
 import { loadConfig } from './config';
 import { empty } from './empty';
 import { getGitBranch, getGitBranches } from './git';
-import { copyFiles, uncopyFiles } from './mount';
+import { Mount } from './mount';
 import { hasFolder, needsFile, needsFolder } from './require';
 
 export type SigIntHandler = () => Promise<undefined | false>;
@@ -236,8 +236,8 @@ export async function initBranch(
         }
 
         handlers.push(async () => {
-            await uncopyFiles();
             console.log();
+            await uncopyFiles();
 
             return undefined;
         });
@@ -345,33 +345,15 @@ export async function runDependencies(
             }
             alreadyRunBranches.add(dependency);
 
-            const newHandlers: SigIntHandler[] = [];
-            let depIsAsync = false;
-            const newIsAsync = () => {
-                depIsAsync = true;
-                isAsync();
-            };
+            const results = await cb(config, dependency, branchName, handlers, alreadyRunBranches, isAsync, params);
 
-            const results = await cb(
-                config, dependency, branchName, newHandlers, alreadyRunBranches,
-                newIsAsync, params,
-            );
-
-            if (!depIsAsync || results === false) {
-                for (const handler of newHandlers) {
+            if (results === false) {
+                // Undo everything
+                for (const handler of handlers) {
                     await handler();
                 }
 
-                if (results === false) {
-                    // Undo everything
-                    for (const handler of handlers) {
-                        await handler();
-                    }
-
-                    return false;
-                }
-            } else {
-                handlers.push(...newHandlers);
+                return false;
             }
         }
     }

@@ -57,7 +57,6 @@
         "prefer-for-of": true,
         "prefer-method-signature": true,
         "await-promise": true,
-        "promise-function-async": true,
         "no-floating-promises": true,
         "triple-equals": true,
         "use-isnan": true,
@@ -84,7 +83,13 @@
             true,
             "array"
         ],
-        "no-namespace": false
+        "no-namespace": false,
+        "variable-name": [
+            true,
+            "check-format",
+            "allow-leading-underscore",
+            "allow-pascal-case"
+        ]
     },
     "rulesDirectory": []
 }
