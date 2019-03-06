@@ -47,9 +47,9 @@ export async function mount(source: string, dest: string): Promise<boolean> {
     let mountedUnderneath = false;
     let relative;
     for (const mount of mounts) {
-        relative = path.relative(path.dirname(dest), mount);
+        relative = path.relative(dest, mount);
 
-        if (relative === '.' || /(^|\/)\.\.\//.test(relative)) {
+        if (relative === '.' || /^(?:\.\.\/)*\.\.$/.test(relative)) {
             mountedUnderneath = true;
             break;
         }

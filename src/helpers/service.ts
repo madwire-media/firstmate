@@ -236,8 +236,8 @@ export async function initBranch(
         }
 
         handlers.push(async () => {
-            console.log();
             await uncopyFiles();
+            console.log();
 
             return undefined;
         });
@@ -345,15 +345,33 @@ export async function runDependencies(
             }
             alreadyRunBranches.add(dependency);
 
-            const results = await cb(config, dependency, branchName, handlers, alreadyRunBranches, isAsync, params);
+            const newHandlers: SigIntHandler[] = [];
+            let depIsAsync = false;
+            const newIsAsync = () => {
+                depIsAsync = true;
+                isAsync();
+            };
 
-            if (results === false) {
-                // Undo everything
-                for (const handler of handlers) {
+            const results = await cb(
+                config, dependency, branchName, newHandlers, alreadyRunBranches,
+                newIsAsync, params,
+            );
+
+            if (!depIsAsync || results === false) {
+                for (const handler of newHandlers) {
                     await handler();
                 }
 
-                return false;
+                if (results === false) {
+                    // Undo everything
+                    for (const handler of handlers) {
+                        await handler();
+                    }
+
+                    return false;
+                }
+            } else {
+                handlers.push(...newHandlers);
             }
         }
     }
