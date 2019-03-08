@@ -516,4 +516,132 @@ describe('mount subsystem private method unit tests', () => {
         //     });
         // });
     });
+
+    describe('hasDotFm', () => {
+        interface TestCase {
+            before: {
+                files: RawFiles;
+            };
+            output: boolean;
+        }
+
+        async function runTest(testCase: TestCase) {
+            // Given
+            const depFs = new InMemoryFs('/', testCase.before.files);
+
+            // Inject
+            const deps = emptyDeps<MountHelper>();
+
+            deps.fs = depFs;
+
+            // When
+            const sut = new MountHelper(deps);
+            const result = await sut.hasDotFm();
+
+            // Then
+            expect(result).toBe(testCase.output);
+        }
+
+        test('returns true when .fm is a directory', async () => {
+            await runTest({
+                before: {
+                    files: {
+                        '.fm': {},
+                    },
+                },
+                output: true,
+            });
+        });
+
+        test('returns false when .fm is not a directory', async () => {
+            await runTest({
+                before: {
+                    files: {
+                        '.fm': 'this is a file',
+                    },
+                },
+                output: false,
+            });
+        });
+
+        test('returns false when .fm does not exist', async () => {
+            await runTest({
+                before: {
+                    files: {},
+                },
+                output: false,
+            });
+        });
+    });
+
+    describe('ensureDotFm', () => {
+        interface TestCase {
+            before: {
+                files: RawFiles;
+            };
+            after: {
+                files: RawFiles;
+            };
+        }
+
+        async function runTest(testCase: TestCase) {
+            // Given
+            const depFs = new InMemoryFs('/', testCase.before.files);
+
+            // Inject
+            const deps = emptyDeps<MountHelper>();
+
+            deps.fs = depFs;
+
+            // When
+            const sut = new MountHelper(deps);
+            await sut.ensureDotFm();
+
+            // Then
+            expect(depFs.toRaw()).toEqual(testCase.after.files);
+        }
+
+        test('does nothing when .fm is a directory', async () => {
+            await runTest({
+                before: {
+                    files: {
+                        '.fm': {},
+                    },
+                },
+                after: {
+                    files: {
+                        '.fm': {},
+                    },
+                },
+            });
+        });
+
+        test('deletes and creates directory when .fm is not a directory', async () => {
+            await runTest({
+                before: {
+                    files: {
+                        '.fm': 'this is a file',
+                    },
+                },
+                after: {
+                    files: {
+                        '.fm': {},
+                    },
+                },
+            });
+        });
+
+        test('creates directory when .fm does not exist', async () => {
+            await runTest({
+                before: {
+                    files: {},
+                },
+                after: {
+                    files: {
+                        '.fm': {},
+                    },
+                },
+            });
+        });
+    });
 });
