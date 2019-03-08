@@ -92,7 +92,7 @@ export async function mount(source: string, dest: string): Promise<boolean> {
     if (isHttp) {
         const {promise, resolve, reject} = defer();
 
-        request(source)
+        request(source, {headers: {'User-Agent': `firstmate dev`}})
             .pipe(fs.createWriteStream(dest))
             .on('close', resolve)
             .on('error', reject);
