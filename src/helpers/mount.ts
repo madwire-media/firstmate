@@ -89,6 +89,10 @@ export async function mount(source: string, dest: string): Promise<boolean> {
         }
     }
 
+    if (!fs.existsSync(path.dirname(dest))) {
+        fs.mkdirSync(dest, {recursive: true});
+    }
+
     if (isHttp) {
         const {promise, resolve, reject} = defer();
 
