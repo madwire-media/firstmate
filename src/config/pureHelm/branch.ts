@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 
 import { setDefault } from '../../util/defaultable';
-import { exact, getProps } from '../../util/io-util';
+import { exact, getProps } from '../../util/io-ts/io-util';
 import * as base from '../base/branch';
 import { branchType } from '../types/branch';
 import { HelmArgs } from '../types/helm';

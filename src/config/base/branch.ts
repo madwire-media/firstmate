@@ -3,7 +3,7 @@ import * as t from 'io-ts';
 import { branchType } from '../types/branch';
 
 import { setDefault } from '../../util/defaultable';
-import { getProps } from '../../util/io-util';
+import { getProps } from '../../util/io-ts/io-util';
 import { CopyFiles } from '../types/common';
 import { ParsingContext } from '../types/parsingContext';
 import { BranchName, ServiceName } from '../types/strings';

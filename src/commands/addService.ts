@@ -9,8 +9,8 @@ import { RawConfig, rawProject } from '../config';
 import { a } from '../helpers/cli';
 import { loadConfig, loadConfigRaw, loadUser, saveConfig } from '../helpers/config';
 import { getGitOrigin } from '../helpers/git';
-import { processTemplateS, TemplateProcessor } from '../helpers/template';
 import { User } from '../user';
+import { processTemplate, TemplateProcessor } from '../util/template';
 
 interface ServiceDep {
     suffix: string;
@@ -174,7 +174,7 @@ async function addSingleService({
     // Run dependencies
     if (fs.existsSync(`${templateDir}/deps.hjson`)) {
         const depsFile = fs.readFileSync(`${templateDir}/deps.hjson`, 'utf8');
-        const deps: ServiceDep[] = Hjson.rt.parse(processTemplateS(depsFile, templateVals));
+        const deps: ServiceDep[] = Hjson.rt.parse(processTemplate(depsFile, templateVals));
 
         for (const dep of deps) {
             const result = await addSingleService({
@@ -196,7 +196,7 @@ async function addSingleService({
     // Add stuff into firstmate.hjson file
     if (fs.existsSync(`${templateDir}/service.hjson`)) {
         const serviceFile = fs.readFileSync(`${templateDir}/service.hjson`, 'utf8');
-        const service = Hjson.rt.parse(processTemplateS(serviceFile, templateVals));
+        const service = Hjson.rt.parse(processTemplate(serviceFile, templateVals));
 
         config.services[name] = service;
     }

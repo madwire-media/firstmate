@@ -4,7 +4,7 @@ import { setDefault } from '../../util/defaultable';
 import { IoContext } from '../../util/io-context';
 import { createError, intoFailure, intoSuccess, IoErrors } from '../../util/io-errors';
 import { mask } from '../../util/maskable';
-import { merge } from '../../util/mergable';
+import { merge } from '../../util/morph/mergable';
 import * as base from '../base/branch';
 import { BranchType } from './branch';
 import { AllowedModes, BranchModeEnum, branchModes } from './common';

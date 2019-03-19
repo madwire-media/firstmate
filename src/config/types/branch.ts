@@ -5,7 +5,7 @@ import { AllowedModes } from './common';
 
 import { setDefault } from '../../util/defaultable';
 import { mask } from '../../util/maskable';
-import { merge } from '../../util/mergable';
+import { merge } from '../../util/morph/mergable';
 
 export const typeName = Symbol('branchTypeName');
 

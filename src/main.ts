@@ -22,6 +22,8 @@ import { templates } from './commands/templates';
 import { validate } from './commands/validate';
 import { uncopyFiles } from './helpers/mount';
 
+import { Command } from './util/cli/argTypes/command';
+
 (ncp as any).limit = 32;
 
 process.on('unhandledRejection', (err) => console.error(err));

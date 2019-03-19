@@ -1,5 +1,5 @@
 import * as t from 'io-ts';
-import { refineRgx } from '../../util/io-util';
+import { refineRgx } from '../../util/io-ts/io-util';
 
 // --------------------------------- Common --------------------------------- //
 export const rgxProjectName = /^[a-z0-9/-]+$/;

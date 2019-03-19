@@ -1,7 +1,7 @@
 import * as t from 'io-ts';
 
 import { setDefault } from '../../util/defaultable';
-import { exact, getProps, intersection } from '../../util/io-util';
+import { exact, getProps, intersection } from '../../util/io-ts/io-util';
 import * as base from '../base/branch';
 import * as pureHelm from '../pureHelm/branch';
 import { branchType } from '../types/branch';

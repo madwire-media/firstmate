@@ -13,7 +13,7 @@ import { IService, ServiceType } from './config/types/service';
 import { applyDefaults } from './config/types/serviceDefaults';
 import { ServiceName } from './config/types/strings';
 import { IoContext } from './util/io-context';
-import { merge } from './util/mergable';
+import { merge } from './util/morph/mergable';
 
 export const project = projectType([
     buildContainer.service,

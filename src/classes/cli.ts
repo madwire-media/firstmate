@@ -3,7 +3,7 @@ import * as os from 'os';
 import * as readline from 'readline';
 import * as tty from 'tty';
 
-import { defer } from './promise';
+import { defer } from '../util/promise';
 
 export const which = os.platform() === 'win32' ? 'where' : 'which';
 export let a: {
