@@ -7,18 +7,19 @@ export function emptyDeps<
     return new Proxy({} as {[key: string]: any}, {
         get(target, property, receiver) {
             if (!(property in target)) {
-                target[property as string] = unused(property.toString());
+                target[property as string] = unusedDep(property.toString());
             }
 
             return Reflect.get(target, property, receiver);
         },
     }) as any;
 }
-export function unused<D extends {}>(dependencyName: string): D {
+
+export function unusedDep<D extends {}>(dependencyName: string): D {
     return new Proxy({} as D, {
         apply(target, thisArg, args) {
             const msg =
-                `This dependency (${dependencyName}) is supposed to be unused` +
+                `This dependency (${dependencyName}) is supposed to be unused ` +
                 `(tried to apply with thisArg ${inspect(thisArg)} and args ${inspect(args)})`;
 
             if (fail !== undefined) {
@@ -29,7 +30,7 @@ export function unused<D extends {}>(dependencyName: string): D {
         },
         construct(target, args) {
             const msg =
-                `This dependency (${dependencyName}) is supposed to be unused` +
+                `This dependency (${dependencyName}) is supposed to be unused ` +
                 `(tried to construct with args ${inspect(args)})`;
 
             if (fail !== undefined) {
@@ -40,7 +41,7 @@ export function unused<D extends {}>(dependencyName: string): D {
         },
         defineProperty(target, property, descriptor) {
             const msg =
-                `This dependency (${dependencyName}) is supposed to be unused` +
+                `This dependency (${dependencyName}) is supposed to be unused ` +
                 `(tried to defineProperty [${inspect(property)}] with ${inspect(descriptor)})`;
 
             if (fail !== undefined) {
@@ -51,7 +52,7 @@ export function unused<D extends {}>(dependencyName: string): D {
         },
         deleteProperty(target, property) {
             const msg =
-                `This dependency (${dependencyName}) is supposed to be unused` +
+                `This dependency (${dependencyName}) is supposed to be unused ` +
                 `(tried to deleteProperty [${inspect(property)}])`;
 
             if (fail !== undefined) {
@@ -62,7 +63,7 @@ export function unused<D extends {}>(dependencyName: string): D {
         },
         get(target, property) {
             const msg =
-                `This dependency (${dependencyName}) is supposed to be unused` +
+                `This dependency (${dependencyName}) is supposed to be unused ` +
                 `(tried to get [${inspect(property)}])`;
 
             if (fail !== undefined) {
@@ -73,7 +74,7 @@ export function unused<D extends {}>(dependencyName: string): D {
         },
         has(target, property) {
             const msg =
-                `This dependency (${dependencyName}) is supposed to be unused` +
+                `This dependency (${dependencyName}) is supposed to be unused ` +
                 `(tried to has [${inspect(property)}])`;
 
             if (fail !== undefined) {
@@ -84,7 +85,7 @@ export function unused<D extends {}>(dependencyName: string): D {
         },
         set(target, property, value) {
             const msg =
-                `This dependency (${dependencyName}) is supposed to be unused` +
+                `This dependency (${dependencyName}) is supposed to be unused ` +
                 `(tried to set [${inspect(property)}] to ${inspect(value)})`;
 
             if (fail !== undefined) {
@@ -95,8 +96,23 @@ export function unused<D extends {}>(dependencyName: string): D {
         },
     });
 }
-export function unimplemented(): never {
-    const msg = 'This function has yet to be mocked out';
+
+// export function unimplementedClass<I extends {}>(): I {
+//     return new Proxy({} as {[key: string]: any}, {
+//         get(target, property, receiver) {
+//             if (!(property in target)) {
+//                 target[property as string] = unimplementedFn(property.toString());
+//             }
+
+//             return Reflect.get(target, property, receiver);
+//         },
+//     }) as any;
+// }
+export function unimplementedFn(name: string = '?'): () => any {
+    return () => unimplementedCall(name);
+}
+export function unimplementedCall(name: string = '?'): never {
+    const msg = `This function (named '${name}') has yet to be mocked out`;
 
     if (fail !== undefined) {
         fail(msg);
@@ -104,6 +120,7 @@ export function unimplemented(): never {
 
     throw new Error(msg);
 }
+
 export function cases<
     C extends [any[], any][],
 >(cases: C):
@@ -136,23 +153,3 @@ export function cases<
         throw new Error(msg);
     };
 }
-// export function cases<
-//     R,
-//     C extends {[input: string]: R},
-// >(input: string, cases: C): R {
-//     if (input in cases) {
-//         return cases[input] as any;
-//     } else {
-//         throw new Error(`Unimplemented case ${inspect(input)}`);
-//     }
-// }
-// export function casesFn<
-//     R,
-//     C extends {[input: string]: () => R},
-// >(input: string, cases: C): R {
-//     if (input in cases) {
-//         return cases[input]();
-//     } else {
-//         throw new Error(`Unimplemented case ${inspect(input)}`);
-//     }
-// }

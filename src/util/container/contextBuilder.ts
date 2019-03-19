@@ -1,18 +1,18 @@
-import { Dependencies } from './dependencies';
+import { ContextType } from './context';
 
-export class ContextBuilder<D extends Dependencies = {}> {
-    public readonly context: D;
+export class ContextBuilder<C extends ContextType = {}> {
+    public readonly context: C;
 
-    constructor(dependencies: D) {
-        this.context = Object.create(dependencies);
+    constructor(context: C) {
+        this.context = Object.create(context);
         Object.freeze(this.context);
     }
 
-    public register<D2 extends Dependencies>(newDependencies: D2): ContextBuilder<D & D2> {
-        return new ContextBuilder({...this.context, ...newDependencies});
+    public register<C2 extends ContextType>(additionalContext: C2): ContextBuilder<C & C2> {
+        return new ContextBuilder({...this.context, ...additionalContext});
     }
 
-    public finalize(): D {
+    public finalize(): C {
         return this.context;
     }
 }
