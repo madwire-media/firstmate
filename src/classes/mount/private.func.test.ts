@@ -3,7 +3,7 @@ import { Endpoints, StaticHttp } from '../../deps/http/mocks/static';
 import { NodePath } from '../../deps/path/impls/node';
 import { UnimplementedProcess } from '../../deps/process/mocks/unimplemented';
 import { emptyDeps } from '../../util/container/mock';
-import { MountHelper, MountRecord } from '../mount.private';
+import { MountPrivate, MountRecord } from './private';
 
 describe('mount subsystem private method unit tests', () => {
     describe('isHttp', () => {
@@ -16,17 +16,17 @@ describe('mount subsystem private method unit tests', () => {
 
         function runTest(testCase: TestCase) {
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isHttp(testCase.input.path);
 
             // Then
             expect(result).toBe(testCase.output);
         }
 
-        test('definitely not a url', () => {
+        test('"notaurl" -> false', () => {
             runTest({
                 input: {
                     path: 'notaurl',
@@ -35,7 +35,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('http but not a url', () => {
+        test('"http:stillnotaurl" -> false', () => {
             runTest({
                 input: {
                     path: 'http:stillnotaurl',
@@ -44,7 +44,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('url but not http', () => {
+        test('"ftp://thisisaurl" -> true', () => {
             runTest({
                 input: {
                     path: 'ftp://thisisaurl',
@@ -53,7 +53,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('is http', () => {
+        test('"http://thisisaurl" -> true', () => {
             runTest({
                 input: {
                     path: 'http://thisisaurl',
@@ -62,7 +62,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('is https', () => {
+        test('"https://thisisaurl" -> true', () => {
             runTest({
                 input: {
                     path: 'https://thisisaurl',
@@ -84,7 +84,7 @@ describe('mount subsystem private method unit tests', () => {
 
         function runTest(testCase: TestCase) {
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.process = new UnimplementedProcess();
             deps.process.cwd = () => testCase.cwd;
@@ -94,14 +94,14 @@ describe('mount subsystem private method unit tests', () => {
             deps.path.resolve = (...paths) => origResolve(testCase.cwd, ...paths);
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.toRelativePath(testCase.input.path);
 
             // Then
             expect(result).toBe(testCase.output);
         }
 
-        test('absolute to relative no change at root', () => {
+        test('absolute path at root cwd -> removes initial /', () => {
             runTest({
                 cwd: '/',
 
@@ -112,7 +112,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('absolute to relative in subdir', () => {
+        test('absolute path in subdir cwd -> adds traversal to common parent', () => {
             runTest({
                 cwd: '/my/subdir',
 
@@ -123,7 +123,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('relative to relative no change', () => {
+        test('relative path -> no change', () => {
             runTest({
                 cwd: '/my/subdir',
 
@@ -134,7 +134,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('relative to relative collapses duplicates', () => {
+        test('relative path with .. in subdir cwd -> collapses duplicates', () => {
             runTest({
                 cwd: '/my/subdir',
 
@@ -157,12 +157,12 @@ describe('mount subsystem private method unit tests', () => {
 
         function runTest(testCase: TestCase) {
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.path = new NodePath();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isMountedUnderneath(
                 testCase.input.mounts,
                 testCase.input.dest,
@@ -172,7 +172,7 @@ describe('mount subsystem private method unit tests', () => {
             expect(result).toBe(testCase.output);
         }
 
-        test('no mounts', () => {
+        test('no preexisting mounts -> false', () => {
             runTest({
                 input: {
                     mounts: [],
@@ -182,7 +182,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('never mounted underneath - cousins', () => {
+        test('new mount is cousin to existing mounts -> false', () => {
             runTest({
                 input: {
                     mounts: [
@@ -196,7 +196,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('never mounted underneath - siblings', () => {
+        test('new mount is sibling to existing mounts -> false', () => {
             runTest({
                 input: {
                     mounts: [
@@ -210,7 +210,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('never mounted underneath - partial', () => {
+        test('new mount is cousin to existing mounts with similar subpaths -> false', () => {
             runTest({
                 input: {
                     mounts: [
@@ -224,7 +224,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('never mounted underneath - parent', () => {
+        test('new mount is parent to existing mounts -> false', () => {
             runTest({
                 input: {
                     mounts: [
@@ -238,7 +238,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('is mounted underneath - same', () => {
+        test('new mount duplicates existing mount -> true', () => {
             runTest({
                 input: {
                     mounts: [
@@ -252,7 +252,7 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        test('is mounted underneath - child', () => {
+        test('new mount is child to existing mount -> true', () => {
             runTest({
                 input: {
                     mounts: [
@@ -274,10 +274,10 @@ describe('mount subsystem private method unit tests', () => {
 
         function runTest(testCase: TestCase) {
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.generateRandomName(testCase.len);
 
             // Then
@@ -285,19 +285,19 @@ describe('mount subsystem private method unit tests', () => {
             expect(result).toHaveLength(testCase.len);
         }
 
-        test('length 0', () => {
+        test('generates string of 0 chars', () => {
             runTest({
                 len: 0,
             });
         });
 
-        test('length 16', () => {
+        test('generates string of 16 chars', () => {
             runTest({
                 len: 16,
             });
         });
 
-        test('len 256', () => {
+        test('generates string of 0 chars', () => {
             runTest({
                 len: 256,
             });
@@ -310,18 +310,22 @@ describe('mount subsystem private method unit tests', () => {
             const depFs = new InMemoryFs('/', {'.fm': {}});
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = depFs;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.generateMountFilename();
 
             // Then
             expect(typeof result).toBe('string');
             expect(result).toHaveLength(16);
         }
+
+        test('generates string of 16 chars', async () => {
+            await runTest();
+        });
     });
 
     describe('writeMountRecord', () => {
@@ -344,12 +348,12 @@ describe('mount subsystem private method unit tests', () => {
             const depFs = new InMemoryFs('/', testCase.before.files);
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = depFs;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             await sut.writeMountRecord(
                 testCase.input.record,
                 testCase.input.name,
@@ -403,19 +407,19 @@ describe('mount subsystem private method unit tests', () => {
             const depFs = new InMemoryFs('/', testCase.files);
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = depFs;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.readMountRecord(testCase.input.name);
 
             // Then
             expect(result).toEqual(testCase.output);
         }
 
-        test('reads file by name', async () => {
+        test('reads file by given name', async () => {
             await runTest({
                 files: {
                     '.fm': {
@@ -434,7 +438,7 @@ describe('mount subsystem private method unit tests', () => {
         });
     });
 
-    describe('downloadFile', async () => {
+    describe('downloadFile', () => {
         interface TestCase {
             endpoints: Endpoints;
 
@@ -457,14 +461,14 @@ describe('mount subsystem private method unit tests', () => {
             const depHttp = new StaticHttp(testCase.endpoints);
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = depFs;
             deps.http = depHttp;
-            // deps.path = new NodePath();
+            deps.path = new NodePath();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             await sut.downloadFile(
                 testCase.input.url,
                 testCase.input.dest,
@@ -474,7 +478,7 @@ describe('mount subsystem private method unit tests', () => {
             expect(depFs.toRaw()).toEqual(testCase.after.files);
         }
 
-        test('downloads file from url', async () => {
+        test('downloads contents from url and saves into given file', async () => {
             await runTest({
                 endpoints: {
                     'http://my.site/file.txt': 'hello from the other side!',
@@ -494,27 +498,27 @@ describe('mount subsystem private method unit tests', () => {
             });
         });
 
-        // test('downloads file from url to new folder path', async () => {
-        //     await runTest({
-        //         endpoints: {
-        //             'http://my.site/file.txt': 'hello from the other side!',
-        //         },
-        //         before: {
-        //             files: {},
-        //         },
-        //         after: {
-        //             files: {
-        //                 newFolder: {
-        //                     'newFile.txt': 'hello from the other side!',
-        //                 },
-        //             },
-        //         },
-        //         input: {
-        //             url: 'http://my.site/file.txt',
-        //             dest: 'newFolder/newFile.txt',
-        //         },
-        //     });
-        // });
+        test('downloads contents from url and saves into given file, creating dirs when needed', async () => {
+            await runTest({
+                endpoints: {
+                    'http://my.site/file.txt': 'hello from the other side!',
+                },
+                before: {
+                    files: {},
+                },
+                after: {
+                    files: {
+                        newFolder: {
+                            'newFile.txt': 'hello from the other side!',
+                        },
+                    },
+                },
+                input: {
+                    url: 'http://my.site/file.txt',
+                    dest: 'newFolder/newFile.txt',
+                },
+            });
+        });
     });
 
     describe('hasDotFm', () => {
@@ -530,12 +534,12 @@ describe('mount subsystem private method unit tests', () => {
             const depFs = new InMemoryFs('/', testCase.before.files);
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = depFs;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.hasDotFm();
 
             // Then
@@ -589,12 +593,12 @@ describe('mount subsystem private method unit tests', () => {
             const depFs = new InMemoryFs('/', testCase.before.files);
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = depFs;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             await sut.ensureDotFm();
 
             // Then

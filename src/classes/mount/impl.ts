@@ -1,39 +1,36 @@
-import AggregateError = require('aggregate-error');
+import AggregateError from 'aggregate-error';
 
-import { CopyFiles } from '../config/types/common';
-import { KubernetesVolumes } from '../config/types/k8s';
+import { CopyFiles } from '../../config/types/common';
+import { KubernetesVolumes } from '../../config/types/k8s';
 
-import { FsError, RequiresFs } from '../deps/fs';
-import { RequiresHttp } from '../deps/http';
-import { RequiresProcess } from '../deps/process';
-import { Injectable } from '../util/container/injectable';
-import { context } from '../util/container/symbols';
-import { fmt } from './cli';
-import { RequiresFmMountHelper } from './mount.private';
-
-export interface RequiresFmMount {
-    mount: Mount;
-}
+import { Mount, MountRecord } from '.';
+import { FsError, RequiresFs } from '../../deps/fs';
+import { RequiresHttp } from '../../deps/http';
+import { RequiresProcess } from '../../deps/process';
+import { context, ContextOf, defaults, Injectable } from '../../util/container';
+import { fmt } from '../cli';
+import { MountPrivate, RequiresFmMountHelper } from './private';
 
 type Dependencies = RequiresFmMountHelper & RequiresFs & RequiresHttp & RequiresProcess;
 
-interface MountRecord {
-    dest: string;
-    replaced: string | false;
-}
+export class MountImpl extends Injectable<Dependencies> implements Mount {
+    public static [defaults](context:  ContextOf<MountPrivate>): RequiresFmMountHelper {
+        return {
+            mountPrivate: new MountPrivate(context),
+        };
+    }
 
-export class Mount extends Injectable<Dependencies> {
     private readonly mounts: Set<string> = new Set();
     private mountCount = 0;
 
     public async mount(source: string, dest: string): Promise<void> {
-        const {fs, mountHelper} = this[context];
+        const {fs, mountPrivate} = this[context];
 
-        const isHttp = mountHelper.isHttp(source);
+        const isHttp = mountPrivate.isHttp(source);
 
         if (!isHttp) {
-            source = mountHelper.toRelativePath(source);
-            dest = mountHelper.toRelativePath(dest);
+            source = mountPrivate.toRelativePath(source);
+            dest = mountPrivate.toRelativePath(dest);
 
             if (!await fs.exists(source)) {
                 throw new FsError({
@@ -44,19 +41,23 @@ export class Mount extends Injectable<Dependencies> {
             }
         }
 
-        const mountedUnderneath = mountHelper.isMountedUnderneath(this.mounts, dest);
+        const mountedUnderneath = mountPrivate.isMountedUnderneath(this.mounts, dest);
 
-        await mountHelper.ensureDotFm();
+        await mountPrivate.ensureDotFm();
 
         let destExists = await fs.exists(dest);
+
+        if (!destExists) {
+            await fs.mkdirp(dest);
+        }
 
         if (!mountedUnderneath) {
             if (destExists) {
                 // Generate name
-                const replaced = await mountHelper.generateMountFilename();
+                const replaced = await mountPrivate.generateMountFilename();
 
                 // Save manifest
-                await mountHelper.writeMountRecord({
+                await mountPrivate.writeMountRecord({
                     dest,
                     replaced,
                 }, (this.mountCount++).toString());
@@ -69,7 +70,7 @@ export class Mount extends Injectable<Dependencies> {
                 this.mounts.add(dest);
             } else {
                 // Save manifest
-                await mountHelper.writeMountRecord({
+                await mountPrivate.writeMountRecord({
                     dest,
                     replaced: false,
                 }, (this.mountCount++).toString());
@@ -84,7 +85,7 @@ export class Mount extends Injectable<Dependencies> {
         }
 
         if (isHttp) {
-            await mountHelper.downloadFile(source, dest);
+            await mountPrivate.downloadFile(source, dest);
         } else {
             await fs.copy(source, dest);
         }
@@ -107,11 +108,11 @@ export class Mount extends Injectable<Dependencies> {
     }
 
     public async copyFiles(paths: CopyFiles, serviceName: string): Promise<void> {
-        const {mountHelper} = this[context];
+        const {mountPrivate} = this[context];
 
         const serviceRoot = `fm/${serviceName}`;
 
-        await mountHelper.ensureDotFm();
+        await mountPrivate.ensureDotFm();
 
         for (let dest in paths) {
             const source = paths[dest];
@@ -127,16 +128,16 @@ export class Mount extends Injectable<Dependencies> {
     }
 
     public async uncopyFiles(): Promise<void> {
-        const {fs, mountHelper} = this[context];
+        const {fs, mountPrivate} = this[context];
 
-        if (await mountHelper.hasDotFm()) {
-            const mountIds = await mountHelper.getMountIds();
+        if (await mountPrivate.hasDotFm()) {
+            const mountIds = await mountPrivate.getMountIds();
 
             const errors: Error[] = [];
 
             for (const mountId of mountIds) {
                 try {
-                    const mount = await mountHelper.readMountRecord(mountId.toString());
+                    const mount = await mountPrivate.readMountRecord(mountId.toString());
                     await this.unmount(mount);
                 } catch (error) {
                     errors.push(error);
@@ -161,9 +162,9 @@ export class Mount extends Injectable<Dependencies> {
         k8sVolumes: KubernetesVolumes,
         command: string,
     ): Promise<string> {
-        const {fs, mountHelper} = this[context];
+        const {fs, mountPrivate} = this[context];
 
-        await mountHelper.ensureDotFm();
+        await mountPrivate.ensureDotFm();
 
         const lines = [
             '#!/bin/sh',

@@ -1,55 +1,59 @@
 import { Readable, Writable } from 'stream';
 import { FsError, Stats } from '../../deps/fs';
 import { UnimplementedFs } from '../../deps/fs/mocks/unimplemented';
-import { UnimplementedHttp, UnimplementedHttpRequest, UnimplementedHttpResponse } from '../../deps/http/mocks/unimplemented';
+import {
+    UnimplementedHttp,
+    UnimplementedHttpRequest,
+    UnimplementedHttpResponse,
+} from '../../deps/http/mocks/unimplemented';
 import { UnimplementedPath } from '../../deps/path/mocks/unimplemented';
 import { UnimplementedProcess } from '../../deps/process/mocks/unimplemented';
-import { cases, emptyDeps, unimplemented } from '../../util/container/mock';
-import { MountHelper, MountRecord } from '../mount.private';
+import { cases, emptyDeps, unimplementedCall } from '../../util/container/mock';
+import { MountPrivate, MountRecord } from './private';
 
 describe('mount subsystem private method unit tests', () => {
     describe('isHttp', () => {
         // isHttp is so simple that its unit tests are its functional tests
 
-        test('is not a url', () => {
+        test('returns false when string is not a url', () => {
             // Given
             const source = 'not.a/url';
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isHttp(source);
 
             // Then
             expect(result).toBe(false);
         });
 
-        test('is a url - http', () => {
+        test('returns true when string starts with http://', () => {
             // Given
             const source = 'http://is.a/url';
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isHttp(source);
 
             // Then
             expect(result).toBe(true);
         });
 
-        test('is a url - https', () => {
+        test('returns true when string stars with https://', () => {
             // Given
             const source = 'https://is.a/url';
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isHttp(source);
 
             // Then
@@ -58,7 +62,7 @@ describe('mount subsystem private method unit tests', () => {
     });
 
     describe('toRelativePath', () => {
-        test('works', () => {
+        test('makes an absolute path relative', () => {
             // Given
             const input = '/absolute/path';
 
@@ -75,7 +79,7 @@ describe('mount subsystem private method unit tests', () => {
             );
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.process = new UnimplementedProcess();
             deps.process.cwd = fnProcessCwd;
@@ -85,7 +89,7 @@ describe('mount subsystem private method unit tests', () => {
             deps.path.relative = fnPathRelative;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.toRelativePath(input);
 
             // Then
@@ -98,29 +102,32 @@ describe('mount subsystem private method unit tests', () => {
     });
 
     describe('isMountedUnderneath', () => {
-        test('no mounts', () => {
+        test('returns false when no preexisting mounts', () => {
             // Given
             const mounts: any[] = [];
             const dest = '/foo/bar';
 
-            const fnPathRelative = jest.fn();
-            const fnPathDirname = jest.fn();
+            const fnPathResolve = jest.fn();
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
+
+            deps.path = new UnimplementedPath();
+            deps.path.resolve = fnPathResolve;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isMountedUnderneath(mounts, dest);
 
             // Then
             expect(result).toBe(false);
 
-            expect(fnPathRelative).not.toHaveBeenCalled();
-            expect(fnPathDirname).not.toHaveBeenCalled();
+            expect(fnPathResolve.mock.calls).toEqual([
+                [dest],
+            ]);
         });
 
-        test('never mounted underneath - cousins', () => {
+        test('returns false when new mount is cousin to others', () => {
             // Given
             const mounts = [
                 '/first/location',
@@ -129,34 +136,37 @@ describe('mount subsystem private method unit tests', () => {
             ];
             const dest = '/not/underneath';
 
-            const fnPathRelative = jest.fn(
+            const fnPathResolve = jest.fn(
                 cases([
-                    [['/not/underneath', '/first/location'], '../first/location'],
-                    [['/not/underneath', '/place/number/two'], '../place/number/two'],
-                    [['/not/underneath', '/the/third/spot'], '../the/third/spot'],
+                    [['/not/underneath'], '/not/underneath'],
+                    [['/first/location'], '/first/location'],
+                    [['/place/number/two'], '/place/number/two'],
+                    [['/the/third/spot'], '/the/third/spot'],
                 ]),
             );
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.path = new UnimplementedPath();
-            deps.path.relative = fnPathRelative;
+            deps.path.resolve = fnPathResolve;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isMountedUnderneath(mounts, dest);
 
             // Then
             expect(result).toBe(false);
 
-            expect(fnPathRelative).toHaveBeenCalledTimes(3);
-            expect(fnPathRelative).toHaveBeenCalledWith('/not/underneath', '/first/location');
-            expect(fnPathRelative).toHaveBeenCalledWith('/not/underneath', '/place/number/two');
-            expect(fnPathRelative).toHaveBeenCalledWith('/not/underneath', '/the/third/spot');
+            expect(fnPathResolve.mock.calls).toEqual([
+                ['/not/underneath'],
+                ['/first/location'],
+                ['/place/number/two'],
+                ['/the/third/spot'],
+            ]);
         });
 
-        test('never mounted underneath - siblings', () => {
+        test('returns false when new mount is sibling to others', () => {
             // Given
             const mounts = [
                 '/first/location',
@@ -165,34 +175,37 @@ describe('mount subsystem private method unit tests', () => {
             ];
             const dest = '/not';
 
-            const fnPathRelative = jest.fn(
+            const fnPathResolve = jest.fn(
                 cases([
-                    [['/not', '/first/location'], 'first/location'],
-                    [['/not', '/place/number/two'], 'place/number/two'],
-                    [['/not', '/the/third/spot'], 'the/third/spot'],
+                    [['/not'], '/not'],
+                    [['/first/location'], '/first/location'],
+                    [['/place/number/two'], '/place/number/two'],
+                    [['/the/third/spot'], '/the/third/spot'],
                 ]),
             );
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.path = new UnimplementedPath();
-            deps.path.relative = fnPathRelative;
+            deps.path.resolve = fnPathResolve;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isMountedUnderneath(mounts, dest);
 
             // Then
             expect(result).toBe(false);
 
-            expect(fnPathRelative).toHaveBeenCalledTimes(3);
-            expect(fnPathRelative).toHaveBeenCalledWith('/not', '/first/location');
-            expect(fnPathRelative).toHaveBeenCalledWith('/not', '/place/number/two');
-            expect(fnPathRelative).toHaveBeenCalledWith('/not', '/the/third/spot');
+            expect(fnPathResolve.mock.calls).toEqual([
+                ['/not'],
+                ['/first/location'],
+                ['/place/number/two'],
+                ['/the/third/spot'],
+            ]);
         });
 
-        test('is mounted underneath - same', () => {
+        test('returns true when new mount duplicates existing mount', () => {
             // Given
             const mounts = [
                 '/first/location',
@@ -201,31 +214,35 @@ describe('mount subsystem private method unit tests', () => {
             ];
             const dest = '/place/number/two';
 
-            const fnPathRelative = jest.fn(
+            const fnPathResolve = jest.fn(
                 cases([
-                    [['/place/number/two', '/first/location'], '../../../first/location'],
-                    [['/place/number/two', '/place/number/two'], ''],
-                    [['/place/number/two', '/the/third/spot'], '../../../the/third/spot'],
+                    [['/first/location'], '/first/location'],
+                    [['/place/number/two'], '/place/number/two'],
+                    [['/the/third/spot'], '/the/third/spot'],
                 ]),
             );
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.path = new UnimplementedPath();
-            deps.path.relative = fnPathRelative;
+            deps.path.resolve = fnPathResolve;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isMountedUnderneath(mounts, dest);
 
             // Then
             expect(result).toBe(true);
 
-            expect(fnPathRelative).toHaveBeenCalledWith('/place/number/two', '/place/number/two');
+            expect(fnPathResolve.mock.calls).toEqual([
+                ['/place/number/two'],
+                ['/first/location'],
+                ['/place/number/two'],
+            ]);
         });
 
-        test('is mounted underneath - child', () => {
+        test('returns true when new mount child of existing mount', () => {
             // Given
             const mounts = [
                 '/first/location',
@@ -234,41 +251,46 @@ describe('mount subsystem private method unit tests', () => {
             ];
             const dest = '/place/number/two/underneath';
 
-            const fnPathRelative = jest.fn(
+            const fnPathResolve = jest.fn(
                 cases([
-                    [['/place/number/two/underneath', '/first/location'], '../../../../first/location'],
-                    [['/place/number/two/underneath', '/place/number/two'], '..'],
-                    [['/place/number/two/underneath', '/the/third/spot'], '../../../../first/location'],
+                    [['/place/number/two/underneath'], '/place/number/two/underneath'],
+                    [['/first/location'], '/first/location'],
+                    [['/place/number/two'], '/place/number/two'],
+                    [['/the/third/spot'], '/the/third/spot'],
                 ]),
             );
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.path = new UnimplementedPath();
-            deps.path.relative = fnPathRelative;
+            deps.path.resolve = fnPathResolve;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.isMountedUnderneath(mounts, dest);
 
             // Then
             expect(result).toBe(true);
 
-            expect(fnPathRelative).toHaveBeenCalledWith('/place/number/two/underneath', '/place/number/two');
+            expect(fnPathResolve.mock.calls).toEqual([
+                ['/place/number/two/underneath'],
+                ['/first/location'],
+                ['/place/number/two'],
+            ]);
         });
     });
 
     describe('generateRandomName', () => {
-        test('works', () => {
+        test('generates a random sting of given length', () => {
             // Given
             const len = 16;
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = sut.generateRandomName(len);
 
             // Then
@@ -278,18 +300,18 @@ describe('mount subsystem private method unit tests', () => {
     });
 
     describe('generateMountFilename', () => {
-        test('generates name', async () => {
+        test('generates random 16-char filename', async () => {
             // Given
             const fnFsExists = jest.fn(() => Promise.resolve(false));
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.exists = fnFsExists;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.generateMountFilename();
 
             // Then
@@ -297,7 +319,7 @@ describe('mount subsystem private method unit tests', () => {
             expect(result).toHaveLength(16);
         });
 
-        test('generates unique name', async () => {
+        test('generates unique random 16-char filename', async () => {
             // Captures
             const existingFiles: string[] = [];
 
@@ -313,13 +335,13 @@ describe('mount subsystem private method unit tests', () => {
             });
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.exists = fnFsExists;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.generateMountFilename();
 
             // Then
@@ -332,7 +354,7 @@ describe('mount subsystem private method unit tests', () => {
     });
 
     describe('writeMountRecord', () => {
-        test('works', async () => {
+        test('writes mount record to disk', async () => {
             // Given
             const record: MountRecord = {
                 dest: 'my/destination',
@@ -343,13 +365,13 @@ describe('mount subsystem private method unit tests', () => {
             const fnFsWrite = jest.fn();
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.write = fnFsWrite;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.writeMountRecord(record, name);
 
             // Then
@@ -364,7 +386,7 @@ describe('mount subsystem private method unit tests', () => {
     });
 
     describe('readMountRecord', () => {
-        test('works', async () => {
+        test('reads mount record from disk', async () => {
             // Given
             const name = 'other-record';
 
@@ -373,13 +395,13 @@ describe('mount subsystem private method unit tests', () => {
             );
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.read = fnFsRead;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.readMountRecord(name);
 
             // Then
@@ -394,7 +416,7 @@ describe('mount subsystem private method unit tests', () => {
     });
 
     describe('downloadFile', () => {
-        test('works', async () => {
+        test('downloads file to disk', async () => {
             // Captures
             let writtenData = '';
 
@@ -432,18 +454,29 @@ describe('mount subsystem private method unit tests', () => {
                     final: fnFsCreateWriteStreamFinal,
                 });
             });
+            const fnFsExists = jest.fn(() => Promise.resolve(true));
+
+            const fnPathDirname = jest.fn(
+                cases([
+                    [['hello/world'], 'hello'],
+                ]),
+            );
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.http = new UnimplementedHttp();
             deps.http.get = fnHttpGet;
 
             deps.fs = new UnimplementedFs();
             deps.fs.createWriteStream = fnFsCreateWriteStream;
+            deps.fs.exists = fnFsExists;
+
+            deps.path = new UnimplementedPath();
+            deps.path.dirname = fnPathDirname;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.downloadFile(url, dest);
 
             // Then
@@ -459,24 +492,29 @@ describe('mount subsystem private method unit tests', () => {
             expect(fnFsCreateWriteStream).toBeCalledWith('hello/world');
             expect(fnFsCreateWriteStreamWrite).toBeCalled();
             expect(fnFsCreateWriteStreamFinal).toBeCalledTimes(1);
+            expect(fnFsExists).toBeCalledTimes(1);
+
+            expect(fnPathDirname).toBeCalledTimes(1);
         });
+
+        // TODO: test when destination does not already exist
     });
 
     describe('getMountIds', () => {
-        test('works', async () => {
+        test('returns numeric filenames from .fm/*.mount files', async () => {
             // Given
             const fnFsReaddir = jest.fn(() => Promise.resolve([
                 '3.mount', '.mount', '1.mount', 'hello.world', '5.mount',
             ]));
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.readdir = fnFsReaddir;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.getMountIds();
 
             // Then
@@ -493,19 +531,19 @@ describe('mount subsystem private method unit tests', () => {
             const fnFsStatIsDirectory = jest.fn(() => true);
             const fnFsStat = jest.fn((): Promise<Stats> => {
                 return Promise.resolve({
-                    getMode: unimplemented,
+                    getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
             });
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.hasDotFm();
 
             // Then
@@ -522,19 +560,19 @@ describe('mount subsystem private method unit tests', () => {
             const fnFsStatIsDirectory = jest.fn(() => false);
             const fnFsStat = jest.fn((): Promise<Stats> => {
                 return Promise.resolve({
-                    getMode: unimplemented,
+                    getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
             });
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.hasDotFm();
 
             // Then
@@ -556,13 +594,13 @@ describe('mount subsystem private method unit tests', () => {
             });
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.hasDotFm();
 
             // Then
@@ -581,13 +619,13 @@ describe('mount subsystem private method unit tests', () => {
             });
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             await expect(sut.hasDotFm()).rejects.toThrowError('walla walla bing bang');
 
             // Then
@@ -602,19 +640,19 @@ describe('mount subsystem private method unit tests', () => {
             const fnFsStatIsDirectory = jest.fn(() => true);
             const fnFsStat = jest.fn((): Promise<Stats> => {
                 return Promise.resolve({
-                    getMode: unimplemented,
+                    getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
             });
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.ensureDotFm();
 
             // Then
@@ -631,7 +669,7 @@ describe('mount subsystem private method unit tests', () => {
             const fnFsStatIsDirectory = jest.fn(() => false);
             const fnFsStat = jest.fn((): Promise<Stats> => {
                 return Promise.resolve({
-                    getMode: unimplemented,
+                    getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
             });
@@ -639,7 +677,7 @@ describe('mount subsystem private method unit tests', () => {
             const fnFsMkdir = jest.fn();
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
@@ -647,7 +685,7 @@ describe('mount subsystem private method unit tests', () => {
             deps.fs.mkdir = fnFsMkdir;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.ensureDotFm();
 
             // Then
@@ -674,14 +712,14 @@ describe('mount subsystem private method unit tests', () => {
             const fnFsMkdirp = jest.fn();
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
             deps.fs.mkdirp = fnFsMkdirp;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             const result = await sut.ensureDotFm();
 
             // Then
@@ -703,13 +741,13 @@ describe('mount subsystem private method unit tests', () => {
             });
 
             // Inject
-            const deps = emptyDeps<MountHelper>();
+            const deps = emptyDeps<MountPrivate>();
 
             deps.fs = new UnimplementedFs();
             deps.fs.stat = fnFsStat;
 
             // When
-            const sut = new MountHelper(deps);
+            const sut = new MountPrivate(deps);
             await expect(sut.ensureDotFm()).rejects.toThrowError('walla walla bing bang');
 
             // Then

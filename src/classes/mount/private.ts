@@ -1,13 +1,12 @@
-import { FsError, RequiresFs } from '../deps/fs';
-import { RequiresHttp } from '../deps/http';
-import { RequiresPath } from '../deps/path';
-import { RequiresProcess } from '../deps/process';
-import { Injectable } from '../util/container/injectable';
-import { context } from '../util/container/symbols';
-import { defer } from './promise';
+import { FsError, RequiresFs } from '../../deps/fs';
+import { RequiresHttp } from '../../deps/http';
+import { RequiresPath } from '../../deps/path';
+import { RequiresProcess } from '../../deps/process';
+import { context, Injectable } from '../../util/container';
+import { defer } from '../../util/promise';
 
 export interface RequiresFmMountHelper {
-    mountHelper: MountHelper;
+    mountPrivate: MountPrivate;
 }
 
 type Dependencies = RequiresFs & RequiresHttp & RequiresPath & RequiresProcess;
@@ -17,7 +16,7 @@ export interface MountRecord {
     replaced: string | false;
 }
 
-export class MountHelper extends Injectable<Dependencies> {
+export class MountPrivate extends Injectable<Dependencies> {
     public isHttp(source: string): boolean {
         return /^https?:\/\//.test(source);
     }
@@ -31,10 +30,12 @@ export class MountHelper extends Injectable<Dependencies> {
     public isMountedUnderneath(mounts: Iterable<string>, dest: string): boolean {
         const {path} = this[context];
 
-        for (const mount of mounts) {
-            const relative = path.relative(dest, mount);
+        dest = path.resolve(dest);
 
-            if (relative === '' || /^(?:\.\.\/)*\.\.$/.test(relative)) {
+        for (let mount of mounts) {
+            mount = path.resolve(mount);
+
+            if (dest === mount || dest.startsWith(`${mount}/`)) {
                 return true;
             }
         }
@@ -80,10 +81,16 @@ export class MountHelper extends Injectable<Dependencies> {
     }
 
     public async downloadFile(url: string, dest: string): Promise<void> {
-        const {http, fs} = this[context];
+        const {http, fs, path} = this[context];
 
         const {promise, resolve, reject} = defer();
         const httpResponse = await http.get(url).getResponse();
+
+        const parentDir = path.dirname(dest);
+
+        if (!(await fs.exists(parentDir))) {
+            await fs.mkdirp(parentDir);
+        }
 
         httpResponse
             .pipe(fs.createWriteStream(dest))
