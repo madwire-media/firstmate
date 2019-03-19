@@ -1,4 +1,4 @@
-import { defer } from '../helpers/promise';
+import { defer } from '../util/promise';
 
 export type MutexCallback<D> = (
     get: () => D,
@@ -6,8 +6,8 @@ export type MutexCallback<D> = (
 ) => Promise<void>;
 
 export class MutexLock<D> {
-    private get: () => D;
-    private set: (value: D) => void;
+    private readonly get: () => D;
+    private readonly set: (value: D) => void;
 
     constructor(get: () => D, set: (value: D) => void) {
         this.get = get;
@@ -23,7 +23,7 @@ export class MutexLock<D> {
 }
 
 export class Mutex<D = undefined> {
-    private watchers: MutexCallback<D>[];
+    private readonly watchers: MutexCallback<D>[];
     private locked: boolean;
     private data: D;
 
@@ -41,7 +41,7 @@ export class Mutex<D = undefined> {
                 resolve();
             }
         });
-        this.run();
+        await this.run();
 
         await promise;
     }

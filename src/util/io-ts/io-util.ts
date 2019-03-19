@@ -1,6 +1,6 @@
 import * as t from 'io-ts';
+import { only } from '../morph/maskable';
 import { createError, intoFailure, intoSuccess } from './io-errors';
-import { only } from './maskable';
 
 export function refineRgx<T extends t.Type<string>>(
     rgx: RegExp,
