@@ -1,21 +1,15 @@
 import { Readable, Writable } from 'stream';
 import { Http, HttpRequest, HttpResponse } from '..';
-import { unimplemented } from '../../../util/container/mock';
+import { unimplementedFn } from '../../../util/container/mock';
 
 export class UnimplementedHttp implements Http {
-    public get(): any {
-        return unimplemented();
-    }
+    public get = unimplementedFn('get');
 }
 
 export class UnimplementedHttpRequest extends Writable implements HttpRequest {
-    public getResponse(): any {
-        return unimplemented();
-    }
+    public getResponse = unimplementedFn('getResponse');
 }
 
 export class UnimplementedHttpResponse extends Readable implements HttpResponse {
-    public intoString(): any {
-        return unimplemented();
-    }
+    public intoString = unimplementedFn('intoString');
 }

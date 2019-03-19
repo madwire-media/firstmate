@@ -3,7 +3,7 @@ import * as https from 'https';
 
 import { Readable, Writable } from 'stream';
 import { Http, HttpRequest, HttpResponse } from '..';
-import { defer } from '../../../classes/promise';
+import { defer } from '../../../util/promise';
 
 export class NodeHttpRequest extends Writable implements HttpRequest {
     private readonly parent: Writable;

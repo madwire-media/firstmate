@@ -92,13 +92,13 @@ export interface OsErrorProps {
 export class OsError implements Error, OsErrorProps {
     public readonly name: string = 'OsError';
 
-    public readonly inner: Error | OsErrorProps;
-    public readonly message: string;
-    public readonly stack?: string;
+    public inner: Error | OsErrorProps;
+    public message: string;
+    public stack?: string;
 
-    public readonly errno?: number;
-    public readonly syscall?: string;
-    public readonly code?: keyof typeof OsErrorCodes;
+    public errno?: number;
+    public syscall?: string;
+    public code?: keyof typeof OsErrorCodes;
 
     constructor(inner: Error | OsErrorProps) {
         this.inner = inner;

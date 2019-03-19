@@ -62,9 +62,10 @@ export interface FsErrorProps extends OsErrorProps {
 
 export class FsError extends OsError {
     public readonly name = 'FsError';
-    public readonly inner: Error | FsErrorProps;
 
-    public readonly path?: string;
+    public inner: Error | FsErrorProps;
+
+    public path?: string;
 
     constructor(inner: Error | FsErrorProps) {
         super(inner);

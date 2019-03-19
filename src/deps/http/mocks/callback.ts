@@ -1,6 +1,6 @@
 import { Readable, Writable } from 'stream';
 import { Http, HttpRequest, HttpResponse } from '..';
-import { defer } from '../../../classes/promise';
+import { defer } from '../../../util/promise';
 
 export type HttpHandler = (url: string, method: string, data?: string) => string;
 

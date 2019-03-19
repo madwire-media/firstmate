@@ -305,7 +305,7 @@ class Directory {
     }
 }
 
-export class InMemoryFs implements Fs {
+class InMemoryFsImpl implements Fs {
     public cwd: string;
     private readonly root: Directory = new Directory();
 
@@ -369,7 +369,7 @@ export class InMemoryFs implements Fs {
         try {
             this.traverse(path);
         } catch (error) {
-            if (error instanceof FsError && error.isNotADirectory()) {
+            if (error instanceof FsError && error.isNoSuchFile()) {
                 return false;
             } else {
                 throw error;
@@ -533,5 +533,214 @@ export class InMemoryFs implements Fs {
         }
 
         return this.root.traverse(path.substr(1));
+    }
+}
+
+type FsErrorKeys = Exclude<keyof FsError, 'name'>;
+
+function editFsError(error: any, newProps: {[K in FsErrorKeys]?: FsError[K]}): any {
+    if (error instanceof FsError) {
+        for (const key in newProps) {
+            error[key as FsErrorKeys] = newProps[key as FsErrorKeys];
+        }
+    }
+
+    return error;
+}
+
+export class InMemoryFs extends InMemoryFsImpl implements Fs {
+    public async chmod(path: string, mode: number): Promise<void> {
+        try {
+            return await super.chmod(path, mode);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, chmod '${path}' '${mode}'`,
+                path,
+            });
+        }
+    }
+
+    public createReadStream(path: string): NodeJS.ReadableStream {
+        try {
+            return super.createReadStream(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, createReadStream '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public createWriteStream(path: string): NodeJS.WritableStream {
+        try {
+            return super.createWriteStream(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, createWriteStream '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async deleteFile(path: string): Promise<void> {
+        try {
+            return await super.deleteFile(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, deleteFile '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async deleteDir(path: string): Promise<void> {
+        try {
+            return await super.deleteDir(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, deleteDir '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async exists(path: string): Promise<boolean> {
+        try {
+            return await super.exists(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, exists '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async mkdir(path: string): Promise<void> {
+        try {
+            return await super.mkdir(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, mkdir '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async read(path: string): Promise<string> {
+        try {
+            return await super.read(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, read '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async readdir(path: string): Promise<string[]> {
+        try {
+            return await super.readdir(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, readdir '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async rename(from: string, to: string): Promise<void> {
+        try {
+            return await super.rename(from, to);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, rename '${from}' '${to}'`,
+            });
+        }
+    }
+
+    public async stat(path: string): Promise<InMemoryFsStats> {
+        try {
+            return await super.stat(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, stat '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async write(path: string, contents: string): Promise<void> {
+        try {
+            return await super.write(path, contents);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, write '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async copy(from: string, to: string, customOpts?: CopyOptions): Promise<void> {
+        try {
+            return await super.copy(from, to, customOpts);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, copy '${from}' '${to}'`,
+            });
+        }
+    }
+
+    public async copyFile(from: string, to: string, customOpts?: CopyOptions): Promise<void> {
+        try {
+            return await super.copyFile(from, to, customOpts);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, copyFile '${from}' '${to}'`,
+            });
+        }
+    }
+
+    public async mkdirp(path: string): Promise<void> {
+        try {
+            return await super.mkdirp(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, mkdirp '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async remove(path: string): Promise<void> {
+        try {
+            return await super.remove(path);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, remove '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async walkDown(path: string, cb: WalkCallback, customOpts?: WalkOptions): Promise<void> {
+        try {
+            return await super.walkDown(path, cb, customOpts);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, walkDown '${path}'`,
+                path,
+            });
+        }
+    }
+
+    public async walkUp(path: string, cb: WalkCallback, customOpts?: WalkOptions): Promise<void> {
+        try {
+            return await super.walkUp(path, cb, customOpts);
+        } catch (error) {
+            throw editFsError(error, {
+                message: `${error.message}, walkUp '${path}'`,
+                path,
+            });
+        }
     }
 }
