@@ -2,5 +2,6 @@
     "todo-tree.flat": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.tslint": true
-    }
+    },
+    "typescript.tsdk": "node_modules/typescript/lib"
 }
