@@ -1,9 +1,10 @@
-import { FsError, RequiresFs } from '../../deps/fs';
+import { FsPromiseResult, RequiresFs } from '../../deps/fs';
 import { RequiresHttp } from '../../deps/http';
 import { RequiresPath } from '../../deps/path';
 import { RequiresProcess } from '../../deps/process';
 import { context, Injectable } from '../../util/container';
 import { defer } from '../../util/promise';
+import { PromiseResult, Result } from '../../util/result';
 
 export interface RequiresFmMountHelper {
     mountPrivate: MountPrivate;
@@ -66,30 +67,33 @@ export class MountPrivate extends Injectable<Dependencies> {
         return name;
     }
 
-    public async writeMountRecord(record: MountRecord, name: string): Promise<void> {
+    public async writeMountRecord(record: MountRecord, name: string): FsPromiseResult<void> {
         const {fs} = this[context];
 
         const hjson = JSON.stringify(record);
-        await fs.write(`.fm/${name}.mount`, hjson);
+        return fs.write(`.fm/${name}.mount`, hjson);
     }
 
-    public async readMountRecord(name: string): Promise<MountRecord> {
+    public async readMountRecord(name: string): FsPromiseResult<MountRecord> {
         const {fs} = this[context];
 
-        const hjson = await fs.read(`.fm/${name}.mount`);
-        return JSON.parse(hjson);
+        return Result.async(fs.read(`.fm/${name}.mount`))
+            .map(JSON.parse);
     }
 
-    public async downloadFile(url: string, dest: string): Promise<void> {
+    public async downloadFile(url: string, dest: string): PromiseResult<void, Error> {
         const {http, fs, path} = this[context];
 
-        const {promise, resolve, reject} = defer();
+        const {promise, resolve, reject} = defer<void>();
         const httpResponse = await http.get(url).getResponse();
 
         const parentDir = path.dirname(dest);
 
         if (!(await fs.exists(parentDir))) {
-            await fs.mkdirp(parentDir);
+            const mkdirpResult = await fs.mkdirp(parentDir);
+            if (mkdirpResult.isErr()) {
+                return mkdirpResult;
+            }
         }
 
         httpResponse
@@ -97,53 +101,50 @@ export class MountPrivate extends Injectable<Dependencies> {
             .on('finish', resolve)
             .on('error', reject);
 
-        await promise;
+        return Result.fromPromise(promise);
     }
 
-    public async getMountIds(): Promise<number[]> {
+    public async getMountIds(): FsPromiseResult<number[]> {
         const {fs} = this[context];
 
         return (await fs.readdir('.fm'))
+            .map((readdir) => readdir
                 .filter((s) => s.endsWith('.mount'))
                 .map((s) => s.slice(0, -6))
                 .filter((s) => s.length > 0)
                 .map((s) => +s)
                 .filter((s) => !isNaN(s))
-                .sort((a, b) => a - b);
+                .sort((a, b) => a - b),
+            );
     }
 
     public async hasDotFm(): Promise<boolean> {
         const {fs} = this[context];
 
-        try {
-            const stats = await fs.stat('.fm');
-
-            return stats.isDirectory();
-        } catch (error) {
-            if (error instanceof FsError && error.isNoSuchFile()) {
-                return false;
-            } else {
-                throw error;
-            }
-        }
+        return fs.exists('.fm');
     }
 
-    public async ensureDotFm(): Promise<void> {
+    public async ensureDotFm(): FsPromiseResult<void> {
         const {fs} = this[context];
 
-        try {
-            const stats = await fs.stat('.fm');
-
-            if (!stats.isDirectory()) {
-                await fs.remove('.fm');
-                await fs.mkdir('.fm');
-            }
-        } catch (error) {
-            if (error instanceof FsError && error.isNoSuchFile()) {
-                await fs.mkdirp('.fm');
-            } else {
-                throw error;
-            }
-        }
+        return Result.async(fs.stat('.fm'))
+            .then(
+                (stats) => {
+                    if (stats.isDirectory()) {
+                        return Result.async(fs.remove('.fm'))
+                            .andThen(() => fs.mkdir('.fm'))
+                            .promise();
+                    } else {
+                        return Result.voidOk;
+                    }
+                },
+                (error) => {
+                    if (error.isNoSuchFile()) {
+                        return fs.mkdirp('.fm');
+                    } else {
+                        return Result.Err(error);
+                    }
+                },
+            ).promise();
     }
 }

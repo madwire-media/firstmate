@@ -1,0 +1,1 @@
+../../tslint-unused-result/lib/index.js

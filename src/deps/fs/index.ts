@@ -1,8 +1,9 @@
+import { PromiseResult, Result } from '../../util/result';
 import { ConcurrencyOptions } from '../concurrently';
 import { OsError, OsErrorProps } from '../os';
 
 export type FileMutator = (from: string, to: string) => NodeJS.ReadWriteStream;
-export type WalkCallback = (relpath: string, isDir: boolean) => void | Promise<void>;
+export type WalkCallback = (relpath: string, isDir: boolean) => void | FsPromiseResult<void>;
 
 export interface Stats {
     isDirectory(): boolean;
@@ -32,28 +33,31 @@ export interface RequiresFs {
     fs: Fs;
 }
 
+export abstract class FsResult<T> extends Result<T, FsError> {}
+export type FsPromiseResult<T> = PromiseResult<T, FsError>;
+
 export interface FsBasic {
-    chmod(path: string, mode: number): Promise<void>;
+    chmod(path: string, mode: number): FsPromiseResult<void>;
     createReadStream(path: string): NodeJS.ReadableStream;
     createWriteStream(path: string): NodeJS.WritableStream;
-    deleteFile(path: string): Promise<void>;
-    deleteDir(path: string): Promise<void>;
+    deleteFile(path: string): FsPromiseResult<void>;
+    deleteDir(path: string): FsPromiseResult<void>;
     exists(path: string): Promise<boolean>;
-    mkdir(path: string): Promise<void>;
-    read(path: string): Promise<string>;
-    readdir(directory: string): Promise<string[]>;
-    rename(from: string, to: string): Promise<void>;
-    stat(path: string): Promise<Stats>;
-    write(path: string, contents: string): Promise<void>;
+    mkdir(path: string): FsPromiseResult<void>;
+    read(path: string): FsPromiseResult<string>;
+    readdir(directory: string): FsPromiseResult<string[]>;
+    rename(from: string, to: string): FsPromiseResult<void>;
+    stat(path: string): FsPromiseResult<Stats>;
+    write(path: string, contents: string): FsPromiseResult<void>;
 }
 
 export interface Fs extends FsBasic {
-    copy(from: string, to: string, opts?: CopyOptions): Promise<void>;
-    copyFile(from: string, to: string, opts?: CopyOptions & WalkOptions): Promise<void>;
-    mkdirp(path: string): Promise<void>;
-    remove(path: string, opts?: WalkOptions): Promise<void>;
-    walkDown(path: string, cb: WalkCallback, opts?: WalkOptions): Promise<void>;
-    walkUp(path: string, cb: WalkCallback, opts?: WalkOptions): Promise<void>;
+    copy(from: string, to: string, opts?: CopyOptions): FsPromiseResult<void>;
+    copyFile(from: string, to: string, opts?: CopyOptions & WalkOptions): FsPromiseResult<void>;
+    mkdirp(path: string): FsPromiseResult<void>;
+    remove(path: string, opts?: WalkOptions): FsPromiseResult<void>;
+    walkDown(path: string, cb: WalkCallback, opts?: WalkOptions): FsPromiseResult<void>;
+    walkUp(path: string, cb: WalkCallback, opts?: WalkOptions): FsPromiseResult<void>;
 }
 
 export interface FsErrorProps extends OsErrorProps {

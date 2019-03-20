@@ -89,7 +89,11 @@
             "check-format",
             "allow-leading-underscore",
             "allow-pascal-case"
-        ]
+        ],
+        "no-unused-result": true,
+        "no-return-await": true
     },
-    "rulesDirectory": []
+    "rulesDirectory": [
+        "./tslint"
+    ]
 }

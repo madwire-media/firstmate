@@ -22,7 +22,10 @@ import { templates } from './commands/templates';
 import { validate } from './commands/validate';
 import { uncopyFiles } from './helpers/mount';
 
-import { Command } from './util/cli/argTypes/command';
+import { Mount } from './classes/mount';
+
+// import { Command } from './util/cli/argTypes/command';
+// import { ExtraFs } from './deps/fs/impls/extra';
 
 (ncp as any).limit = 32;
 

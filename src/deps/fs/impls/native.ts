@@ -1,9 +1,10 @@
 import * as fs from 'fs';
 
-import { FsBasic, FsError, Stats } from '..';
+import { FsBasic, FsError, FsPromiseResult, Stats } from '..';
+import { Result } from '../../../util/result';
 
 export class NativeStats implements Stats {
-    private stats: fs.Stats;
+    private readonly stats: fs.Stats;
 
     constructor(stats: fs.Stats) {
         this.stats = stats;
@@ -18,12 +19,12 @@ export class NativeStats implements Stats {
     }
 }
 
-const intoFsError = (error: Error) => Promise.reject(new FsError(error));
+const intoFsErr = Result.mapToErr((error: any) => new FsError(error));
 
 export class NativeFs implements FsBasic {
-    public chmod(path: string, mode: number): Promise<void> {
+    public chmod(path: string, mode: number): FsPromiseResult<void> {
         return fs.promises.chmod(path, mode)
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 
     public createReadStream(path: string): NodeJS.ReadableStream {
@@ -42,14 +43,14 @@ export class NativeFs implements FsBasic {
         }
     }
 
-    public deleteFile(path: string): Promise<void> {
+    public deleteFile(path: string): FsPromiseResult<void> {
         return fs.promises.unlink(path)
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 
-    public deleteDir(path: string): Promise<void> {
+    public deleteDir(path: string): FsPromiseResult<void> {
         return fs.promises.rmdir(path)
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 
     public exists(path: string): Promise<boolean> {
@@ -60,34 +61,33 @@ export class NativeFs implements FsBasic {
             );
     }
 
-    public mkdir(path: string): Promise<void> {
+    public mkdir(path: string): FsPromiseResult<void> {
         return fs.promises.mkdir(path)
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 
-    public read(path: string): Promise<string> {
+    public read(path: string): FsPromiseResult<string> {
         return fs.promises.readFile(path, 'utf8')
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 
-    public readdir(path: string): Promise<string[]> {
+    public readdir(path: string): FsPromiseResult<string[]> {
         return fs.promises.readdir(path)
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 
-    public rename(from: string, to: string): Promise<void> {
+    public rename(from: string, to: string): FsPromiseResult<void> {
         return fs.promises.rename(from, to)
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 
-    public stat(path: string): Promise<NativeStats> {
+    public stat(path: string): FsPromiseResult<NativeStats> {
         return fs.promises.stat(path)
-            .catch(intoFsError)
-            .then((nodeStats) => new NativeStats(nodeStats));
+            .then(Result.mapToOk((stats) => new NativeStats(stats)), intoFsErr);
     }
 
-    public write(path: string, contents: string): Promise<void> {
+    public write(path: string, contents: string): FsPromiseResult<void> {
         return fs.promises.writeFile(path, contents)
-            .catch(intoFsError);
+            .then(Result.Ok, intoFsErr);
     }
 }

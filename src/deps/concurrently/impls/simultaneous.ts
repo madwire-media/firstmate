@@ -1,8 +1,13 @@
-import { Concurrently } from '..';
+import { ConcurrentCallback, Concurrently } from '..';
+import { PromiseResult, Result } from '../../../util/result';
 
 type Await<T> = T extends Promise<infer R> ? R : T;
 
-export const concurrently: Concurrently = (initial, cb, concurrency) => {
+export const concurrently: Concurrently = <T, E>(
+    initial: T[],
+    cb: ConcurrentCallback<T, E>,
+    concurrency?: number,
+): PromiseResult<void, E> => {
     return new Promise((resolve, reject) => {
         if (concurrency < 0) {
             throw new RangeError('concurrency cannot be less than 0');
@@ -20,7 +25,7 @@ export const concurrently: Concurrently = (initial, cb, concurrency) => {
 
             if (queue.length === 0) {
                 if (inProgress === 0) {
-                    resolve();
+                    resolve(Result.voidOk);
                 }
 
                 return;
@@ -36,7 +41,7 @@ export const concurrently: Concurrently = (initial, cb, concurrency) => {
                     result = await cb(item);
                 } catch (error) {
                     failed = true;
-                    reject(error);
+                    resolve(Result.Err(error));
                     return;
                 }
 
@@ -46,7 +51,7 @@ export const concurrently: Concurrently = (initial, cb, concurrency) => {
 
                 inProgress--;
                 nextStep();
-            })();
+            })().catch(reject);
 
             if (!inLoop) {
                 inLoop = true;

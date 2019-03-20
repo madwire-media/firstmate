@@ -2,10 +2,11 @@ import * as Path from 'path';
 
 import {
     CopyOptions, defaultCopyOptions, defaultWalkOptions, Fs, FsError,
-    RequiresFsBasic, WalkCallback, WalkOptions,
+    FsPromiseResult, RequiresFsBasic, WalkCallback, WalkOptions,
 } from '..';
 import { Injectable } from '../../../util/container/injectable';
 import { context } from '../../../util/container/symbols';
+import { Result } from '../../../util/result';
 import { RequiresConcurrently } from '../../concurrently';
 
 type Dependencies = RequiresFsBasic & RequiresConcurrently;
@@ -26,22 +27,24 @@ export class ExtraFs extends Injectable<Dependencies> implements Fs {
     public write             = this[context].fsBasic.write;
 
     // ------------------------------- Methods ------------------------------ //
-    public async copy(from: string, to: string, opts?: CopyOptions): Promise<void> {
+    public async copy(from: string, to: string, opts?: CopyOptions): FsPromiseResult<void> {
         if (!await this.exists(Path.dirname(to))) {
-            throw new FsError({
-                code: 'ENOENT',
-                message: 'Cannot copy into nonexistent directory',
-                path: to,
-            });
+            return Result.Err(
+                new FsError({
+                    code: 'ENOENT',
+                    message: 'Cannot copy into nonexistent directory',
+                    path: to,
+                }),
+            );
         }
 
-        await this.walkDown(
+        return this.walkDown(
             from,
             async (relpath, isDir) => {
                 if (isDir) {
-                    await this.mkdirp(Path.join(to, relpath));
+                    return this.mkdirp(Path.join(to, relpath));
                 } else {
-                    await this.copyFile(
+                    return this.copyFile(
                         Path.join(from, relpath),
                         Path.join(to, relpath),
                         opts,
@@ -52,12 +55,12 @@ export class ExtraFs extends Injectable<Dependencies> implements Fs {
         );
     }
 
-    public async copyFile(from: string, to: string, customOpts: CopyOptions): Promise<void> {
+    public async copyFile(from: string, to: string, customOpts?: CopyOptions): FsPromiseResult<void> {
         const opts = {...defaultCopyOptions, ...customOpts};
 
         if (await this.exists(to)) {
             if (opts.clobber) {
-                await this.remove(to);
+                return this.remove(to);
             } else {
                 throw new FsError({
                     code: 'EEXIST',
@@ -84,9 +87,9 @@ export class ExtraFs extends Injectable<Dependencies> implements Fs {
         });
     }
 
-    public async mkdirp(path: string): Promise<void> {
+    public async mkdirp(path: string): FsPromiseResult<void> {
         const parts = Path.normalize(path).split(Path.sep);
-        let partial: string;
+        let partial: string | undefined;
 
         for (const part of parts) {
             if (partial === undefined) {
@@ -96,95 +99,121 @@ export class ExtraFs extends Injectable<Dependencies> implements Fs {
             }
 
             if (partial !== '') {
-                try {
-                    const stats = await this.stat(partial);
+                const stats = await this.stat(partial);
 
-                    if (!stats.isDirectory()) {
-                        throw new FsError({
-                            code: 'ENOTDIR',
-                            message: 'Cannot make directory in place of file',
-                            path: partial,
-                        });
+                if (stats.isOk()) {
+                    if (!stats.value.isDirectory()) {
+                        return Result.Err(
+                            new FsError({
+                                code: 'ENOTDIR',
+                                message: 'Cannot make directory in place of file',
+                                path: partial,
+                            }),
+                        );
                     }
-                } catch {
-                    await this.mkdir(partial);
                 }
+
+                return this.mkdir(partial);
             }
         }
+
+        return Result.voidOk;
     }
 
-    public async remove(path: string, opts?: WalkOptions): Promise<void> {
-        this.walkUp(
+    public async remove(path: string, opts?: WalkOptions): FsPromiseResult<void> {
+        return this.walkUp(
             path,
             async (relpath, isdir) => {
                 const fullpath = Path.join(path, relpath);
 
                 if (isdir) {
-                    await this.deleteDir(fullpath);
+                    return this.deleteDir(fullpath);
                 } else {
-                    await this.deleteFile(fullpath);
+                    return this.deleteFile(fullpath);
                 }
             },
             opts,
         );
     }
 
-    public async walkDown(path: string, cb: WalkCallback, customOpts?: WalkOptions): Promise<void> {
+    public async walkDown(path: string, cb: WalkCallback, customOpts?: WalkOptions): FsPromiseResult<void> {
         const opts = {...defaultWalkOptions, ...customOpts};
 
-        await this[context].concurrently(
+        return this[context].concurrently(
             ['.'],
             async (relpath) => {
                 const fullpath = Path.join(path, relpath);
-                let newPaths: string[] | undefined;
+                let newPaths: string[] | void;
 
-                const stats = await this.stat(fullpath);
-
-                if (stats.isDirectory()) {
-                    const newFilenames = await this.readdir(fullpath);
-
-                    newPaths = newFilenames.map((filename) => Path.join(relpath, filename));
+                const statsResult = await this.stat(fullpath);
+                if (statsResult.isErr()) {
+                    return statsResult;
                 }
 
-                await cb(relpath, stats.isDirectory());
+                if (statsResult.value.isDirectory()) {
+                    const readdirResult = await this.readdir(fullpath);
+                    if (readdirResult.isErr()) {
+                        return readdirResult;
+                    }
 
-                return newPaths;
+                    newPaths = readdirResult.value.map((filename) => Path.join(relpath, filename));
+                }
+
+                const cbResult = await cb(relpath, statsResult.value.isDirectory());
+                if (cbResult && cbResult.isErr()) {
+                    return cbResult;
+                }
+
+                return Result.Ok(newPaths);
             },
             opts.concurrency,
         );
     }
 
-    public async walkUp(path: string, cb: WalkCallback, customOpts?: WalkOptions): Promise<void> {
+    public async walkUp(path: string, cb: WalkCallback, customOpts?: WalkOptions): FsPromiseResult<void> {
         const opts = {...defaultWalkOptions, ...customOpts};
 
         const filesLeftInDir: {[dir: string]: number} = {};
 
-        await this[context].concurrently(
+        return this[context].concurrently(
             ['.'],
             async (relpath) => {
                 const fullpath = Path.join(path, relpath);
                 let newPaths: string[] | undefined;
 
-                const stats = await this.stat(fullpath);
+                const statsResult = await this.stat(fullpath);
+                if (statsResult.isErr()) {
+                    return statsResult;
+                }
 
-                if (stats.isDirectory()) {
-                    const newFilenames = await this.readdir(fullpath);
+                if (statsResult.value.isDirectory()) {
+                    const readdirResult = await this.readdir(fullpath);
+                    if (readdirResult.isErr()) {
+                        return readdirResult;
+                    }
 
-                    filesLeftInDir[relpath] = newFilenames.length;
-                    newPaths = newFilenames.map((filename) => Path.join(relpath, filename));
+                    filesLeftInDir[relpath] = readdirResult.value.length;
+                    newPaths = readdirResult.value.map((filename) => Path.join(relpath, filename));
                 } else {
-                    await cb(relpath, false);
+                    let result = await cb(relpath, false);
+                    if (result && result.isErr()) {
+                        return result;
+                    }
 
                     let dirname = Path.dirname(relpath);
                     filesLeftInDir[dirname]--;
 
                     while (filesLeftInDir[dirname] === 0) {
-                        await cb(dirname, true);
+                        result = await cb(dirname, true);
+                        if (result && result.isErr()) {
+                            return result;
+                        }
+
                         dirname = Path.dirname(dirname);
                     }
                 }
 
-                return newPaths;
+                return Result.Ok(newPaths);
             },
             opts.concurrency,
         );
