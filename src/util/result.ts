@@ -87,8 +87,12 @@ abstract class AbstractResult<T, E> {
     public static abstract<T, E>(result: Result<T, E>): AbstractResult<T, E> {
         return result;
     }
-    public static async<T, E>(result: Promise<Result<T, E>>): AsyncResult<T, E> {
-        return new AsyncResult(result);
+    public static async<T, E>(result: Promise<Result<T, E>> | Result<T, E>): AsyncResult<T, E> {
+        if (result instanceof Promise) {
+            return new AsyncResult(result);
+        } else {
+            return new AsyncResult(Promise.resolve(result));
+        }
     }
 
     public abstract isOk(): this is ResultOk<T>;
@@ -111,6 +115,8 @@ abstract class AbstractResult<T, E> {
     public abstract mapVoid(): Result<void, E>;
     public abstract mapErrVoid(): Result<T, void>;
     public abstract unwrapRaw(): T;
+    public abstract inspect(op: (value: T) => any): Result<T, E>;
+    public abstract inspectErr(op: (error: E) => any): Result<T, E>;
 
     public abstract<U, F>(this: Result<U, F>): AbstractResult<U, F> {
         return this;
@@ -206,6 +212,24 @@ export class AsyncResult<T, E> {
             () => Result.voidErr,
         );
     }
+    public inspect(op: (value: T) => any | Promise<any>): AsyncResult<T, E> {
+        return this.then(
+            async (value, result) => {
+                await op(value);
+                return result;
+            },
+            passthru,
+        );
+    }
+    public inspectErr(op: (error: E) => any | Promise<any>): AsyncResult<T, E> {
+        return this.then(
+            passthru,
+            async (error, result) => {
+                await op(error);
+                return result;
+            },
+        ); ;
+    }
 
     public promise(): PromiseResult<T, E> {
         return this.internal;
@@ -287,6 +311,13 @@ export class ResultOk<T> extends Result<T, any> {
     public unwrapRaw(): T {
         return this.value;
     }
+    public inspect(op: (value: T) => any): ResultOk<T> {
+        op(this.value);
+        return this;
+    }
+    public inspectErr(): ResultOk<T> {
+        return this;
+    }
 }
 
 export class ResultErr<E> extends Result<any, E> {
@@ -355,6 +386,13 @@ export class ResultErr<E> extends Result<any, E> {
     }
     public unwrapRaw(): never {
         throw this.error;
+    }
+    public inspect(): ResultErr<E> {
+        return this;
+    }
+    public inspectErr(op: (error: E) => any): ResultErr<E> {
+        op(this.error);
+        return this;
     }
 }
 
