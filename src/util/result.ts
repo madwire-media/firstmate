@@ -124,7 +124,7 @@ abstract class AbstractResult<T, E> {
     public mapOrElse<U, T, E>(this: Result<T, E>, fallback: (error: E) => U, map: (value: T) => U): U {
         if (this.isOk()) {
             return map(this.value);
-        } else if (this.isErr()) {
+        } else {
             return fallback(this.error);
         }
     }
