@@ -9,6 +9,7 @@ import { a, cleanup } from './helpers/cli';
 import { runService } from './helpers/service';
 
 import { addService } from './commands/addService';
+import { copyFilesCmd, copyFilesCmdReqs } from './commands/copyFiles';
 import { dryDev } from './commands/dryDev';
 import { newProject } from './commands/newProject';
 import { publishProd, publishProdConfig, publishProdReqs } from './commands/publishProd';
@@ -197,6 +198,20 @@ sywac
         ],
         async run(argv: {[arg: string]: any}, context: any) {
             templates(argv.type);
+        },
+    })
+    .command('copyFiles <mode:enum> [service]', {
+        desc: 'Temporarily copies files for a service',
+        params: [
+            {
+                choices: ['dev', 'stage', 'prod'],
+            },
+        ],
+        paramsDesc: [
+            'Service to copy files for',
+        ],
+        async run(argv: {[arg: string]: any}, context: any) {
+            await runService(copyFilesCmd, copyFilesCmdReqs, undefined, context, argv, argv.service, {});
         },
     })
     .command('clean', {
