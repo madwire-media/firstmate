@@ -212,7 +212,12 @@ export function generateMountsScript(
     for (const dest in k8sVolumes) {
         const src = k8sVolumes[dest];
 
-        lines.push(`ln -s ${fmt(src)} ${fmt(dest)}`);
+        lines.push(
+            `if [ -e ${fmt(dest)} ]; then`,
+            `  rm -rf ${fmt(dest)}`,
+            `fi`,
+            `ln -s ${fmt(src)} ${fmt(dest)}`,
+        );
     }
 
     lines.push(`exec ${command}`);
