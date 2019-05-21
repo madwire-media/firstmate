@@ -105,6 +105,9 @@ export async function mount(source: string, dest: string): Promise<boolean> {
     } else {
         // Copy new contents in
         await promisify(ncp)(source, dest);
+
+        // Sleep some extra time because ncp is bugged
+        await new Promise((res) => setTimeout(res, 50));
     }
 
     console.log(a`\{ld Copied \{m ${source}\} to \{m ${dest}\}\}`);
