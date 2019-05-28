@@ -55,7 +55,7 @@ export function install(context: HelmContext, release: string, service: string, 
         action = ['upgrade', release].concat(chart);
         actionText = `upgrade ${fmt(release)} ${chartText}`;
 
-        if (context.branch.recreatePods) {
+        if (context.branch.recreatePods && !context.telepresenceContainer) {
             args.push('--recreate-pods');
             argsText += ' --recreate-pods';
         }
