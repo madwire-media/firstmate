@@ -354,10 +354,10 @@ describe('mount subsystem private method unit tests', () => {
 
             // When
             const sut = new MountPrivate(deps);
-            await sut.writeMountRecord(
+            (await sut.writeMountRecord(
                 testCase.input.record,
                 testCase.input.name,
-            );
+            )).unwrap();
 
             // Then
             expect(depFs.toRaw()).toEqual(testCase.after.files);
@@ -416,7 +416,7 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.readMountRecord(testCase.input.name);
 
             // Then
-            expect(result).toEqual(testCase.output);
+            expect(result.unwrap()).toEqual(testCase.output);
         }
 
         test('reads file by given name', async () => {
@@ -469,10 +469,10 @@ describe('mount subsystem private method unit tests', () => {
 
             // When
             const sut = new MountPrivate(deps);
-            await sut.downloadFile(
+            (await sut.downloadFile(
                 testCase.input.url,
                 testCase.input.dest,
-            );
+            )).unwrap();
 
             // Then
             expect(depFs.toRaw()).toEqual(testCase.after.files);
@@ -599,7 +599,7 @@ describe('mount subsystem private method unit tests', () => {
 
             // When
             const sut = new MountPrivate(deps);
-            await sut.ensureDotFm();
+            (await sut.ensureDotFm()).unwrap();
 
             // Then
             expect(depFs.toRaw()).toEqual(testCase.after.files);

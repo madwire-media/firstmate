@@ -78,7 +78,8 @@ export class MountPrivate extends Injectable<Dependencies> {
         const {fs} = this[context];
 
         return Result.async(fs.read(`.fm/${name}.mount`))
-            .map(JSON.parse);
+            .map(JSON.parse)
+            .promise();
     }
 
     public async downloadFile(url: string, dest: string): PromiseResult<void, Error> {
@@ -96,8 +97,13 @@ export class MountPrivate extends Injectable<Dependencies> {
             }
         }
 
+        const destStreamResult = fs.createWriteStream(dest);
+        if (destStreamResult.isErr()) {
+            return destStreamResult;
+        }
+
         httpResponse
-            .pipe(fs.createWriteStream(dest))
+            .pipe(destStreamResult.value)
             .on('finish', resolve)
             .on('error', reject);
 
@@ -121,7 +127,11 @@ export class MountPrivate extends Injectable<Dependencies> {
     public async hasDotFm(): Promise<boolean> {
         const {fs} = this[context];
 
-        return fs.exists('.fm');
+        return Result.async(fs.stat('.fm'))
+            .mapOrElse(
+                (stats) => stats.isDirectory(),
+                () => false,
+            );
     }
 
     public async ensureDotFm(): FsPromiseResult<void> {
@@ -130,7 +140,7 @@ export class MountPrivate extends Injectable<Dependencies> {
         return Result.async(fs.stat('.fm'))
             .then(
                 (stats) => {
-                    if (stats.isDirectory()) {
+                    if (!stats.isDirectory()) {
                         return Result.async(fs.remove('.fm'))
                             .andThen(() => fs.mkdir('.fm'))
                             .promise();

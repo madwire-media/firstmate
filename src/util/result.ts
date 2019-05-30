@@ -121,7 +121,7 @@ abstract class AbstractResult<T, E> {
     public abstract<U, F>(this: Result<U, F>): AbstractResult<U, F> {
         return this;
     }
-    public mapOrElse<U, T, E>(this: Result<T, E>, fallback: (error: E) => U, map: (value: T) => U): U {
+    public mapOrElse<U, T, E>(this: Result<T, E>, map: (value: T) => U, fallback: (error: E) => U): U {
         if (this.isOk()) {
             return map(this.value);
         } else {
@@ -134,6 +134,9 @@ abstract class AbstractResult<T, E> {
         } else {
             return Result.Err(mapErr(this.error));
         }
+    }
+    public async<U, F>(this: Result<U, F>): AsyncResult<U, F> {
+        return new AsyncResult(Promise.resolve(this));
     }
 }
 
@@ -228,7 +231,12 @@ export class AsyncResult<T, E> {
                 await op(error);
                 return result;
             },
-        ); ;
+        );
+    }
+    public mapOrElse<U>(map: (value: T) => U, fallback: (error: E) => U): Promise<U> {
+        return this.internal.then(
+            (result) => result.mapOrElse(map, fallback),
+        );
     }
 
     public promise(): PromiseResult<T, E> {

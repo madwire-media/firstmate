@@ -9,6 +9,7 @@ import {
 import { UnimplementedPath } from '../../deps/path/mocks/unimplemented';
 import { UnimplementedProcess } from '../../deps/process/mocks/unimplemented';
 import { cases, emptyDeps, unimplementedCall } from '../../util/container/mock';
+import { PromiseResult, Result, ResultErr, ResultOk } from '../../util/result';
 import { MountPrivate, MountRecord } from './private';
 
 describe('mount subsystem private method unit tests', () => {
@@ -362,7 +363,9 @@ describe('mount subsystem private method unit tests', () => {
             };
             const name = 'my-record';
 
-            const fnFsWrite = jest.fn();
+            const fnFsWrite = jest.fn(
+                () => Result.promise.Ok(undefined),
+            );
 
             // Inject
             const deps = emptyDeps<MountPrivate>();
@@ -375,7 +378,8 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.writeMountRecord(record, name);
 
             // Then
-            expect(result).toBe(undefined);
+            expect(result.isOk()).toBe(true);
+            expect(result.unwrap()).toBe(undefined);
 
             expect(fnFsWrite).toHaveBeenCalledTimes(1);
             expect(fnFsWrite).toHaveBeenCalledWith(
@@ -391,7 +395,7 @@ describe('mount subsystem private method unit tests', () => {
             const name = 'other-record';
 
             const fnFsRead = jest.fn(
-                () => Promise.resolve('{"dest":"other/destination","replaced":false}'),
+                () => Result.promise.Ok('{"dest":"other/destination","replaced":false}'),
             );
 
             // Inject
@@ -405,7 +409,7 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.readMountRecord(name);
 
             // Then
-            expect(result).toEqual({
+            expect(result.unwrap()).toEqual({
                 dest: 'other/destination',
                 replaced: false,
             });
@@ -449,10 +453,10 @@ describe('mount subsystem private method unit tests', () => {
             });
             const fnFsCreateWriteStreamFinal = jest.fn((cb: () => void) => cb());
             const fnFsCreateWriteStream = jest.fn(() => {
-                return new Writable({
+                return Result.Ok(new Writable({
                     write: fnFsCreateWriteStreamWrite,
                     final: fnFsCreateWriteStreamFinal,
-                });
+                }));
             });
             const fnFsExists = jest.fn(() => Promise.resolve(true));
 
@@ -480,7 +484,7 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.downloadFile(url, dest);
 
             // Then
-            expect(result).toBe(undefined);
+            expect(result.unwrap()).toBe(undefined);
 
             expect(writtenData).toBe('contents of web file');
 
@@ -503,7 +507,7 @@ describe('mount subsystem private method unit tests', () => {
     describe('getMountIds', () => {
         test('returns numeric filenames from .fm/*.mount files', async () => {
             // Given
-            const fnFsReaddir = jest.fn(() => Promise.resolve([
+            const fnFsReaddir = jest.fn(() => Result.promise.Ok([
                 '3.mount', '.mount', '1.mount', 'hello.world', '5.mount',
             ]));
 
@@ -518,7 +522,7 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.getMountIds();
 
             // Then
-            expect(result).toEqual([1, 3, 5]);
+            expect(result.unwrap()).toEqual([1, 3, 5]);
 
             expect(fnFsReaddir).toBeCalledTimes(1);
             expect(fnFsReaddir).toBeCalledWith('.fm');
@@ -529,8 +533,8 @@ describe('mount subsystem private method unit tests', () => {
         test('returns true when .fm is a directory', async () => {
             // Given
             const fnFsStatIsDirectory = jest.fn(() => true);
-            const fnFsStat = jest.fn((): Promise<Stats> => {
-                return Promise.resolve({
+            const fnFsStat = jest.fn((): Promise<ResultOk<Stats>> => {
+                return Result.promise.Ok({
                     getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
@@ -558,8 +562,8 @@ describe('mount subsystem private method unit tests', () => {
         test('returns false when .fm is not a directory', async () => {
             // Given
             const fnFsStatIsDirectory = jest.fn(() => false);
-            const fnFsStat = jest.fn((): Promise<Stats> => {
-                return Promise.resolve({
+            const fnFsStat = jest.fn((): Promise<ResultOk<Stats>> => {
+                return Result.promise.Ok({
                     getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
@@ -586,8 +590,8 @@ describe('mount subsystem private method unit tests', () => {
 
         test('returns false when .fm does not exist', async () => {
             // Given
-            const fnFsStat = jest.fn((): Promise<Stats> => {
-                return Promise.reject(new FsError({
+            const fnFsStat = jest.fn((): Promise<ResultErr<FsError>> => {
+                return Result.promise.Err(new FsError({
                     message: 'ooo eee, oo ah ah ting tang',
                     code: 'ENOENT',
                 }));
@@ -612,7 +616,7 @@ describe('mount subsystem private method unit tests', () => {
 
         test('throws error on other fs error', async () => {
             // Given
-            const fnFsStat = jest.fn((): Promise<Stats> => {
+            const fnFsStat = jest.fn((): Promise<ResultOk<Stats>> => {
                 return Promise.reject(new Error(
                     'walla walla bing bang',
                 ));
@@ -638,8 +642,8 @@ describe('mount subsystem private method unit tests', () => {
         test('does nothing when .fm is a directory', async () => {
             // Given
             const fnFsStatIsDirectory = jest.fn(() => true);
-            const fnFsStat = jest.fn((): Promise<Stats> => {
-                return Promise.resolve({
+            const fnFsStat = jest.fn((): Promise<ResultOk<Stats>> => {
+                return Result.promise.Ok({
                     getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
@@ -656,7 +660,7 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.ensureDotFm();
 
             // Then
-            expect(result).toBe(undefined);
+            expect(result.unwrap()).toBe(undefined);
 
             expect(fnFsStat).toBeCalledTimes(1);
             expect(fnFsStat).toBeCalledWith('.fm');
@@ -667,14 +671,18 @@ describe('mount subsystem private method unit tests', () => {
         test('deletes and creates directory when .fm is not a directory', async () => {
             // Given
             const fnFsStatIsDirectory = jest.fn(() => false);
-            const fnFsStat = jest.fn((): Promise<Stats> => {
-                return Promise.resolve({
+            const fnFsStat = jest.fn((): Promise<ResultOk<Stats>> => {
+                return Result.promise.Ok({
                     getMode: unimplementedCall,
                     isDirectory: fnFsStatIsDirectory,
                 });
             });
-            const fnFsRemove = jest.fn();
-            const fnFsMkdir = jest.fn();
+            const fnFsRemove = jest.fn(
+                () => Result.promise.Ok(undefined),
+            );
+            const fnFsMkdir = jest.fn(
+                () => Result.promise.Ok(undefined),
+            );
 
             // Inject
             const deps = emptyDeps<MountPrivate>();
@@ -689,7 +697,7 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.ensureDotFm();
 
             // Then
-            expect(result).toBe(undefined);
+            expect(result.unwrap()).toBe(undefined);
 
             expect(fnFsStat).toBeCalledTimes(1);
             expect(fnFsStat).toBeCalledWith('.fm');
@@ -703,13 +711,15 @@ describe('mount subsystem private method unit tests', () => {
 
         test('creates directory when .fm does not exist', async () => {
             // Given
-            const fnFsStat = jest.fn((): Promise<Stats> => {
-                return Promise.reject(new FsError({
+            const fnFsStat = jest.fn((): Promise<ResultErr<FsError>> => {
+                return Result.promise.Err(new FsError({
                     message: 'ooo eee, oo ah ah ting tang',
                     code: 'ENOENT',
                 }));
             });
-            const fnFsMkdirp = jest.fn();
+            const fnFsMkdirp = jest.fn(
+                () => Result.promise.Ok(undefined),
+            );
 
             // Inject
             const deps = emptyDeps<MountPrivate>();
@@ -723,7 +733,7 @@ describe('mount subsystem private method unit tests', () => {
             const result = await sut.ensureDotFm();
 
             // Then
-            expect(result).toBe(undefined);
+            expect(result.unwrap()).toBe(undefined);
 
             expect(fnFsStat).toBeCalledTimes(1);
             expect(fnFsStat).toBeCalledWith('.fm');
@@ -734,7 +744,7 @@ describe('mount subsystem private method unit tests', () => {
 
         test('throws error on other fs error', async () => {
             // Given
-            const fnFsStat = jest.fn((): Promise<Stats> => {
+            const fnFsStat = jest.fn((): Promise<ResultOk<Stats>> => {
                 return Promise.reject(new Error(
                     'walla walla bing bang',
                 ));
@@ -748,6 +758,7 @@ describe('mount subsystem private method unit tests', () => {
 
             // When
             const sut = new MountPrivate(deps);
+            // tslint:disable-next-line: no-unused-result
             await expect(sut.ensureDotFm()).rejects.toThrowError('walla walla bing bang');
 
             // Then

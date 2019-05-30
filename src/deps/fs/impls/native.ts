@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 
-import { FsBasic, FsError, FsPromiseResult, Stats } from '..';
+import { FsBasic, FsError, FsPromiseResult, FsResult, Stats } from '..';
 import { Result } from '../../../util/result';
 
 export class NativeStats implements Stats {
@@ -27,20 +27,14 @@ export class NativeFs implements FsBasic {
             .then(Result.Ok, intoFsErr);
     }
 
-    public createReadStream(path: string): NodeJS.ReadableStream {
-        try {
-            return fs.createReadStream(path);
-        } catch (error) {
-            throw new FsError(error);
-        }
+    public createReadStream(path: string): FsResult<NodeJS.ReadableStream> {
+        return Result.fromCallback(() => fs.createReadStream(path))
+            .mapErr((error) => new FsError(error));
     }
 
-    public createWriteStream(path: string): NodeJS.WritableStream {
-        try {
-            return fs.createWriteStream(path);
-        } catch (error) {
-            throw new FsError(error);
-        }
+    public createWriteStream(path: string): FsResult<NodeJS.WritableStream> {
+        return Result.fromCallback(() => fs.createWriteStream(path))
+            .mapErr((error) => new FsError(error));
     }
 
     public deleteFile(path: string): FsPromiseResult<void> {

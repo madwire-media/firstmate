@@ -69,3 +69,9 @@ declare module 'hjson' {
       stringify: (value: any, options?: SerializeOptions) => string,
   };
 }
+
+declare namespace jest {
+  interface Matchers<R> {
+    toBeOk(): R;
+  }
+}

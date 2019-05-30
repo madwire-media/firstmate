@@ -33,13 +33,13 @@ export interface RequiresFs {
     fs: Fs;
 }
 
-export abstract class FsResult<T> extends Result<T, FsError> {}
+export type FsResult<T> = Result<T, FsError>;
 export type FsPromiseResult<T> = PromiseResult<T, FsError>;
 
 export interface FsBasic {
     chmod(path: string, mode: number): FsPromiseResult<void>;
-    createReadStream(path: string): NodeJS.ReadableStream;
-    createWriteStream(path: string): NodeJS.WritableStream;
+    createReadStream(path: string): FsResult<NodeJS.ReadableStream>;
+    createWriteStream(path: string): FsResult<NodeJS.WritableStream>;
     deleteFile(path: string): FsPromiseResult<void>;
     deleteDir(path: string): FsPromiseResult<void>;
     exists(path: string): Promise<boolean>;
