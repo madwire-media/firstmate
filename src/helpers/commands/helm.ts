@@ -1,5 +1,7 @@
 import * as ChildProcess from 'child_process';
+import * as fs from 'fs';
 
+import { HelmArgs } from '../../config/types/helm';
 import { a, fmt } from '../cli';
 
 export function hasRelease(cluster: string, release: string): boolean {
@@ -24,7 +26,7 @@ export interface HelmContext {
         namespace: string,
         cluster: string,
         registry?: string,
-        helmArgs?: {[argName: string]: string},
+        helmArgs?: HelmArgs,
         recreatePods?: boolean,
         version?: string,
     };
@@ -34,7 +36,13 @@ export interface HelmContext {
     dryrun?: boolean;
 }
 export function install(context: HelmContext, release: string, service: string, repo = 'fm'): boolean {
-    const args = parseHelmInstallArgs(context);
+    let valuesFile;
+
+    if (context.branch.helmArgs !== undefined) {
+        valuesFile = setupHelmValues(context.branch.helmArgs);
+    }
+
+    const args = parseHelmInstallArgs(context, valuesFile);
     let argsText = args.map(fmt).join(' ');
 
     let chart;
@@ -83,37 +91,16 @@ export function install(context: HelmContext, release: string, service: string, 
         return false;
     }
 
+    if (valuesFile !== undefined) {
+        cleanupHelmValues(valuesFile);
+    }
+
     console.log(a`\{g Ok\}`);
 
     return true;
 }
 
-export function escapeHelmArg(arg: string): string {
-    let out = '';
-
-    let isString = false;
-    let isEscaped = false;
-
-    for (const char of arg) {
-        if (isEscaped) {
-            out += char;
-            isEscaped = false;
-        } else if (char === '"') {
-            out += char;
-            isString = !isString;
-        } else if (!isString && char === ',') {
-            out += '\,';
-        } else if (!isString && char === '=') {
-            out += '\=';
-        } else {
-            out += char;
-        }
-    }
-
-    return out;
-}
-
-export function parseHelmInstallArgs(context: HelmContext): string[] {
+export function parseHelmInstallArgs(context: HelmContext, valuesFile?: string): string[] {
     const args: string[] = [];
 
     if (context.dryrun) {
@@ -137,12 +124,8 @@ export function parseHelmInstallArgs(context: HelmContext): string[] {
         }
     }
 
-    if (context.branch.helmArgs !== undefined) {
-        for (const argName in context.branch.helmArgs) {
-            const arg = context.branch.helmArgs[argName];
-
-            args.push('--set', `${escapeHelmArg(argName)}=${escapeHelmArg(arg)}`);
-        }
+    if (valuesFile !== undefined) {
+        args.push('-f', valuesFile);
     }
 
     args.push('--set', `env=${context.env}`);
@@ -151,6 +134,29 @@ export function parseHelmInstallArgs(context: HelmContext): string[] {
     args.push('--namespace', context.branch.namespace);
 
     return args;
+}
+
+function generateRandomName(len: number): string {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+=';
+    let name = '';
+
+    for (let i = 0; i < len; i++) {
+        name += chars[Math.floor(Math.random() * chars.length)];
+    }
+
+    return name;
+}
+
+export function setupHelmValues(args: HelmArgs): string {
+    const filename = `helm-${generateRandomName(16)}`;
+
+    fs.writeFileSync(filename, JSON.stringify(args));
+
+    return filename;
+}
+
+export function cleanupHelmValues(filename: string) {
+    fs.unlinkSync(filename);
 }
 
 export function del(context: HelmContext, release: string, purge = false): boolean {

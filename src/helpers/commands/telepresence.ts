@@ -51,6 +51,23 @@ export function runAsync(options: RunOptions): SigIntHandler {
         argsText += ` --expose ${fmt(port)}`;
     }
 
+    if (options.ports) {
+        for (const port of options.ports) {
+            let inner;
+            let outer;
+
+            if (typeof port === 'number') {
+                inner = port;
+                outer = port;
+            } else {
+                ({inner, outer} = port);
+            }
+
+            argsText += ` --expose ${outer}:${inner}`;
+            args.push('--expose', `${outer}:${inner}`);
+        }
+    }
+
     args.push('--docker-run', ...dockerArgs);
     argsText += ` --docker-run ${dockerArgsText}`;
 

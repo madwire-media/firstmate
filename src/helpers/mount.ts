@@ -216,6 +216,7 @@ export function generateMountsScript(
             `if [ -e ${fmt(dest)} ]; then`,
             `  rm -rf ${fmt(dest)}`,
             `fi`,
+            `mkdir -p ${fmt(path.dirname(dest))}`,
             `ln -s ${fmt(src)} ${fmt(dest)}`,
         );
     }

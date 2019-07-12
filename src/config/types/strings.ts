@@ -109,8 +109,8 @@ export const ReleaseName = refineRgx(
 );
 
 export const rgxHelmArg = /^.+$/;
-export type HelmArg = string;
-export const HelmArg = refineRgx(
+export type HelmStringArg = string;
+export const HelmStringArg = refineRgx(
     rgxHelmArg,
     'HelmArg',
 );

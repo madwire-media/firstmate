@@ -1,8 +1,30 @@
 import * as t from 'io-ts';
 
-import { HelmArg } from './strings';
+import { HelmStringArg } from './strings';
+
+export type HelmArg = HelmStringArg | number | boolean | HelmArrayArg | HelmObjectArg;
+export interface HelmArrayArg extends Array<HelmArg> {}
+export interface HelmObjectArg {
+    [property: string]: HelmArg;
+}
+
+export const HelmArg: t.Type<HelmArg> = t.recursion('HelmArg', () =>
+    t.union([
+        HelmStringArg,
+        t.number,
+        t.boolean,
+        HelmArrayArg,
+        HelmObjectArg,
+    ]),
+);
+export const HelmArrayArg: t.Type<HelmArrayArg> = t.recursion('HelmArrayArg', () =>
+    t.array(HelmArg),
+);
+export const HelmObjectArg: t.Type<HelmObjectArg> = t.recursion('HelmObjectArg', () =>
+    t.dictionary(HelmStringArg, HelmArg),
+);
 
 export interface HelmArgs {
-    [arg: string]: HelmArg;
+    [arg: string]: any;
 }
-export const HelmArgs = t.dictionary(HelmArg, HelmArg);
+export const HelmArgs = t.dictionary(HelmStringArg, t.any);
