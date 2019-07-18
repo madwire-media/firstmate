@@ -148,7 +148,7 @@ function generateRandomName(len: number): string {
 }
 
 export function setupHelmValues(args: HelmArgs): string {
-    const filename = `helm-${generateRandomName(16)}`;
+    const filename = `.fm/helm-${generateRandomName(16)}`;
 
     fs.writeFileSync(filename, JSON.stringify(args));
 
