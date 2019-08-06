@@ -1,4 +1,5 @@
 import * as ChildProcess from 'child_process';
+import * as fs from 'fs';
 
 import { Port } from '../../config/types/common';
 import { DockerVolumes } from '../../config/types/docker';
@@ -222,6 +223,7 @@ export interface RunOptions {
     ports?: Port[];
     command?: string;
     rm?: boolean;
+    inheritUser?: boolean;
 }
 export function run(options: RunOptions): boolean {
     const {args, argsText} = parseArgs(options);
@@ -317,7 +319,7 @@ export function runAsync(options: RunOptions): SigIntHandler {
     };
 }
 export function parseArgs(options: RunOptions): {args: string[], argsText: string} {
-    const args = [];
+    const args: string[] = [];
     let argsText = '';
 
     if (options.rm) {
@@ -338,6 +340,10 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
     if (options.volumes !== undefined) {
         for (const dest in options.volumes) {
             let src = options.volumes[dest];
+
+            if (!fs.existsSync(src)) {
+                fs.mkdirSync(src, {recursive: true});
+            }
 
             if (src[0] !== '/') {
                 src = `${process.cwd()}/${src}`;
