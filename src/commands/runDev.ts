@@ -249,6 +249,7 @@ export async function runDev(
 
                     image,
                     name: containerName,
+                    project: config.project,
                     volumes: {},
                     rm: true,
                 };
@@ -326,6 +327,7 @@ export async function runDev(
                 const runOpts: docker.RunOptions = {
                     image,
                     name: containerName,
+                    project: config.project,
                     network: networkName,
                     rm: true,
                 };
@@ -360,6 +362,7 @@ export async function runDev(
         const runOpts: docker.RunOptions = {
             image,
             name: image,
+            project: config.project,
             rm: true,
             volumes: branch.volumes,
         };

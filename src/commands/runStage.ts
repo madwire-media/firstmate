@@ -170,6 +170,7 @@ export async function runStage(
         const runOpts: docker.RunOptions = {
             image,
             name: image,
+            project: config.project,
             rm: true,
             volumes: branch.volumes,
         };

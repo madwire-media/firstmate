@@ -174,6 +174,72 @@ export function deleteNetwork(networkName: string): boolean {
     return true;
 }
 
+export function createVolume(volumeName: string): boolean {
+    console.log();
+    console.log(a`\{lb,u docker volume create ${fmt(volumeName)}\}`);
+    const result = ChildProcess.spawnSync(
+        'docker', ['volume', 'create', volumeName],
+        {
+            stdio: ['inherit', 'ignore', 'inherit'],
+        },
+    );
+
+    if (result.error) {
+        console.error(a`\{lr Docker volume create failed!\}`);
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        console.error(a`\{lr Docker volume create failed!\}`);
+        return false;
+    }
+
+    console.log(a`\{g Ok\}`);
+
+    return true;
+}
+
+export function volumeExists(volumeName: string): boolean {
+    const result = ChildProcess.spawnSync(
+        'docker', ['volume', 'ls', '-f', `name=${volumeName}`, '--format', '{{.Name}}'],
+    );
+
+    if (result.error) {
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        return false;
+    }
+
+    return result.output[1].length > 0;
+}
+
+export function deleteVolume(volumeName: string): boolean {
+    console.log();
+    console.log(a`\{lb,u docker volume delete ${fmt(volumeName)}\}`);
+    const result = ChildProcess.spawnSync(
+        'docker', ['volume', 'rm', volumeName],
+        {
+            stdio: ['inherit', 'ignore', 'inherit'],
+        },
+    );
+
+    if (result.error) {
+        console.error(a`\{lr Docker volume delete failed!\}`);
+        console.error(result.error);
+        return false;
+    }
+    if (result.status !== 0) {
+        console.error(a`\{lr Docker volume delete failed!\}`);
+        return false;
+    }
+
+    console.log(a`\{g Ok\}`);
+
+    return true;
+}
+
 export function containerExists(containerName: string): boolean {
     const result = ChildProcess.spawnSync(
         'docker', ['ps', '-f', `name=${containerName}`, '--format', '{{.Names}}'],
@@ -218,6 +284,7 @@ export function removeContainer(containerName: string): boolean {
 export interface RunOptions {
     image: string;
     name: string;
+    project: string;
     volumes?: DockerVolumes;
     network?: string;
     ports?: Port[];
@@ -341,12 +408,18 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
         for (const dest in options.volumes) {
             let src = options.volumes[dest];
 
-            if (!fs.existsSync(src)) {
+            if ((src[0] === '.' || src[0] === '/') && !fs.existsSync(src)) {
                 fs.mkdirSync(src, {recursive: true});
             }
 
-            if (src[0] !== '/') {
+            if (src[0] === '.') {
                 src = `${process.cwd()}/${src}`;
+            } else if (src[0] !== '/') {
+                src = `${options.project}-${src}`;
+
+                if (!volumeExists(src)) {
+                    createVolume(src);
+                }
             }
 
             argsText += ` -v ${fmt(`${src}:${dest}`)}`;

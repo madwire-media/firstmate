@@ -229,6 +229,7 @@ export async function publishProd(
         const runOpts: docker.RunOptions = {
             image,
             name: image,
+            project: config.project,
             rm: true,
             volumes: branch.volumes,
         };
