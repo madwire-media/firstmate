@@ -2,6 +2,7 @@ import * as fs from 'fs';
 
 import { Config } from '../config';
 import { tagged } from '../config/types/branch';
+import { ConfiguredDependency } from '../config/types/other';
 import { a } from '../helpers/cli';
 import * as docker from '../helpers/commands/docker';
 import * as helm from '../helpers/commands/helm';
@@ -15,7 +16,7 @@ export function runProdReqs(
     config: Config,
     serviceName: string,
     branchName: string,
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     params: {[arg: string]: any},
     context: any,
 ): boolean {
@@ -68,7 +69,7 @@ export async function runProd(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     isAsync: () => void,
     params: {[arg: string]: any},
     ): Promise<undefined | false> {

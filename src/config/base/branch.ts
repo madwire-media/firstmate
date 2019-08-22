@@ -4,7 +4,8 @@ import { branchType } from '../types/branch';
 
 import { setDefault } from '../../util/defaultable';
 import { getProps } from '../../util/io-util';
-import { CopyFiles } from '../types/common';
+import { CopyFiles, Env } from '../types/common';
+import { ConfiguredDependency } from '../types/other';
 import { ParsingContext } from '../types/parsingContext';
 import { BranchName, ServiceName } from '../types/strings';
 
@@ -15,7 +16,7 @@ export namespace env {
         }
         export interface AllOpt {
             copyFiles?: CopyFiles;
-            dependsOn?: ServiceName[];
+            dependsOn?: (ServiceName | ConfiguredDependency)[];
         }
         export interface InheritFrom {
             inheritFrom?: BranchName | BranchName[];
@@ -27,7 +28,7 @@ export namespace env {
         });
         export const _allOpt = t.partial({
             copyFiles: CopyFiles,
-            dependsOn: t.array(ServiceName),
+            dependsOn: t.array(t.union([t.string, ConfiguredDependency])),
         });
         export const _inheritFrom = t.partial({
             inheritFrom: t.union([

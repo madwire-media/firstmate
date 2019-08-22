@@ -4,6 +4,7 @@ import { setDefault } from '../../util/defaultable';
 import { exact, getProps } from '../../util/io-util';
 import * as base from '../base/branch';
 import { branchType } from '../types/branch';
+import { Env } from '../types/common';
 import { DockerArgs, DockerVolumes } from '../types/docker';
 import { ParsingContext } from '../types/parsingContext';
 import { Defaults, defaultsFrom } from '../types/serviceDefaults';
@@ -15,6 +16,7 @@ export namespace env {
         export interface AllOpt {
             volumes?: DockerVolumes;
             dockerArgs?: DockerArgs;
+            env?: Env;
         }
 
         // tslint:disable:variable-name
@@ -22,6 +24,7 @@ export namespace env {
         export const _allOpt = t.partial({
             volumes: DockerVolumes,
             dockerArgs: DockerArgs,
+            env: Env,
         });
         // tslint:enable:variable-name
 
@@ -63,6 +66,7 @@ export namespace env {
             return setDefault(input, {
                 volumes: {},
                 dockerArgs: {},
+                env: {},
             });
         }
     }

@@ -4,6 +4,7 @@ import * as t from 'io-ts';
 
 import { Config } from '../config';
 import { tagged } from '../config/types/branch';
+import { ConfiguredDependency } from '../config/types/other';
 import { a } from '../helpers/cli';
 import * as docker from '../helpers/commands/docker';
 import * as helm from '../helpers/commands/helm';
@@ -17,7 +18,7 @@ export function dryDevReqs(
     config: Config,
     serviceName: string,
     branchName: string,
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     params: {[arg: string]: any},
     context: any,
 ): boolean {
@@ -72,7 +73,7 @@ export async function dryDev(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     isAsync: () => void,
     params: {[arg: string]: any},
 ): Promise<undefined | false> {
@@ -156,6 +157,7 @@ export async function dryDev(
             project: config.project,
             rm: true,
             volumes: branch.volumes,
+            env: {...branch.env, ...params.env},
         };
 
         if (!docker.run(runOpts)) {

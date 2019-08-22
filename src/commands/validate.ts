@@ -3,6 +3,7 @@ import { Config } from '../config';
 import * as base from '../config/base/branch';
 import { branch } from '../config/buildContainer';
 import { BranchModeEnum } from '../config/types/common';
+import { ConfiguredDependency } from '../config/types/other';
 import { a } from '../helpers/cli';
 import { loadConfig } from '../helpers/config';
 import { getGitBranch } from '../helpers/git';
@@ -41,7 +42,7 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
         serviceName: string,
         branchName: string,
         handlers: SigIntHandler[],
-        alreadyRunBranches: Set<string>,
+        alreadyRunBranches: Set<string | ConfiguredDependency>,
         isAsync: () => void,
     ) => {
         if (checkedServices.has(serviceName)) {

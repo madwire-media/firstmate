@@ -3,6 +3,7 @@ import * as util from 'util';
 
 import { Branch, BranchEnv, Config, Service } from '../config';
 
+import { ConfiguredDependency } from '../config/types/other';
 import { a, colors, events } from './cli';
 import { loadConfig } from './config';
 import { empty } from './empty';
@@ -16,7 +17,7 @@ export type SvcCommandHandler = (
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     isAsync: () => void,
     params: {[arg: string]: any},
 ) => Promise<undefined | false>;
@@ -24,7 +25,7 @@ export type SvcCommandReqHandler = (
     config: Config,
     serviceName: string,
     branchName: string,
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     params: {[arg: string]: any},
     context: any,
 ) => boolean;
@@ -33,7 +34,7 @@ export type SvcCommandMutHandler = (
     rawConfig: [{}, string, boolean],
     serviceName: string,
     branchName: string,
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     params: {[arg: string]: any},
     context: any,
 ) => boolean;
@@ -177,7 +178,7 @@ export interface InitBranchOptions {
     serviceFolder: string;
     usedBranchName: string;
     handlers: SigIntHandler[];
-    alreadyRunBranches: Set<string>;
+    alreadyRunBranches: Set<string | ConfiguredDependency>;
     config: Config;
     branchType: string;
     params: {[key: string]: any};
@@ -328,22 +329,34 @@ export async function runDependencies(
     branchName: string,
     branch: BranchEnv,
     handlers: SigIntHandler[],
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     isAsync: () => void,
     params: {[arg: string]: any},
     cb: SvcCommandHandler,
     runAllDeps = true,
 ): Promise<SigIntHandler[] | false> {
     if (branch.dependsOn !== undefined) {
-        for (const dependency of branch.dependsOn) {
+        for (const rawDependency of branch.dependsOn) {
+            let dependency;
+            const subParams = {...params};
+
+            delete subParams.env;
+
+            if (typeof rawDependency === 'string') {
+                dependency = rawDependency;
+            } else {
+                dependency = rawDependency.service;
+                subParams.env = rawDependency.env;
+            }
+
             if (!runAllDeps && config.services[dependency].type !== 'buildContainer') {
                 continue;
             }
 
-            if (alreadyRunBranches.has(dependency)) {
+            if (alreadyRunBranches.has(rawDependency)) {
                 continue;
             }
-            alreadyRunBranches.add(dependency);
+            alreadyRunBranches.add(rawDependency);
 
             const newHandlers: SigIntHandler[] = [];
             let depIsAsync = false;
@@ -354,7 +367,7 @@ export async function runDependencies(
 
             const results = await cb(
                 config, dependency, branchName, newHandlers, alreadyRunBranches,
-                newIsAsync, params,
+                newIsAsync, subParams,
             );
 
             if (!depIsAsync || results === false) {
@@ -383,24 +396,36 @@ export function reqDependencies(
     config: Config,
     branchName: string,
     branch: BranchEnv,
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     cb: SvcCommandReqHandler,
     params: {[arg: string]: any},
     context: any,
     runAllDeps = true,
 ): boolean {
     if (branch.dependsOn !== undefined) {
-        for (const dependency of branch.dependsOn) {
+        for (const rawDependency of branch.dependsOn) {
+            let dependency;
+            const subParams = {...params};
+
+            delete subParams.env;
+
+            if (typeof rawDependency === 'string') {
+                dependency = rawDependency;
+            } else {
+                dependency = rawDependency.service;
+                subParams.env = rawDependency.env;
+            }
+
             if (!runAllDeps && config.services[dependency].type !== 'buildContainer') {
                 continue;
             }
 
-            if (alreadyRunBranches.has(dependency)) {
+            if (alreadyRunBranches.has(rawDependency)) {
                 continue;
             }
-            alreadyRunBranches.add(dependency);
+            alreadyRunBranches.add(rawDependency);
 
-            const results = cb(config, dependency, branchName, alreadyRunBranches, params, context);
+            const results = cb(config, dependency, branchName, alreadyRunBranches, subParams, context);
 
             if (results === false) {
                 return false;
@@ -440,7 +465,15 @@ export function getDependencies(
             const branch = service.branches[usedBranchName][mode];
 
             if (branch !== undefined && branch.dependsOn !== undefined) {
-                for (const dep of branch.dependsOn) {
+                for (const rawDep of branch.dependsOn) {
+                    let dep;
+
+                    if (typeof rawDep === 'string') {
+                        dep = rawDep;
+                    } else {
+                        dep = rawDep.service;
+                    }
+
                     if (!dependencies.has(dep) && !toCrawl.has(dep) && !ignored.has(dep)) {
                         toCrawl.add(dep);
                     }

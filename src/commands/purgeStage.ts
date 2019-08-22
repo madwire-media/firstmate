@@ -1,5 +1,6 @@
 import { Config } from '../config';
 import { tagged } from '../config/types/branch';
+import { ConfiguredDependency } from '../config/types/other';
 import { a, question } from '../helpers/cli';
 import * as helm from '../helpers/commands/helm';
 import { needsCluster, needsCommand } from '../helpers/require';
@@ -12,7 +13,7 @@ export function purgeStageReqs(
     config: Config,
     serviceName: string,
     branchName: string,
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     params: {[arg: string]: any},
     context: any,
 ): boolean {
@@ -51,7 +52,7 @@ export async function purgeStage(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     isAsync: () => void,
     params: {[arg: string]: any},
 ): Promise<undefined | false> {

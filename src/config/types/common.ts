@@ -33,6 +33,11 @@ export interface CopyFiles {
 }
 export const CopyFiles = t.dictionary(LocalFilePath, LocalFilePath);
 
+export interface Env {
+    [variable: string]: string;
+}
+export const Env = t.dictionary(t.string, t.string);
+
 export type AllowedModes = BranchModeEnum[];
 export const AllowedModes = t.array(BranchMode);
 

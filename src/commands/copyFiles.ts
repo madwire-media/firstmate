@@ -1,4 +1,5 @@
 import { Config } from '../config';
+import { ConfiguredDependency } from '../config/types/other';
 import { a } from '../helpers/cli';
 import { getServiceDir, initBranch, maybeTryBranch, resolveBranchName, SigIntHandler } from '../helpers/service';
 
@@ -6,7 +7,7 @@ export function copyFilesCmdReqs(
     config: Config,
     serviceName: string,
     branchName: string,
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     params: {[key: string]: any},
     context: any,
 ): boolean {
@@ -30,7 +31,7 @@ export async function copyFilesCmd(
     serviceName: string,
     branchName: string,
     handlers: SigIntHandler[],
-    alreadyRunBranches: Set<string>,
+    alreadyRunBranches: Set<string | ConfiguredDependency>,
     isAsync: () => void,
     params: {[key: string]: any},
 ): Promise<undefined | false> {

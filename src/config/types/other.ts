@@ -1,8 +1,8 @@
 import * as t from 'io-ts';
-import { Port } from './common';
+import { Env, Port } from './common';
 import { DockerArgs, DockerVolumes } from './docker';
 import { KubernetesVolumes } from './k8s';
-import { ContainerName } from './strings';
+import { ContainerName, ServiceName } from './strings';
 
 enum DeploymentModeEnum {
     proxy,
@@ -10,6 +10,15 @@ enum DeploymentModeEnum {
 }
 export type DeploymentMode = keyof typeof DeploymentModeEnum;
 export const DeploymentMode = t.keyof(DeploymentModeEnum, 'DeploymentMode');
+
+export interface ConfiguredDependency {
+    service: ServiceName;
+    env: Env;
+}
+export const ConfiguredDependency = t.type({
+    service: ServiceName,
+    env: Env,
+});
 
 export interface Container {
     volumes?: DockerVolumes;

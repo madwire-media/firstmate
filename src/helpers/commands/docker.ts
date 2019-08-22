@@ -1,7 +1,7 @@
 import * as ChildProcess from 'child_process';
 import * as fs from 'fs';
 
-import { Port } from '../../config/types/common';
+import { Env, Port } from '../../config/types/common';
 import { DockerVolumes } from '../../config/types/docker';
 import { a, fmt, interrupt } from '../cli';
 import { SigIntHandler } from '../service';
@@ -286,6 +286,7 @@ export interface RunOptions {
     name: string;
     project: string;
     volumes?: DockerVolumes;
+    env?: Env;
     network?: string;
     ports?: Port[];
     command?: string;
@@ -402,6 +403,13 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
     if (options.network !== undefined) {
         argsText += ` --network ${fmt(options.network)}`;
         args.push('--network', options.network);
+    }
+
+    if (options.env !== undefined) {
+        for (const variable in options.env) {
+            argsText += ` -e ${fmt(`${variable}=${options.env[variable]}`)}`;
+            args.push('-e', `${variable}=${options.env[variable]}`);
+        }
     }
 
     if (options.volumes !== undefined) {
