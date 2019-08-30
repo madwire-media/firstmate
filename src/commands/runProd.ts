@@ -139,7 +139,7 @@ export async function runProd(
 
         // Helm chart run w/ vars
         const helmContext = {
-            branch,
+            branch: {...branch, recreatePods: false},
             dockerImages,
             env: 'prod',
         };
