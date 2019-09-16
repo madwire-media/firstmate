@@ -30,6 +30,13 @@ export function purgeProdReqs(
     }
     const branch = branchBase.prod;
 
+    if (!branch.allowedActions.includes('purge')) {
+        console.error(a`\{lr Cannot purge service \{lw ${serviceName}\} on ${''
+            }branch \{lg ${usedBranchName}\} in \{c prod\} mode\}`);
+        console.error(a`\{b purge action is disabled on branch/mode\}`);
+        return false;
+    }
+
     // Don't need to test service files, just deleteing already deployed code by name
 
     let reqsMet = true;

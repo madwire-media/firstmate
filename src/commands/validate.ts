@@ -2,7 +2,7 @@ import { inspect } from 'util';
 import { Config } from '../config';
 import * as base from '../config/base/branch';
 import { branch } from '../config/buildContainer';
-import { BranchModeEnum } from '../config/types/common';
+import { BranchMode } from '../config/types/common';
 import { ConfiguredDependency } from '../config/types/other';
 import { a } from '../helpers/cli';
 import { loadConfig } from '../helpers/config';
@@ -69,7 +69,7 @@ export async function validate(params: {[arg: string]: any}, service?: string): 
             }
 
             // Check all dependencies for all environments
-            for (const envName of ['dev', 'stage', 'prod'] as (keyof typeof BranchModeEnum)[]) {
+            for (const envName of ['dev', 'stage', 'prod'] as BranchMode[]) {
                 const branch = branchBase[envName];
 
                 if (branch !== undefined) {

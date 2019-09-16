@@ -33,6 +33,13 @@ export function runStageReqs(
     }
     const branch = branchBase.stage;
 
+    if (!branch.allowedActions.includes('run')) {
+        console.error(a`\{lr Cannot run service \{lw ${serviceName}\} on ${''
+            }branch \{lg ${usedBranchName}\} in \{c stage\} mode\}`);
+        console.error(a`\{b run action is disabled on branch/mode\}`);
+        return false;
+    }
+
     if (!testServiceFiles(serviceName, branchBase.type)) {
         return false;
     }

@@ -1,13 +1,22 @@
 import * as t from 'io-ts';
 import { LocalFilePath } from './strings';
 
-export enum BranchModeEnum {
-    dev,
-    stage,
-    prod,
-}
-export const BranchMode = t.keyof(BranchModeEnum, 'BranchMode');
-export const branchModes = Object.keys(BranchModeEnum).filter((k) => isNaN(+k)) as (keyof typeof BranchModeEnum)[];
+const branchModesObj = {
+    dev: true,
+    stage: true,
+    prod: true,
+};
+export type BranchMode = t.TypeOf<typeof BranchMode>;
+export const BranchMode = t.keyof(branchModesObj, 'BranchMode');
+export const branchModes = Object.keys(branchModesObj) as (keyof typeof branchModesObj)[];
+
+const branchActionsObj = {
+    run: true,
+    publish: true,
+    purge: true,
+};
+export const BranchAction = t.keyof(branchActionsObj, 'BranchAction');
+export const branchActions = Object.keys(branchActionsObj) as (keyof typeof branchActionsObj)[];
 
 export type PortNumber = number;
 export const PortNumber = t.refinement(
@@ -38,8 +47,11 @@ export interface Env {
 }
 export const Env = t.dictionary(t.string, t.string);
 
-export type AllowedModes = BranchModeEnum[];
+export type AllowedModes = t.TypeOf<typeof AllowedModes>;
 export const AllowedModes = t.array(BranchMode);
+
+export type AllowedActions = t.TypeOf<typeof AllowedActions>;
+export const AllowedActions = t.array(BranchAction);
 
 export type Primitive = string | number | boolean;
 export const Primitive = t.union([t.string, t.number, t.boolean]);

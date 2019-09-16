@@ -40,6 +40,13 @@ export function runDevReqs(
     }
     const branch = branchBase.dev;
 
+    if (!branch.allowedActions.includes('run')) {
+        console.error(a`\{lr Cannot run service \{lw ${serviceName}\} on ${''
+            }branch \{lg ${usedBranchName}\} in \{c dev\} mode\}`);
+        console.error(a`\{b run action is disabled on branch/mode\}`);
+        return false;
+    }
+
     if (!testServiceFiles(serviceName, branchBase.type)) {
         return false;
     }

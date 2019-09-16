@@ -7,7 +7,7 @@ import { mask } from '../../util/maskable';
 import { merge } from '../../util/mergable';
 import * as base from '../base/branch';
 import { BranchType } from './branch';
-import { AllowedModes, BranchModeEnum, branchModes } from './common';
+import { AllowedModes, BranchMode, branchModes } from './common';
 import { BranchName, rgxUsedBranchName, UsedBranchName } from './strings';
 
 export interface IService<T extends string, B extends BranchType<any, any, any, T>> {
@@ -51,7 +51,7 @@ function resolveBranches<
 >(
     branches: {[key: string]: TypeOfPlusInherit<typeof base.env.comp.allPartial>},
     rawBranches: {[key: string]: AllowedModesBranch},
-    env: keyof typeof BranchModeEnum,
+    env: BranchMode,
     c: IoContext,
     {
         partialBranches,

@@ -100,6 +100,13 @@ export function publishProdReqs(
     }
     const branch = branchBase.prod;
 
+    if (!branch.allowedActions.includes('publish')) {
+        console.error(a`\{lr Cannot publish service \{lw ${serviceName}\} on ${''
+            }branch \{lg ${usedBranchName}\} in \{c prod\} mode\}`);
+        console.error(a`\{b publish action is disabled on branch/mode\}`);
+        return false;
+    }
+
     if (!testServiceFiles(serviceName, branchBase.type)) {
         return false;
     }

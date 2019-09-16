@@ -4,7 +4,7 @@ import { branchType } from '../types/branch';
 
 import { setDefault } from '../../util/defaultable';
 import { getProps } from '../../util/io-util';
-import { CopyFiles, Env } from '../types/common';
+import { AllowedActions, CopyFiles } from '../types/common';
 import { ConfiguredDependency } from '../types/other';
 import { ParsingContext } from '../types/parsingContext';
 import { BranchName, ServiceName } from '../types/strings';
@@ -17,6 +17,7 @@ export namespace env {
         export interface AllOpt {
             copyFiles?: CopyFiles;
             dependsOn?: (ServiceName | ConfiguredDependency)[];
+            allowedActions?: AllowedActions;
         }
         export interface InheritFrom {
             inheritFrom?: BranchName | BranchName[];
@@ -29,6 +30,7 @@ export namespace env {
         export const _allOpt = t.partial({
             copyFiles: CopyFiles,
             dependsOn: t.array(t.union([t.string, ConfiguredDependency])),
+            allowedActions: AllowedActions,
         });
         export const _inheritFrom = t.partial({
             inheritFrom: t.union([
@@ -71,6 +73,7 @@ export namespace env {
             return setDefault(input, {
                 copyFiles: {},
                 dependsOn: [],
+                allowedActions: ['publish', 'run'],
             }) as any;
         }
     }
