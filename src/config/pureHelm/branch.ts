@@ -7,7 +7,7 @@ import { branchType } from '../types/branch';
 import { HelmArgs } from '../types/helm';
 import { ParsingContext } from '../types/parsingContext';
 import { defaultsFrom } from '../types/serviceDefaults';
-import { ChartMuseum, ClusterName, Namespace, ReleaseName } from '../types/strings';
+import { ChartMuseum, ClusterName, LocalFilePath, Namespace, ReleaseName } from '../types/strings';
 
 export namespace env {
     export namespace atoms {
@@ -18,6 +18,7 @@ export namespace env {
         export interface AllOpt {
             releaseName?: ReleaseName;
             helmArgs?: HelmArgs;
+            helmArgFiles?: LocalFilePath[];
             chartmuseum?: ChartMuseum;
         }
 
@@ -47,6 +48,7 @@ export namespace env {
         export const _allOpt = t.partial({
             releaseName: ReleaseName,
             helmArgs: HelmArgs,
+            helmArgFiles: t.array(LocalFilePath),
             chartmuseum: t.union([ChartMuseum, t.undefined]), // force partial
         });
 
@@ -179,6 +181,7 @@ export namespace env {
             return setDefault(input, {
                 releaseName: `${context.project}-${context.service}-${context.env}`,
                 helmArgs: {},
+                helmArgFiles: [],
                 chartmuseum: context.chartmuseum,
             });
         }

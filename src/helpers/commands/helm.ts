@@ -2,6 +2,7 @@ import * as ChildProcess from 'child_process';
 import * as fs from 'fs';
 
 import { HelmArgs } from '../../config/types/helm';
+import { LocalFilePath } from '../../config/types/strings';
 import { a, fmt } from '../cli';
 
 export function hasRelease(cluster: string, release: string): boolean {
@@ -27,6 +28,7 @@ export interface HelmContext {
         cluster: string,
         registry?: string,
         helmArgs?: HelmArgs,
+        helmArgFiles?: LocalFilePath[],
         recreatePods?: boolean,
         version?: string,
     };
@@ -126,6 +128,12 @@ export function parseHelmInstallArgs(context: HelmContext, valuesFile?: string):
 
     if (valuesFile !== undefined) {
         args.push('-f', valuesFile);
+    }
+
+    if (context.branch.helmArgFiles) {
+        for (const file of context.branch.helmArgFiles) {
+            args.push('-f', file);
+        }
     }
 
     args.push('--set', `env=${context.env}`);
