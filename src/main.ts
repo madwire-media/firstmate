@@ -8,6 +8,7 @@ import { ncp } from 'ncp';
 import { a, cleanup } from './helpers/cli';
 import { runService } from './helpers/service';
 
+import * as semver from 'semver';
 import { addService } from './commands/addService';
 import { copyFilesCmd, copyFilesCmdReqs } from './commands/copyFiles';
 import { dryDev } from './commands/dryDev';
@@ -19,6 +20,7 @@ import { purgeStage, purgeStageReqs } from './commands/purgeStage';
 import { runDev, runDevReqs } from './commands/runDev';
 import { runProd, runProdReqs } from './commands/runProd';
 import { runStage, runStageReqs } from './commands/runStage';
+import { setVersion, setVersionConfig, setVersionReqs } from './commands/setVersion';
 import { templates } from './commands/templates';
 import { validate } from './commands/validate';
 import { uncopyFiles } from './helpers/mount';
@@ -89,14 +91,15 @@ export enum VersionChangeKind {
     patch,
     prerelease,
     tag,
+    value,
 }
 export class VersionChange<K extends VersionChangeKind> {
     public kind: K;
-    public value: K extends VersionChangeKind.tag ? string : undefined;
+    public value: K extends VersionChangeKind.tag | VersionChangeKind.value ? string : undefined;
 
     constructor(
         kind: K,
-        value: K extends VersionChangeKind.tag ? string : undefined,
+        value: K extends VersionChangeKind.tag | VersionChangeKind.value ? string : undefined,
     ) {
         this.kind = kind;
         this.value = value;
@@ -129,6 +132,8 @@ class TypeVersion extends require('sywac/types/string') {
             change = new VersionChange(VersionChangeKind[v], undefined);
         } else if (v.startsWith('_')) {
             change = new VersionChange(VersionChangeKind.tag, v);
+        } else if (semver.valid(v)) {
+            change = new VersionChange(VersionChangeKind.value, v);
         } else {
             return undefined;
         }
@@ -200,7 +205,7 @@ sywac
             templates(argv.type);
         },
     })
-    .command('copyFiles <mode:enum> [service]', {
+    .command('copy-files <mode:enum> [service]', {
         desc: 'Temporarily copies files for a service',
         params: [
             {
@@ -348,6 +353,25 @@ sywac
             }
 
             helpOnError(this, context);
+        },
+    })
+    .command('set-version <mode:enum> <service> <version:version>', {
+        desc: "Set or increment a service's version",
+        hints: [
+            '[docker] [helm]',
+        ],
+        params: [
+            {
+                choices: ['dev', 'stage', 'prod'],
+            },
+        ],
+        paramsDesc: [
+            'Environment to publish for',
+            'Service to publish',
+            'Semver version change or tag to publish',
+        ],
+        async run(argv: {[arg: string]: any}, context: any) {
+            await runService(setVersion, setVersionReqs, setVersionConfig, context, argv, argv.service, {});
         },
     })
     .command('validate [service]', {
