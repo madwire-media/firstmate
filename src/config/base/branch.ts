@@ -73,7 +73,7 @@ export namespace env {
             return setDefault(input, {
                 copyFiles: {},
                 dependsOn: [],
-                allowedActions: ['publish', 'run'],
+                allowedActions: ['publish', 'run', 'purge'],
             }) as any;
         }
     }
