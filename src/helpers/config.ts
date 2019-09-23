@@ -101,12 +101,20 @@ export function loadConfig(context: any, dir = '.'): LoadedConfig | undefined {
         }
 
         for (const error of parseResult) {
-            const pts = error.match(/(Invalid value )(.+?)( supplied to )(.+)/)!;
+            const pts = error.match(/(Invalid value )(.+?)( supplied to )(.+)/);
 
-            if (context) {
-                context.cliMessage(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+            if (pts) {
+                if (context) {
+                    context.cliMessage(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+                } else {
+                    console.log(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+                }
             } else {
-                console.log(a`  \{lr ${pts[1]}\}\{y ${pts[2]}\}\{lr ${pts[3]}\}\{c ${pts[4]}\}`);
+                if (context) {
+                    context.cliMessage(a`  ${error}`);
+                } else {
+                    console.log(a`  \{lr ${error}\}`);
+                }
             }
         }
 
