@@ -416,6 +416,12 @@ export function parseArgs(options: RunOptions): {args: string[], argsText: strin
         for (const dest in options.volumes) {
             let src = options.volumes[dest];
 
+            if (src === 'tmpfs') {
+                argsText += ` --tmpfs ${fmt(dest)}`;
+                args.push('--tmpfs', dest);
+                continue;
+            }
+
             if ((src[0] === '.' || src[0] === '/') && !fs.existsSync(src)) {
                 fs.mkdirSync(src, {recursive: true});
             }
