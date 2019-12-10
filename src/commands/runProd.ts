@@ -111,12 +111,17 @@ export async function runProd(
             branch,
             env: 'prod',
         };
+        let repo;
+
+        if (!branch.noHelmDeploy) {
+            repo = branch.chartmuseum;
+        }
 
         if (!helm.install(
             helmContext,
             branch.releaseName || `${config.project}-${serviceName}`,
             serviceName,
-            branch.chartmuseum,
+            repo,
         )) {
             return false;
         }
@@ -150,12 +155,17 @@ export async function runProd(
             dockerImages,
             env: 'prod',
         };
+        let repo;
+
+        if (!branch.noHelmDeploy) {
+            repo = branch.chartmuseum;
+        }
 
         if (!helm.install(
             helmContext,
             branch.releaseName || `${config.project}-${serviceName}`,
             serviceName,
-            branch.chartmuseum,
+            repo,
         )) {
             return false;
         }

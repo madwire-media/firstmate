@@ -183,14 +183,18 @@ export async function publishProd(
             return false;
         }
     } else if (tagged(branch, 'pureHelm')) {
-        // Helm chart publish
-        const helmContext = {
-            branch,
-            env: 'prod',
-        };
+        if (branch.noHelmDeploy) {
+            console.log(a`\{ly Skipping helm push for service \{lw ${serviceName}\}`);
+        } else {
+            // Helm chart publish
+            const helmContext = {
+                branch,
+                env: 'prod',
+            };
 
-        if (!helm.push(helmContext, serviceName)) {
-            return false;
+            if (!helm.push(helmContext, serviceName)) {
+                return false;
+            }
         }
     } else if (tagged(branch, 'dockerDeployment')) {
         const containers = fs.readdirSync(`${serviceFolder}/docker`)
@@ -221,14 +225,18 @@ export async function publishProd(
             }
         }
 
-        // Helm chart publish
-        const helmContext = {
-            branch,
-            env: 'prod',
-        };
+        if (branch.noHelmDeploy) {
+            console.log(a`\{ly Skipping helm push for service \{lw ${serviceName}\}`);
+        } else {
+            // Helm chart publish
+            const helmContext = {
+                branch,
+                env: 'prod',
+            };
 
-        if (!helm.push(helmContext, serviceName)) {
-            return false;
+            if (!helm.push(helmContext, serviceName)) {
+                return false;
+            }
         }
     } else if (tagged(branch, 'buildContainer')) {
         const image = `fmbuild-${serviceName}`;

@@ -38,6 +38,7 @@ export namespace env {
         export interface ProdReq {}
         export interface ProdOpt {
             chartmuseum?: ChartMuseum;
+            noHelmDeploy?: boolean;
         }
 
         // tslint:disable:variable-name
@@ -65,6 +66,7 @@ export namespace env {
         export const _prodReq = t.type({});
         export const _prodOpt = t.partial({
             chartmuseum: ChartMuseum,
+            noHelmDeploy: t.boolean,
         });
         // tslint:enable:variable-name
 
@@ -183,6 +185,7 @@ export namespace env {
                 helmArgs: {},
                 helmArgFiles: [],
                 chartmuseum: context.chartmuseum,
+                noHelmDeploy: false,
             });
         }
 
