@@ -1,13 +1,24 @@
 import * as ChildProcess from 'child_process';
 import * as fs from 'fs';
 
-import { HelmArgs } from '../../config/types/helm';
+import { HelmArgs, HelmVersion } from '../../config/types/helm';
 import { LocalFilePath } from '../../config/types/strings';
 import { a, fmt } from '../cli';
 
-export function hasRelease(cluster: string, release: string): boolean {
+export function hasRelease(
+    cluster: string,
+    release: string,
+    namespace: string,
+    helmVersion?: HelmVersion,
+): boolean {
+    const nsArgs = [];
+
+    if (helmVersion !== 2) {
+        nsArgs.push('-n', namespace);
+    }
+
     const result = ChildProcess.spawnSync(
-        'helm', ['status', '--kube-context', cluster, release],
+        'helm', ['status', ...nsArgs, '--kube-context', cluster, release],
     );
 
     if (result.error) {
@@ -62,7 +73,14 @@ export function install(context: HelmContext, release: string, service: string, 
     let action;
     let actionText;
 
-    if (hasRelease(context.branch.cluster, release)) {
+    const releaseExists = hasRelease(
+        context.branch.cluster,
+        release,
+        context.branch.namespace,
+        context.branch.helmVersion,
+    );
+
+    if (releaseExists) {
         action = ['upgrade', release].concat(chart);
         actionText = `upgrade ${fmt(release)} ${chartText}`;
 
