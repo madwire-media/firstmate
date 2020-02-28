@@ -93,6 +93,7 @@ export function parseRaw(json: {}): Config | string[] {
         registry: configPartial.defaults && configPartial.defaults.registry,
         chartmuseum: configPartial.defaults && configPartial.defaults.chartmuseum,
         project: configPartial.project,
+        helmVersion: configPartial.defaults && configPartial.defaults.helmVersion,
     };
     const errors = [];
     const baseTContext = new IoContext()

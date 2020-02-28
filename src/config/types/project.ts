@@ -1,4 +1,5 @@
 import * as t from 'io-ts';
+import { HelmVersion } from './helm';
 import { ServiceType } from './service';
 import { ChartMuseum, ProjectName, Registry, ServiceName } from './strings';
 
@@ -7,6 +8,7 @@ export interface IProject<S extends ServiceType<any, any>> {
         registry?: string,
         chartmuseum?: string,
         service?: string,
+        helmVersion?: 2 | 3,
     };
     services: {[key: string]: t.TypeOf<S>};
     project: string;
@@ -48,6 +50,7 @@ export function projectType<
                 registry: Registry,
                 chartmuseum: ChartMuseum,
                 service: ServiceName,
+                helmVersion: HelmVersion,
             }),
         }),
     ]);

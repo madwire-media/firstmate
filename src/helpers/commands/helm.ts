@@ -31,6 +31,7 @@ export interface HelmContext {
         helmArgFiles?: LocalFilePath[],
         recreatePods?: boolean,
         version?: string,
+        helmVersion?: 2 | 3;
     };
     env: string;
     dockerImages?: {[container: string]: string};
@@ -70,8 +71,13 @@ export function install(context: HelmContext, release: string, service: string, 
             argsText += ' --recreate-pods';
         }
     } else {
-        action = ['install', '-n', release].concat(chart);
-        actionText = `install -n ${fmt(release)} ${chartText}`;
+        if (context.branch.helmVersion === 2) {
+            action = ['install', '-n', release].concat(chart);
+            actionText = `install -n ${fmt(release)} ${chartText}`;
+        } else {
+            action = ['install', release].concat(chart);
+            actionText = `install ${fmt(release)} ${chartText}`;
+        }
     }
 
     console.log();
@@ -174,7 +180,7 @@ export function del(context: HelmContext, release: string, purge = false): boole
     console.log();
     console.log(a`\{lb,u helm delete ${argsText} ${release}\}`);
     const result = ChildProcess.spawnSync(
-        'helm', ['delete', release].concat(args),
+        'helm', ['delete'].concat(args).concat([release]),
         {
             stdio: 'inherit',
         },
@@ -198,8 +204,14 @@ export function del(context: HelmContext, release: string, purge = false): boole
 export function parseHelmDeleteArgs(context: HelmContext, purge: boolean): string[] {
     const args: string[] = [];
 
-    if (purge) {
+    if (context.branch.helmVersion !== 2) {
+        args.push('-n', context.branch.namespace);
+    }
+
+    if (purge && context.branch.helmVersion === 2) {
         args.push('--purge');
+    } else if (!purge && context.branch.helmVersion !== 2) {
+        args.push('--keep-history');
     }
     if (context.dryrun) {
         args.push('--dry-run');

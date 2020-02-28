@@ -28,3 +28,9 @@ export interface HelmArgs {
     [arg: string]: any;
 }
 export const HelmArgs = t.dictionary(HelmStringArg, t.any);
+
+export type HelmVersion = 2 | 3;
+export const HelmVersion = t.union([
+    t.literal(2),
+    t.literal(3),
+]);

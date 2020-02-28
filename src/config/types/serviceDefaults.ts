@@ -3,6 +3,7 @@ import * as t from 'io-ts';
 import { Left, Right } from 'fp-ts/lib/Either';
 import { defaultContents } from '../../util/defaultable';
 import { BranchType, typeName } from './branch';
+import { HelmVersion } from './helm';
 import { ParsingContext } from './parsingContext';
 import { IService } from './service';
 
@@ -28,6 +29,7 @@ export interface PartialContext {
 
     chartmuseum?: string;
     registry?: string;
+    helmVersion?: HelmVersion;
 }
 
 export function defaultsFrom<

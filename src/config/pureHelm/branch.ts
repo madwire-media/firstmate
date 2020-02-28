@@ -4,7 +4,7 @@ import { setDefault } from '../../util/defaultable';
 import { exact, getProps } from '../../util/io-util';
 import * as base from '../base/branch';
 import { branchType } from '../types/branch';
-import { HelmArgs } from '../types/helm';
+import { HelmArgs, HelmVersion } from '../types/helm';
 import { ParsingContext } from '../types/parsingContext';
 import { defaultsFrom } from '../types/serviceDefaults';
 import { ChartMuseum, ClusterName, LocalFilePath, Namespace, ReleaseName } from '../types/strings';
@@ -20,6 +20,7 @@ export namespace env {
             helmArgs?: HelmArgs;
             helmArgFiles?: LocalFilePath[];
             chartmuseum?: ChartMuseum;
+            helmVersion?: HelmVersion;
         }
 
         // tslint:disable-next-line:no-empty-interface
@@ -51,6 +52,7 @@ export namespace env {
             helmArgs: HelmArgs,
             helmArgFiles: t.array(LocalFilePath),
             chartmuseum: t.union([ChartMuseum, t.undefined]), // force partial
+            helmVersion: t.union([HelmVersion, t.undefined]), // force partial
         });
 
         export const _devReq = t.type({});
