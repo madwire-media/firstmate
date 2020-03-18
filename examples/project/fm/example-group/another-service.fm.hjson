@@ -1,0 +1,13 @@
+{
+    type: service/docker-image
+    description: Export the common-build docker image
+
+    sourceModule: ./common-build
+
+    branches: {
+        ~default: {
+            registry: registry.madwire.network
+            imageName: common-build
+        }
+    }
+}

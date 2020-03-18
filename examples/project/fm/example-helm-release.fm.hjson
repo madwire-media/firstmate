@@ -1,0 +1,21 @@
+{
+    kind: service/helm-release
+    description: Example Helm release service
+
+    sourceModule: ./example-module
+
+    branches: {
+        ~base: {
+            version: 0.1.1
+
+            dependencies: {
+                build: {
+                    service: example-group/common-build
+                    params: {
+                        codeModule: example-service
+                    }
+                }
+            }
+        }
+    }
+}

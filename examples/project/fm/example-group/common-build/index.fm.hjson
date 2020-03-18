@@ -1,0 +1,35 @@
+{
+    type: service/container
+    description: Common build system for code modules
+
+    requiredParams: [
+        codeModule
+    ]
+
+    branches: {
+        ~default: {
+            version: 1.0.0
+
+            dockerArgs: {
+                NODE_VERSION: 13.0.1
+                PNPM_VERSION: 4.3.3
+                MODULE_PACKAGER_VERSION: 1.2.3
+                TYPESCRIPT_VERTSION: 3.7.4
+                RUSTUP_VERSION: 1.20.2
+                RUST_NIGHTLY_VERSION: 2019-11-22
+                WASM_PACK_VERSION: 0.8.1
+            }
+
+            volumes: {
+                /tmp: { tmpfs: true }
+
+                /user/local/parcel-cache: cache.parcel
+                /root/source: /source
+                /root/source/.pnpm-store: cache.pnpm-store
+                /output: ./output
+
+                /root/source/node_modules: node_modules.root
+            }
+        }
+    }
+}

@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es2018",
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "moduleResolution": "node",
+        "sourceMap": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "outDir": "dist",
+
+        "plugins": [
+            {
+                "transform": "@madwire-media/result-try/transform.js"
+            }
+        ]
+    },
+    "include": [
+        "**/*.ts"
+    ],
+    "exclude": [
+        "**/*.test.ts",
+        "**/*.d.ts",
+        "dist",
+        "node_modules"
+    ]
+}
