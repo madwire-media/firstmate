@@ -5,7 +5,7 @@ import { ModulePath } from '../common/firstmate';
 import { interpolated } from '../common/interpolated-string';
 import { HelmRepository, InterpolatedHelmValues, HelmReleaseName } from '../common/helm';
 import { K8sNamespace, K8sContext } from '../common/k8s';
-import { createServiceOrModule } from '../common/config';
+import { createModule } from '../common/config-helpers';
 
 const rootProps = t.type({
     sourceModule: ModulePath,
@@ -23,7 +23,7 @@ const profileProps = t.intersection([
 ]);
 
 export type HelmReleaseService = t.TypeOf<typeof HelmReleaseService>;
-export const HelmReleaseService = createServiceOrModule(
+export const HelmReleaseService = createModule(
     'HelmReleaseService',
     'service/helm-release',
     rootProps,

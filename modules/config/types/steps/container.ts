@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 
-import { createServiceOrModule } from '../common/config';
+import { createModule } from '../common/config-helpers';
 import { ModulePath } from '../common/firstmate';
 import { DockerImage } from '../common/docker';
 
@@ -18,7 +18,10 @@ const profileProps = t.intersection([
         // TODO: environment variables
         // TODO: command
         // TODO: volumes
+        // TODO: ports
 
+        async: t.boolean,
+        proxy: t.boolean,
         overrideEntrypoint: t.boolean,
     }),
     t.type({
@@ -26,7 +29,7 @@ const profileProps = t.intersection([
 ]);
 
 export type DockerImageService = t.TypeOf<typeof DockerImageService>;
-export const DockerImageService = createServiceOrModule(
+export const DockerImageService = createModule(
     'DockerImageService',
     'service/docker-image',
     rootProps,

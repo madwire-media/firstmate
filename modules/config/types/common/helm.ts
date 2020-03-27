@@ -16,6 +16,37 @@ export interface HelmRepositoryBrand {
     readonly HelmRepository: unique symbol;
 }
 
+// Helm actually has no limitations to a chart's name
+export type HelmChartName = t.TypeOf<typeof HelmChartName>;
+export const HelmChartName = t.brand(
+    t.string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_s): _s is t.Branded<string, HelmChartNameBrand> => true,
+    'HelmChartName',
+);
+export interface HelmChartNameBrand extends DNS1123LabelBrand {
+    readonly HelmChartName: unique symbol;
+}
+
+// Helm actually has no limitations to a chart's version
+export type HelmChartVersion = t.TypeOf<typeof HelmChartVersion>;
+export const HelmChartVersion = t.brand(
+    t.string,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_s): _s is t.Branded<string, HelmChartVersionBrand> => true,
+    'HelmChartVersion',
+);
+export interface HelmChartVersionBrand extends DNS1123LabelBrand {
+    readonly HelmChartVersion: unique symbol;
+}
+
+export type HelmChartRef = t.TypeOf<typeof HelmChartRef>;
+export const HelmChartRef = t.type({
+    name: HelmChartName,
+    version: HelmChartVersion,
+    repository: HelmRepository,
+});
+
 export type HelmReleaseName = t.TypeOf<typeof HelmReleaseName>;
 export const HelmReleaseName = t.brand(
     t.string,

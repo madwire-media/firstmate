@@ -35,7 +35,7 @@ export type K8sNamespace = t.TypeOf<typeof K8sNamespace>;
 export const K8sNamespace = t.brand(
     t.string,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (_s): _s is t.Branded<string, K8sNamespaceBrand> => isDNS1123Label(s),
+    (s): s is t.Branded<string, K8sNamespaceBrand> => isDNS1123Label(s),
     'K8sNamespace',
 );
 export interface K8sNamespaceBrand extends DNS1123LabelBrand {

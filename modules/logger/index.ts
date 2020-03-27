@@ -12,4 +12,6 @@ export interface Logger {
     success: LogFunction;
     warn: LogFunction;
     error: LogFunction;
+
+    question: (strings: TemplateStringsArray, ...data: LogData[]) => Promise<string>;
 }

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import t, { string } from 'io-ts';
+import t from 'io-ts';
 import { map } from './other';
 
 const imageNameRegex = /^\w[\w.-]+$/;

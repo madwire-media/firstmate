@@ -9,8 +9,8 @@ import { Result } from '@madwire-media/result';
 import { UnimplementedFs } from '@madwire-media/fs/mocks/unimplemented';
 import { FsError } from '@madwire-media/fs';
 import { UnimplementedMountPrivate } from './private.mock';
-import { UnimplementedCacheHandle } from '../../../tmpfs/mock';
-import { UnimplementedEnv } from '../../../env/mock';
+import { UnimplementedCacheHandle } from '../../../tmpfs/mocks/unimplemented';
+import { UnimplementedEnv } from '../../../env/mocks/unimplemented';
 import { DudLogger } from '../../../logger/mocks/dud';
 
 import { SingleMounterImpl } from './single';

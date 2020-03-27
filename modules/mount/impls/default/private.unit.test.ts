@@ -7,7 +7,7 @@ import { Readable, Writable } from 'stream';
 
 import { UnimplementedHttpResponse, UnimplementedHttpRequest, UnimplementedHttp } from '@madwire-media/http/mocks/unimplemented';
 import { UnimplementedFs } from '@madwire-media/fs/mocks/unimplemented';
-import { UnimplementedCacheHandle } from '../../../tmpfs/mock';
+import { UnimplementedCacheHandle } from '../../../tmpfs/mocks/unimplemented';
 
 import { MountPrivateImpl } from './private';
 import { MountRecord } from './types';

@@ -207,4 +207,8 @@ export class ColoredConsoleLogger implements Logger {
         // eslint-disable-next-line no-console
         console.log(log);
     }
+
+    public question(): Promise<string> {
+        throw new Error('unimplemented');
+    }
 }

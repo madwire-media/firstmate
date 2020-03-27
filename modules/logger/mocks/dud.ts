@@ -1,3 +1,4 @@
+import { unimplementedFn } from '@madwire-media/di-container';
 import { Logger } from '..';
 
 export class DudLogger implements Logger {
@@ -10,4 +11,6 @@ export class DudLogger implements Logger {
     public warn() {}
 
     public error() {}
+
+    public question = unimplementedFn('question');
 }

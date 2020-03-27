@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 
-import { createServiceOrModule } from '../common/config';
+import { createModule } from '../common/config-helpers';
 import { ModulePath } from '../common/firstmate';
 import { DockerRegistry, DockerImageName } from '../common/docker';
 import { interpolated } from '../common/interpolated-string';
@@ -19,7 +19,7 @@ const profileProps = t.intersection([
 ]);
 
 export type DockerImageService = t.TypeOf<typeof DockerImageService>;
-export const DockerImageService = createServiceOrModule(
+export const DockerImageService = createModule(
     'DockerImageService',
     'service/docker-image',
     rootProps,

@@ -144,6 +144,10 @@ export class InterpolatedString<C extends string = string> {
         this.type = type;
     }
 
+    public hasExpressions(): boolean {
+        return this.expressions.length > 0;
+    }
+
     public interpolate(context: ExpressionContext): Result<string, InterpolationError> {
         let output = '';
 

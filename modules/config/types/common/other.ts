@@ -147,7 +147,11 @@ export const map = <K extends t.Mixed, V extends t.Mixed>(
         return true;
     },
     (inputMap, context) => {
-        if (!(inputMap instanceof Map) || typeof inputMap !== 'object') {
+        if (
+            !(inputMap instanceof Map)
+            || typeof inputMap !== 'object'
+            || inputMap === null
+        ) {
             return t.failure(inputMap, context);
         }
 

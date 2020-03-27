@@ -51,43 +51,17 @@ export const Dependency = t.union([
     ServiceDependency,
 ], 'Dependency');
 
-export function createBranches<
-    B extends t.Type<unknown, unknown>,
->(
-    branchType: B,
-    name = `Branches<${branchType.name}>`,
-) {
-    return map(BranchName, branchType, name);
-}
+export type BaseServiceOrModuleBranch = t.TypeOf<typeof BaseServiceOrModuleBranch>;
+export const BaseServiceOrModuleBranch = t.type({
+    version: t.string,
+    profiles: map(ProfileName, t.UnknownRecord),
+});
 
-export function createServiceOrModule<
-    K extends string,
-    RP extends t.Mixed,
-    PP extends t.Mixed,
->(
-    typeName: string,
-    kind: K,
-    rootProps: RP,
-    profileProps: PP,
-) {
-    const branchType = t.intersection([
-        t.type({
-            version: t.string,
-            profiles: map(ProfileName, profileProps, `${typeName}Profile`),
-        }),
-        profileProps,
-    ], `${typeName}Branch`);
-
-    const commonRootType = t.type({
-        kind: t.literal(kind),
-        description: t.string,
-        defaultParams: Params,
-        requiredParams: RequiredParams,
-        branches: branchType,
-    }, typeName);
-
-    return t.intersection([
-        commonRootType,
-        rootProps,
-    ], typeName);
-}
+export type BaseServiceOrModule = t.TypeOf<typeof BaseServiceOrModule>;
+export const BaseServiceOrModule = t.type({
+    kind: t.string,
+    description: t.string,
+    defaultParams: Params,
+    requiredParams: RequiredParams,
+    branches: map(BranchName, BaseServiceOrModuleBranch),
+}, 'BaseServiceOrModule');

@@ -1,6 +1,6 @@
 import { unimplementedFn } from '@madwire-media/di-container';
 
-import { Cache, CacheHandle } from '.';
+import { Cache, CacheHandle } from '..';
 
 export class UnimplementedCache implements Cache {
     public startup = unimplementedFn('startup');
