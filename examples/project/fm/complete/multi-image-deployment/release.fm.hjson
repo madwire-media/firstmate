@@ -1,0 +1,27 @@
+{
+    kind: step/helm-release
+    description: run the example helm chart
+
+    profiles: {
+        *: {
+            requiredParams: [
+                image-1
+                image-2
+            ]
+            deps: {
+                chart: ./chart
+            }
+
+            source: ${deps.chart.chart}
+
+            values: {
+                images: {
+                    image1: ${params.image-1}
+                    image2: ${params.image-2}
+                }
+
+                proxyId: ${params.proxyId}
+            }
+        }
+    }
+}
