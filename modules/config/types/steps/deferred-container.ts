@@ -28,10 +28,10 @@ const profileProps = t.intersection([
     }),
 ]);
 
-export type ContainerStep = t.TypeOf<typeof ContainerStep>;
-export const ContainerStep = createModule(
-    'ContainerStep',
-    'step/container',
+export type DeferredContainerStep = t.TypeOf<typeof DeferredContainerStep>;
+export const DeferredContainerStep = createModule(
+    'DeferredContainerStep',
+    'step/deferred-container',
     rootProps,
     profileProps,
 );

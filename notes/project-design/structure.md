@@ -76,7 +76,8 @@ Since we won't have Firstmate services adjacent to code, and they will all live 
     * step/helm-push - Push a Helm chart to a registry
     * step/helm-release - Create a Helm release on a cluster (aka run a Helm chart)
 * Service
-    * service - A versioned collection of build steps
+    * service/main - A versioned collection of build steps that you run commands on
+    * service/child - A collection of build steps with an interpolated version param
 
 ## New file structure
 * `/` (project root)

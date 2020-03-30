@@ -1,0 +1,14 @@
+{
+    kind: service/main
+    description: example docker push service
+
+    version: 0.1.1
+
+    profiles: {
+        default: {
+            deps: {
+                push: ./push
+            }
+        }
+    }
+}

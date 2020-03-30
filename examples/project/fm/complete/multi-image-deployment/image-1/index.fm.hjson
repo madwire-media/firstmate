@@ -1,0 +1,15 @@
+{
+    kind: step/empty
+    description: profile combiner for image-1
+
+    profiles: {
+        *: {
+            deps: {
+                push: ./push
+            }
+            outputs: {
+                image: ${deps.push.url}
+            }
+        }
+    }
+}

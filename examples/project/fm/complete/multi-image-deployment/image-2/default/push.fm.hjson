@@ -1,0 +1,17 @@
+{
+    kind: step/docker-push
+    description: push image-2 to the docker registry
+
+    profiles: {
+        *: {
+            deps: {
+                image: ./image
+            }
+
+            source: ${deps.image.image}
+
+            registry: my.private.registry
+            path: examples/multi-deploy/image-2
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    kind: step/container
+    description: compiles the source code
+
+    profiles: {
+        default: {
+            deps: {
+                build-image: ./build-image
+            }
+
+            source: ${deps.build-image.image}
+
+            volumes: {
+                // ~ refers to the project root
+                /mnt/code: ~/source/compiled-image-example
+                // . refers to the directory of this file
+                /mnt/output: ./image/artifacts
+            }
+        }
+    }
+}

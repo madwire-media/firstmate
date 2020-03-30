@@ -1,0 +1,22 @@
+{
+    kind: source/helm-chart
+    description: example helm chart with multiple images
+
+    profiles: {
+        *: {
+            requiredParams: [
+                image-1
+                image-2
+            ]
+
+            values: {
+                images: {
+                    image1: ${params.image-1}
+                    image2: ${params.image-2}
+                }
+
+                proxyId: ${params.proxyId}
+            }
+        }
+    }
+}

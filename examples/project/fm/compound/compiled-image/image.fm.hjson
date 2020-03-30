@@ -1,0 +1,12 @@
+{
+    kind: source/docker-image
+    description: example image source with compiled artifacts
+
+    profiles: {
+        default: {
+            deps: {
+                build: ./build
+            }
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    kind: service/main
+    description: compiles code with a container, builds it into a Docker image, and pushes it
+
+    version: 0.1.5
+
+    profiles: {
+        default: {
+            deps: {
+                push: ./push
+            }
+        }
+    }
+}

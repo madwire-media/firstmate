@@ -1,0 +1,19 @@
+{
+    kind: step/helm-release
+    description: run the example chart on a k8s cluster
+
+    profiles: {
+        default: {
+            requiredArgs: ['chartVersion']
+
+            source: stable/minecraft:${args.chartVersion}
+
+            cluster: my-cluster.k8s.local
+            namespace: my-namespace
+
+            values: {
+                exampleValue: 42
+            }
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    kind: step/helm-release
+    description: run the example chart on a k8s cluster
+
+    profiles: {
+        default: {
+            deps: {
+                chart: ./chart
+            }
+
+            source: ${deps.chart.chart}
+
+            cluster: my-cluster.k8s.local
+            namespace: my-namespace
+
+            values: {
+                exampleValue: 42
+            }
+        }
+    }
+}

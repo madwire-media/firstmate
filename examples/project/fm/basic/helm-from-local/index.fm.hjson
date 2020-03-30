@@ -1,0 +1,14 @@
+{
+    kind: service/main
+    description: example helm release service with local chart
+
+    version: 0.1.2
+
+    profiles: {
+        default: {
+            deps: {
+                release: ./release
+            }
+        }
+    }
+}

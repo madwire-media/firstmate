@@ -12,10 +12,10 @@ const profileProps = t.intersection([
     }),
 ]);
 
-export type HelmChartService = t.TypeOf<typeof HelmChartService>;
-export const HelmChartService = createModule(
-    'HelmChartService',
-    'service/helm-chart',
+export type HelmChartSource = t.TypeOf<typeof HelmChartSource>;
+export const HelmChartSource = createModule(
+    'HelmChartSource',
+    'source/helm-chart',
     rootProps,
     profileProps,
 );

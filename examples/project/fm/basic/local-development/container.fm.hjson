@@ -1,0 +1,22 @@
+{
+    kind: step/deferred-container
+    description: runs a local development container
+
+    profiles: {
+        default: {
+            deps: {
+                image: ./image
+            }
+
+            source: ${deps.image.image}
+
+            env: {
+                LIVE_DEVELOPMENT: 'true'
+            }
+            volumes: {
+                // ~ refers to the project root
+                /root/app/src: ~/source/local-dev-example
+            }
+        }
+    }
+}

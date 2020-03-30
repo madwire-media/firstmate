@@ -1,0 +1,21 @@
+{
+    kind: step/deferred-container
+    description: local development container
+
+    profiles: {
+        *: {
+            deps: {
+                local-image: ./local-image
+            }
+
+            source: ${deps.local-image.image}
+
+            proxy: true
+
+            volumes: {
+                // ~ refers to the project root
+                /root/app/src: ~/source/multi-image-deployment-example
+            }
+        }
+    }
+}

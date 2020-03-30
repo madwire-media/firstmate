@@ -1,0 +1,4 @@
+{
+    kind: source/docker-image
+    description: image for local development
+}

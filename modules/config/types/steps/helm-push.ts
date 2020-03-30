@@ -2,26 +2,25 @@
 import t from 'io-ts';
 
 import { createModule } from '../common/config-helpers';
-import { ModulePath } from '../common/firstmate';
-import { DockerRegistry, DockerImageName } from '../common/docker';
 import { interpolated } from '../common/interpolated-string';
+import { HelmRepository } from '../common/helm';
+import { ModulePath } from '../common/firstmate';
 
 const rootProps = t.type({
     sourceModule: ModulePath,
 });
 const profileProps = t.intersection([
     t.partial({
-        registry: interpolated(DockerRegistry),
     }),
     t.type({
-        imageName: interpolated(DockerImageName),
+        repository: interpolated(HelmRepository),
     }),
 ]);
 
-export type DockerImageService = t.TypeOf<typeof DockerImageService>;
-export const DockerImageService = createModule(
-    'DockerImageService',
-    'service/docker-image',
+export type HelmPushStep = t.TypeOf<typeof HelmPushStep>;
+export const HelmPushStep = createModule(
+    'HelmPushStep',
+    'step/helm-push',
     rootProps,
     profileProps,
 );

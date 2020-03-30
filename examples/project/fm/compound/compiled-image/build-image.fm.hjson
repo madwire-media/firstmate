@@ -1,0 +1,4 @@
+{
+    kind: source/docker-image
+    description: example build image source
+}

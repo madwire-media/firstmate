@@ -1,0 +1,4 @@
+{
+    kind: source/helm-chart
+    description: example helm chart
+}

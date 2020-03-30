@@ -1,0 +1,12 @@
+{
+    kind: source/docker-image
+    description: regular docker image source
+
+    profiles: {
+        *: {
+            deps: {
+                build: ./build
+            }
+        }
+    }
+}

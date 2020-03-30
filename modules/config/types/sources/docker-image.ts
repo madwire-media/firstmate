@@ -8,16 +8,17 @@ const rootProps = t.type({
 });
 const profileProps = t.intersection([
     t.partial({
-        dockerArgs: DockerArgs,
+        buildArgs: DockerArgs,
+        alwaysPull: t.boolean,
     }),
     t.type({
     }),
 ]);
 
-export type DockerImageService = t.TypeOf<typeof DockerImageService>;
-export const DockerImageService = createModule(
-    'DockerImageService',
-    'service/docker-image',
+export type DockerImageSource = t.TypeOf<typeof DockerImageSource>;
+export const DockerImageSource = createModule(
+    'DockerImageSource',
+    'source/docker-image',
     rootProps,
     profileProps,
 );

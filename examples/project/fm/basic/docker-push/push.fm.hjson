@@ -1,0 +1,17 @@
+{
+    kind: step/docker-push
+    description: push the example image to a private registry
+
+    profiles: {
+        default: {
+            deps: {
+                image: ./image
+            }
+
+            source: ${deps.image.image}
+
+            registry: my.private.registry
+            path: examples/docker-push
+        }
+    }
+}

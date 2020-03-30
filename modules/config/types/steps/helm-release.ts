@@ -22,10 +22,10 @@ const profileProps = t.intersection([
     }),
 ]);
 
-export type HelmReleaseService = t.TypeOf<typeof HelmReleaseService>;
-export const HelmReleaseService = createModule(
-    'HelmReleaseService',
-    'service/helm-release',
+export type HelmReleaseStep = t.TypeOf<typeof HelmReleaseStep>;
+export const HelmReleaseStep = createModule(
+    'HelmReleaseStep',
+    'step/helm-release',
     rootProps,
     profileProps,
 );
