@@ -1,0 +1,63 @@
+{
+    kind: service/main
+    description: example multi-image deployment with local development
+
+    version: 0.1.7
+
+    profileTemplates: {
+        base: {
+            deps: {
+                image-1: ./image-1
+                image-2: ./image-2
+
+                release: {
+                    path: ./release
+                    params: {
+                        image-1: ${deps.image-1.image}
+                        image-2: ${deps.image-2.image}
+                        proxyId: ${deps.image-2.proxyId}
+                    }
+                }
+            }
+        }
+    }
+
+    profiles: {
+        local: {
+            extendsTemplate: base
+
+            overrideVersion: local-${git.branch}-${env.uniqueId}
+            allowedBranches: [
+                !stage
+                !master
+            ]
+        }
+
+        dev: {
+            extendsTemplate: base
+
+            overrideVersion: dev-${git.branch}-${env.uniqueId}
+            allowedBranches: [
+                !stage
+                !master
+            ]
+        }
+
+        stage: {
+            extendsTemplate: base
+
+            overrideVersion: stage-${env.uniqueId}
+            allowedBranches: [
+                stage
+            ]
+        }
+
+        prod: {
+            extendsTemplate: base
+
+            allowedBranches: [
+                master
+            ]
+        }
+    }
+}

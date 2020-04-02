@@ -1,0 +1,21 @@
+{
+    kind: template/built-in/docker/built
+    description: example templated Docker image and push with build container step
+
+    profiles: {
+        *: {
+            registry: my.private.registry
+            path: examples/multi-deploy-templated/image-1
+
+            buildVolumes: {
+                // ~ refers to the project root
+                /mnt/code: ~/source/compiled-image-example
+                // . refers to the directory of this file
+                /mnt/output: ./image/artifacts
+            }
+
+            registry: my.private.registry
+            path: examples/multi-deploy-templated/image-2
+        }
+    }
+}

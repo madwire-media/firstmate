@@ -1,0 +1,11 @@
+{
+    kind: template/built-in/docker/simple
+    description: example templated Docker image and push
+
+    profiles: {
+        *: {
+            registry: my.private.registry
+            path: examples/multi-deploy-templated/image-1
+        }
+    }
+}

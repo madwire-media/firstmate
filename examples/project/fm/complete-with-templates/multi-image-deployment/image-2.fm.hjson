@@ -1,0 +1,25 @@
+{
+    kind: step/empty
+    description: profile combiner for image-2
+
+    profiles: {
+        *: {
+            deps: {
+                image: ./default
+            }
+            outputs: {
+                image: ${deps.image.url}
+            }
+        }
+
+        local: {
+            deps: {
+                image: ./local
+            }
+            outputs: {
+                image: ${deps.image.url}
+                proxyId: ${deps.local.proxyId}
+            }
+        }
+    }
+}

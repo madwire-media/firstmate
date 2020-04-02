@@ -1,0 +1,13 @@
+{
+    kind: template/built-in/docker/local-dev
+    description: example templated Docker image and push
+
+    profiles: {
+        *: {
+            liveVolumes: {
+                // ~ refers to the project root
+                /root/app/src: ~/source/multi-image-deployment-example
+            }
+        }
+    }
+}
