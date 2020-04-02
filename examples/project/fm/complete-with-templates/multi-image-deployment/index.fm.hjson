@@ -1,6 +1,6 @@
 {
     kind: service/main
-    description: example multi-image deployment with local development
+    description: example templated multi-image deployment with local development
 
     version: 0.1.7
 

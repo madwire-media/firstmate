@@ -1,5 +1,5 @@
 {
-    kind: template/built-in/docker/local-dev
+    kind: template/docker/local-dev
     description: example templated Docker image and push
 
     profiles: {
