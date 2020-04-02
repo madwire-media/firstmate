@@ -1,5 +1,5 @@
 {
-    kind: template/docker/built-image
+    kind: template/std/docker/built-image
     description: example templated Docker image and push with build container step
 
     profiles: {

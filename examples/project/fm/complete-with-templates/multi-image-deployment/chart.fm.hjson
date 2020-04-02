@@ -1,5 +1,5 @@
 {
-    kind: template/helm/simple-release
+    kind: template/std/helm/simple-release
     description: example templated chart and release
 
     profiles: {
