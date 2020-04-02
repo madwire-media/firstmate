@@ -13,9 +13,9 @@
                 chart: {
                     path: ./chart
                     params: {
-                        image-1: ${deps.image-1.image}
-                        image-2: ${deps.image-2.image}
-                        proxyId: ${deps.image-2.proxyId}
+                        image-1-url: ${deps.image-1.url}
+                        image-2-url: ${deps.image-2.url}
+                        image-2-proxyId: ${deps.image-2.proxyId}
                     }
                 }
             }

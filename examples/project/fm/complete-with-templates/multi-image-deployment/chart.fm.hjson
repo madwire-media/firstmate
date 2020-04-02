@@ -11,11 +11,11 @@
 
             values: {
                 images: {
-                    image1: ${params.image-1}
-                    image2: ${params.image-2}
+                    image1: ${params.image-1-url}
+                    image2: ${params.image-2-url}
                 }
 
-                proxyId: ${params.proxyId}
+                image2ProxyId: ${params.image-2-proxyId}
             }
         }
     }

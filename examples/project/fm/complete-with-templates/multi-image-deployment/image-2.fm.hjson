@@ -7,8 +7,9 @@
             deps: {
                 image: ./default
             }
+
             outputs: {
-                image: ${deps.image.url}
+                url: ${deps.image.url}
             }
         }
 
@@ -16,8 +17,9 @@
             deps: {
                 image: ./local
             }
+
             outputs: {
-                image: ${deps.image.url}
+                url: ${deps.image.url}
                 proxyId: ${deps.local.proxyId}
             }
         }
