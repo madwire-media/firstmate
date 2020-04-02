@@ -10,8 +10,8 @@
                 image-1: ./image-1
                 image-2: ./image-2
 
-                release: {
-                    path: ./release
+                chart: {
+                    path: ./chart
                     params: {
                         image-1: ${deps.image-1.image}
                         image-2: ${deps.image-2.image}
