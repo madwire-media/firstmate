@@ -6,16 +6,16 @@
 
     profileTemplates: {
         base: {
-            deps: {
+            steps: {
                 image-1: ./image-1
                 image-2: ./image-2
 
                 release: {
                     path: ./release
                     params: {
-                        image-1: ${deps.image-1.image}
-                        image-2: ${deps.image-2.image}
-                        proxyId: ${deps.image-2.proxyId}
+                        image-1: ${steps.image-1.image}
+                        image-2: ${steps.image-2.image}
+                        proxyId: ${steps.image-2.proxyId}
                     }
                 }
             }
@@ -24,7 +24,7 @@
 
     profiles: {
         local: {
-            extendsTemplate: base
+            extendsProfile: base
 
             overrideVersion: local-${git.branch}-${env.uniqueId}
             allowedBranches: [
@@ -34,7 +34,7 @@
         }
 
         dev: {
-            extendsTemplate: base
+            extendsProfile: base
 
             overrideVersion: dev-${git.branch}-${env.uniqueId}
             allowedBranches: [
@@ -44,7 +44,7 @@
         }
 
         stage: {
-            extendsTemplate: base
+            extendsProfile: base
 
             overrideVersion: stage-${env.uniqueId}
             allowedBranches: [
@@ -53,8 +53,9 @@
         }
 
         prod: {
-            extendsTemplate: base
+            extendsProfile: base
 
+            versionLocked: true
             allowedBranches: [
                 master
             ]

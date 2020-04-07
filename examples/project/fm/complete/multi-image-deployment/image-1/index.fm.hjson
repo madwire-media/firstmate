@@ -4,11 +4,11 @@
 
     profiles: {
         *: {
-            deps: {
+            steps: {
                 push: ./push
             }
             outputs: {
-                image: ${deps.push.url}
+                image: ${steps.push.url}
             }
         }
     }

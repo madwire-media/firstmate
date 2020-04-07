@@ -1,63 +1,24 @@
 {
-    kind: service/main
+    kind: template/service/main-ldsp
     description: example templated multi-image deployment with local development
 
     version: 0.1.7
 
-    profileTemplates: {
-        base: {
-            deps: {
+    profiles: {
+        *: {
+            steps: {
                 image-1: ./image-1
                 image-2: ./image-2
 
                 chart: {
                     path: ./chart
                     params: {
-                        image-1-url: ${deps.image-1.url}
-                        image-2-url: ${deps.image-2.url}
-                        image-2-proxyId: ${deps.image-2.proxyId}
+                        image-1-url: ${steps.image-1.url}
+                        image-2-url: ${steps.image-2.url}
+                        image-2-proxyId: ${steps.image-2.proxyId}
                     }
                 }
             }
-        }
-    }
-
-    profiles: {
-        local: {
-            extendsTemplate: base
-
-            overrideVersion: local-${git.branch}-${env.uniqueId}
-            allowedBranches: [
-                !stage
-                !master
-            ]
-        }
-
-        dev: {
-            extendsTemplate: base
-
-            overrideVersion: dev-${git.branch}-${env.uniqueId}
-            allowedBranches: [
-                !stage
-                !master
-            ]
-        }
-
-        stage: {
-            extendsTemplate: base
-
-            overrideVersion: stage-${env.uniqueId}
-            allowedBranches: [
-                stage
-            ]
-        }
-
-        prod: {
-            extendsTemplate: base
-
-            allowedBranches: [
-                master
-            ]
         }
     }
 }

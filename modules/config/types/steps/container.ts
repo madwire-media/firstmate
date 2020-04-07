@@ -1,37 +1,40 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 
-import { createModule } from '../common/config-helpers';
-import { ModulePath } from '../common/firstmate';
-import { DockerImage } from '../common/docker';
+import { createModule, createModuleProfile } from '../common/config-helpers';
+import {
+    InterpolatedDockerEnv,
+    InterpolatedDockerCommand,
+    InterpolatedDockerVolumes,
+    DockerPorts,
+    DockerImage,
+} from '../common/docker';
+import { interpolated } from '../common/interpolated-string';
 
-const rootProps = t.union([
-    t.type({
-        sourceModule: ModulePath,
-    }),
-    t.type({
-        sourceImage: DockerImage,
-    }),
-]);
-const profileProps = t.intersection([
-    t.partial({
-        // TODO: environment variables
-        // TODO: command
-        // TODO: volumes
-        // TODO: ports
+const rootProps = t.type({});
+const partialProps = {
+    env: InterpolatedDockerEnv,
+    command: InterpolatedDockerCommand,
+    setEntrypoint: t.boolean,
+    volumes: InterpolatedDockerVolumes,
+    ports: DockerPorts,
+};
+const requiredProps = {
+    source: interpolated(DockerImage),
+};
 
-        async: t.boolean,
-        proxy: t.boolean,
-        overrideEntrypoint: t.boolean,
-    }),
-    t.type({
-    }),
-]);
+export const containerStepKind = 'step/container';
 
 export type ContainerStep = t.TypeOf<typeof ContainerStep>;
 export const ContainerStep = createModule(
     'ContainerStep',
-    'step/container',
+    t.literal(containerStepKind),
     rootProps,
-    profileProps,
+    t.intersection([t.partial(partialProps), t.partial(requiredProps)]),
+);
+
+export type ContainerStepProfile = t.TypeOf<typeof ContainerStepProfile>;
+export const ContainerStepProfile = createModuleProfile(
+    'ContainerStep',
+    t.intersection([t.partial(partialProps), t.type(requiredProps)]),
 );

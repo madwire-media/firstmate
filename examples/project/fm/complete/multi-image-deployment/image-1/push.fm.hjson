@@ -4,11 +4,11 @@
 
     profiles: {
         *: {
-            deps: {
+            steps: {
                 image: ./image
             }
 
-            source: ${deps.image.image}
+            source: ${steps.image.image}
 
             registry: my.private.registry
             path: examples/multi-deploy/image-1

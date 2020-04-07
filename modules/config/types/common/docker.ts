@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 import { map } from './other';
+import { ContainerPath, LocalPath } from './firstmate';
+import { interpolated } from './interpolated-string';
 
 const imageNameRegex = /^\w[\w.-]+$/;
 
@@ -53,5 +55,70 @@ export interface DockerArgNameBrand {
     readonly DockerArgName: unique symbol;
 }
 
+export type InterpolatedDockerArgs = t.TypeOf<typeof InterpolatedDockerArgs>;
+export const InterpolatedDockerArgs = map(
+    DockerArgName,
+    interpolated(t.string),
+    'InterpolatedDockerArgs',
+);
+
 export type DockerArgs = t.TypeOf<typeof DockerArgs>;
 export const DockerArgs = map(DockerArgName, t.string, 'DockerArgs');
+
+export type InterpolatedDockerEnv = t.TypeOf<typeof InterpolatedDockerEnv>;
+export const InterpolatedDockerEnv = map(
+    t.string,
+    interpolated(t.string),
+    'InterpolatedDockerEnv',
+);
+
+export type DockerEnv = t.TypeOf<typeof DockerEnv>;
+export const DockerEnv = map(t.string, t.string, 'DockerEnv');
+
+export type InterpolatedDockerCommand = t.TypeOf<typeof InterpolatedDockerCommand>;
+export const InterpolatedDockerCommand = t.array(
+    interpolated(t.string),
+    'InterpolatedDockerCommand',
+);
+
+export type DockerCommand = t.TypeOf<typeof DockerCommand>;
+export const DockerCommand = t.array(t.string, 'DockerCommand');
+
+export type PortNumber = t.TypeOf<typeof PortNumber>;
+export const PortNumber = t.brand(
+    t.Int,
+    (n): n is t.Branded<t.Int, PortNumberBrand> => n > 0 && n < 65536,
+    'PortNumber',
+);
+export interface PortNumberBrand {
+    readonly PortNumber: unique symbol;
+}
+
+export type PortMap = t.TypeOf<typeof PortMap>;
+export const PortMap = t.type({
+    inner: PortNumber,
+    outer: PortNumber,
+}, 'PortMap');
+
+export type DockerPorts = t.TypeOf<typeof DockerPorts>;
+export const DockerPorts = t.array(
+    t.union([
+        PortNumber,
+        PortMap,
+    ]),
+    'DockerPorts',
+);
+
+export type InterpolatedDockerVolumes = t.TypeOf<typeof InterpolatedDockerVolumes>;
+export const InterpolatedDockerVolumes = map(
+    interpolated(ContainerPath),
+    interpolated(LocalPath),
+    'InterpolatedDockerVolumes',
+);
+
+export type DockerVolumes = t.TypeOf<typeof DockerVolumes>;
+export const DockerVolumes = map(
+    ContainerPath,
+    LocalPath,
+    'DockerVolumes',
+);

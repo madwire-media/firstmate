@@ -4,23 +4,23 @@
 
     profiles: {
         *: {
-            deps: {
+            steps: {
                 image: ./default
             }
 
             outputs: {
-                url: ${deps.image.url}
+                url: ${steps.image.url}
             }
         }
 
         local: {
-            deps: {
+            steps: {
                 image: ./local
             }
 
             outputs: {
-                url: ${deps.image.url}
-                proxyId: ${deps.local.proxyId}
+                url: ${steps.image.url}
+                proxyId: ${steps.local.proxyId}
             }
         }
     }

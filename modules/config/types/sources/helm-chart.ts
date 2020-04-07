@@ -1,21 +1,24 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 
-import { createModule } from '../common/config-helpers';
+import { createModule, createModuleProfile } from '../common/config-helpers';
 
-const rootProps = t.type({
-});
-const profileProps = t.intersection([
-    t.partial({
-    }),
-    t.type({
-    }),
-]);
+const rootProps = t.type({});
+const partialProps = {};
+const requiredProps = {};
+
+export const helmChartSourceKind = 'source/helm-chart';
 
 export type HelmChartSource = t.TypeOf<typeof HelmChartSource>;
 export const HelmChartSource = createModule(
     'HelmChartSource',
-    'source/helm-chart',
+    t.literal(helmChartSourceKind),
     rootProps,
-    profileProps,
+    t.intersection([t.partial(partialProps), t.partial(requiredProps)]),
+);
+
+export type HelmChartSourceProfile = t.TypeOf<typeof HelmChartSourceProfile>;
+export const HelmChartSourceProfile = createModuleProfile(
+    'HelmChartSource',
+    t.intersection([t.partial(partialProps), t.type(requiredProps)]),
 );

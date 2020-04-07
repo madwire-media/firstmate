@@ -1,9 +1,62 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 import { map, set } from './other';
-import { BranchName } from './git';
-// eslint-disable-next-line import/no-cycle
-import { ProfileName, ModulePath, ServicePath } from './firstmate';
+
+const projectNameRegex = /^[0-9a-z]+(?:-[0-9a-z]+)$/;
+const projectNameMaxLength = 31;
+
+export type ProjectName = t.TypeOf<typeof ProjectName>;
+export const ProjectName = t.brand(
+    t.string,
+    (s): s is t.Branded<string, ProjectNameBrand> => (
+        projectNameRegex.test(s)
+        && s.length <= projectNameMaxLength
+    ),
+    'ProjectName',
+);
+export interface ProjectNameBrand {
+    readonly ProjectName: unique symbol;
+}
+
+
+const profileNameRegex = /^[a-zA-Z]$/;
+
+export type ProfileName = t.TypeOf<typeof ProfileName>;
+export const ProfileName = t.brand(
+    t.string,
+    (s): s is t.Branded<string, ProfileNameBrand> => profileNameRegex.test(s),
+    'ProfileName',
+);
+export interface ProfileNameBrand extends ParamNameBrand {
+    readonly ProfileName: unique symbol;
+}
+
+
+const modulePathRegex = /^[a-z0-9.-]+(?:\/[a-z0-9.-]+)*|\.\.?(?:\/[a-z0-9.-]+)+$/;
+
+export type ModulePath = t.TypeOf<typeof ModulePath>;
+export const ModulePath = t.brand(
+    t.string,
+    (s): s is t.Branded<string, ModulePathBrand> => modulePathRegex.test(s),
+    'ModulePath',
+);
+export interface ModulePathBrand {
+    readonly ModulePath: unique symbol;
+}
+
+
+const templateModuleKindRegex = /^template\/[a-z0-9/-]$/;
+
+export type TemplateModuleKind = t.TypeOf<typeof TemplateModuleKind>;
+export const TemplateModuleKind = t.brand(
+    t.string,
+    (s): s is t.Branded<string, TemplateModuleKindBrand> => templateModuleKindRegex.test(s),
+    'TemplateModuleKind',
+);
+export interface TemplateModuleKindBrand {
+    readonly TemplateModuleKind: unique symbol;
+}
+
 
 const paramNameRegex = /^[a-zA-Z]+$/;
 
@@ -16,6 +69,7 @@ export const ParamName = t.brand(
 export interface ParamNameBrand {
     readonly ParamName: unique symbol;
 }
+
 
 export type Params = t.TypeOf<typeof Params>;
 export const Params = map(ParamName, t.string, 'Params');
@@ -33,35 +87,32 @@ export interface DependencyNameBrand extends ParamNameBrand {
     readonly DependencyName: unique symbol;
 }
 
-export type ModuleDependency = t.TypeOf<typeof ModuleDependency>;
-export const ModuleDependency = t.type({
+export type Dependency = t.TypeOf<typeof Dependency>;
+export const Dependency = t.type({
     module: ModulePath,
     params: Params,
-}, 'ModuleDependency');
+}, 'Dependency');
 
-export type ServiceDependency = t.TypeOf<typeof ServiceDependency>;
-export const ServiceDependency = t.type({
-    service: ServicePath,
-    params: Params,
+export type Dependencies = t.TypeOf<typeof Dependencies>;
+export const Dependencies = map(DependencyName, t.union([
+    ModulePath,
+    Dependency,
+]), 'Dependencies');
+
+export type BaseModuleProfile = t.TypeOf<typeof BaseModuleProfile>;
+export const BaseModuleProfile = t.partial({
+    // No defaultParams or requiredParams because they are not valid on root modules
+    steps: Dependencies,
+    extendsProfile: ProfileName,
 });
 
-export type Dependency = t.TypeOf<typeof Dependency>;
-export const Dependency = t.union([
-    ModuleDependency,
-    ServiceDependency,
-], 'Dependency');
-
-export type BaseServiceOrModuleBranch = t.TypeOf<typeof BaseServiceOrModuleBranch>;
-export const BaseServiceOrModuleBranch = t.type({
-    version: t.string,
-    profiles: map(ProfileName, t.UnknownRecord),
-});
-
-export type BaseServiceOrModule = t.TypeOf<typeof BaseServiceOrModule>;
-export const BaseServiceOrModule = t.type({
-    kind: t.string,
-    description: t.string,
-    defaultParams: Params,
-    requiredParams: RequiredParams,
-    branches: map(BranchName, BaseServiceOrModuleBranch),
-}, 'BaseServiceOrModule');
+export type BaseModule = t.TypeOf<typeof BaseModule>;
+export const BaseModule = t.intersection([
+    t.type({
+        kind: t.string,
+        description: t.string,
+    }),
+    t.partial({
+        profiles: map(ProfileName, BaseModuleProfile),
+    }),
+], 'BaseModule');

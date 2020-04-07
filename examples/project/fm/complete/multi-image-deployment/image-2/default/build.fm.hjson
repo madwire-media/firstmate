@@ -4,11 +4,11 @@
 
     profiles: {
         default: {
-            deps: {
+            steps: {
                 build-image: ./build-image
             }
 
-            source: ${deps.build-image.image}
+            source: ${steps.build-image.image}
 
             volumes: {
                 // ~ refers to the project root

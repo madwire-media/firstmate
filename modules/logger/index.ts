@@ -1,4 +1,4 @@
-import { LogData } from './types';
+import { LogData, LogPartial } from './types';
 
 export interface RequiresLogger {
     logger: Logger;
@@ -14,4 +14,5 @@ export interface Logger {
     error: LogFunction;
 
     question: (strings: TemplateStringsArray, ...data: LogData[]) => Promise<string>;
+    options: (options: string[], question: LogPartial) => Promise<string>;
 }

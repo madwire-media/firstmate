@@ -1,57 +1,27 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 
-// eslint-disable-next-line import/no-cycle
-import type { ParamNameBrand } from './config';
-
-const projectNameRegex = /^[0-9a-z]+(?:-[0-9a-z]+)$/;
-const projectNameMaxLength = 31;
-
-export type ProjectName = t.TypeOf<typeof ProjectName>;
-export const ProjectName = t.brand(
+// TODO: Add a regex to this type
+export type LocalPath = t.TypeOf<typeof LocalPath>;
+export const LocalPath = t.brand(
     t.string,
-    (s): s is t.Branded<string, ProjectNameBrand> => (
-        projectNameRegex.test(s)
-        && s.length <= projectNameMaxLength
-    ),
-    'ProjectName',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_s): _s is t.Branded<string, LocalPathBrand> => true,
+    'LocalPath',
 );
-export interface ProjectNameBrand {
-    readonly ProjectName: unique symbol;
+export interface LocalPathBrand {
+    readonly LocalPath: unique symbol;
 }
 
 
-const profileNameRegex = /^[a-zA-Z]$/;
-
-export type ProfileName = t.TypeOf<typeof ProfileName>;
-export const ProfileName = t.brand(
+// TODO: Add a regex to this type
+export type ContainerPath = t.TypeOf<typeof ContainerPath>;
+export const ContainerPath = t.brand(
     t.string,
-    (s): s is t.Branded<string, ProfileNameBrand> => profileNameRegex.test(s),
-    'ProfileName',
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (_s): _s is t.Branded<string, ContainerPathBrand> => true,
+    'ContainerPath',
 );
-export interface ProfileNameBrand extends ParamNameBrand {
-    readonly ProfileName: unique symbol;
-}
-
-
-const serviceOrModulePathRegex = /^[a-z0-9.-]+(?:\/[a-z0-9.-]+)*|\.\.?(?:\/[a-z0-9.-]+)+$/;
-
-export type ServicePath = t.TypeOf<typeof ServicePath>;
-export const ServicePath = t.brand(
-    t.string,
-    (s): s is t.Branded<string, ServicePathBrand> => serviceOrModulePathRegex.test(s),
-    'ServicePath',
-);
-export interface ServicePathBrand {
-    readonly ServicePath: unique symbol;
-}
-
-export type ModulePath = t.TypeOf<typeof ModulePath>;
-export const ModulePath = t.brand(
-    t.string,
-    (s): s is t.Branded<string, ModulePathBrand> => serviceOrModulePathRegex.test(s),
-    'ModulePath',
-);
-export interface ModulePathBrand {
-    readonly ModulePath: unique symbol;
+export interface ContainerPathBrand {
+    readonly ContainerPath: unique symbol;
 }

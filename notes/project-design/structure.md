@@ -78,9 +78,48 @@ Since we won't have Firstmate services adjacent to code, and they will all live 
 * Service
     * service/main - A versioned collection of build steps that you run commands on
     * service/child - A collection of build steps with an interpolated version param
+* Template
+    * template/std/* - Built-in templates
+    * template/local/* - Project templates
+    * (other namespaces reserved for later use)
+
+## Planned Templates
+* docker/basic-image - Builds and pushes a local Docker image (aka dockerImage)
+* docker/build-container - Build and runs a local Docker image (aka buildContainer)
+* docker/built-image - Runs a build container and then pushes a basic image
+* docker/local-dev - Builds and defers a local container for development
+* helm/basic-release - Releases a local helm chart (aka pureHelm)
+* service/main-dsp - Root service with built-in dev, stage, and prod profiles
+* service/main-ldsp - Root service with built-in local, dev, stage, and prod profiles
+
+## Planned Augmentations (WIP names)
+* std/docker/add-local-dev - Adds a local mode to a Docker image module
+    * Renames `[service]` to `[service]/default`
+    * Adds a `[service]/local` with a duplicated Dockerfile
+    * Adds a `[service]` module (`step/empty`) that switches between the default and local modules depending on the profile
+* std/helm/expose - Adds a service to a Helm chart
+* std/combo/add-image-to-deployment - Adds a Docker image and inserts it into a Deployment
+
+## Planned string interpolations
+(note that all of the environmental ones will be stored in the lockfile on version publishing)
+* params
+    * (param name) - input param
+* steps
+    * (step name)
+        * (step output) - step output
+* git
+    * branch - current git branch
+* session
+    * unixTime - unix epoch time in seconds
+    * uniqueId - random unique ID for session
+    * profile - name of profile for session
 
 ## New file structure
 * `/` (project root)
+    * `.fm/`
+        * `cool-session-name` (auto generated session folder)
+            * `modules`
+            * (all sorts of session-specific files)
     * `firstmate.hjson` (head Firstmate config file)
     * `firstmate.lock` (top-level Firstmate config lock file)
     * `fm/` (Firstmate project data)

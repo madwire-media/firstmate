@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 import { map } from './other';
-import { InterpolatedString, interpolatedString } from './interpolated-string';
+import { InterpolatedString, interpolatedString, interpolated } from './interpolated-string';
 import { isDNS1123Label, DNS1123LabelBrand } from './k8s';
 
 // Helm actually has no limitations to a repository's name
@@ -40,12 +40,19 @@ export interface HelmChartVersionBrand extends DNS1123LabelBrand {
     readonly HelmChartVersion: unique symbol;
 }
 
+export type InterpolatedHelmChartRef = t.TypeOf<typeof InterpolatedHelmChartRef>;
+export const InterpolatedHelmChartRef = t.type({
+    name: interpolated(HelmChartName),
+    version: interpolated(HelmChartVersion),
+    repository: interpolated(HelmRepository),
+}, 'InterpolatedHelmChartRef');
+
 export type HelmChartRef = t.TypeOf<typeof HelmChartRef>;
 export const HelmChartRef = t.type({
     name: HelmChartName,
     version: HelmChartVersion,
     repository: HelmRepository,
-});
+}, 'HelmChartRef');
 
 export type HelmReleaseName = t.TypeOf<typeof HelmReleaseName>;
 export const HelmReleaseName = t.brand(

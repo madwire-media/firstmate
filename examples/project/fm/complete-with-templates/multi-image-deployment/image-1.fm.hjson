@@ -1,5 +1,5 @@
 {
-    kind: template/std/docker/simple-image
+    kind: template/std/docker/basic-image
     description: example templated Docker image and push
 
     profiles: {

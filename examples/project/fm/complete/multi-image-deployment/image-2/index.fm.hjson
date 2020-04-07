@@ -4,21 +4,21 @@
 
     profiles: {
         *: {
-            deps: {
+            steps: {
                 push: ./default/push
             }
             outputs: {
-                image: ${deps.push.url}
+                image: ${steps.push.url}
             }
         }
 
         local: {
-            deps: {
+            steps: {
                 local: ./local/run
             }
             outputs: {
-                image: ${deps.local.proxyImage}
-                proxyId: ${deps.local.proxyId}
+                image: ${steps.local.proxyImage}
+                proxyId: ${steps.local.proxyId}
             }
         }
     }

@@ -8,11 +8,11 @@
                 image-1
                 image-2
             ]
-            deps: {
+            steps: {
                 chart: ./chart
             }
 
-            source: ${deps.chart.chart}
+            source: ${steps.chart.chart}
 
             values: {
                 images: {

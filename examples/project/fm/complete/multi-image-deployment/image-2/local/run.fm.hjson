@@ -4,11 +4,11 @@
 
     profiles: {
         *: {
-            deps: {
+            steps: {
                 local-image: ./local-image
             }
 
-            source: ${deps.local-image.image}
+            source: ${steps.local-image.image}
 
             proxy: true
 

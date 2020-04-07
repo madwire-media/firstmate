@@ -22,7 +22,14 @@ Adds a service into a Firstmate project, optionally from a template
 Adds a template into a Firstmate project
 
 ## `fm add from <template name>`
-Imports and executes a template
+Imports and "applies" a template
+
+### Options:
+* Import example code (yes/no)
+* Import sources (yes/no)
+* Module mode:
+    * Link (reference the original template with configured params)
+    * Unpack (compute the template's modules with configured params)
 
 ## `fm publish <service> :<profile> [version change]`
 Publishes a service to a registry

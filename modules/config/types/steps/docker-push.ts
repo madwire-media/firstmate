@@ -1,27 +1,31 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 
-import { createModule } from '../common/config-helpers';
-import { ModulePath } from '../common/firstmate';
-import { DockerRegistry, DockerImageName } from '../common/docker';
+import { createModule, createModuleProfile } from '../common/config-helpers';
 import { interpolated } from '../common/interpolated-string';
+import { DockerImage, DockerImageName, DockerRegistry } from '../common/docker';
 
-const rootProps = t.type({
-    sourceModule: ModulePath,
-});
-const profileProps = t.intersection([
-    t.partial({
-        registry: interpolated(DockerRegistry),
-    }),
-    t.type({
-        imageName: interpolated(DockerImageName),
-    }),
-]);
+const rootProps = t.type({});
+const partialProps = {
+    registry: interpolated(DockerRegistry),
+};
+const requiredProps = {
+    source: interpolated(DockerImage),
+    imageName: interpolated(DockerImageName),
+};
+
+export const dockerPushStepKind = 'step/docker-push';
 
 export type DockerPushStep = t.TypeOf<typeof DockerPushStep>;
 export const DockerPushStep = createModule(
     'DockerPushStep',
-    'step/docker-push',
+    t.literal(dockerPushStepKind),
     rootProps,
-    profileProps,
+    t.intersection([t.partial(partialProps), t.partial(requiredProps)]),
+);
+
+export type DockerPushStepProfile = t.TypeOf<typeof DockerPushStepProfile>;
+export const DockerPushStepProfile = createModuleProfile(
+    'DockerPushStep',
+    t.intersection([t.partial(partialProps), t.type(requiredProps)]),
 );

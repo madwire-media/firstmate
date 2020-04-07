@@ -1,37 +1,42 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import t from 'io-ts';
 
-import { createModule } from '../common/config-helpers';
-import { ModulePath } from '../common/firstmate';
-import { DockerImage } from '../common/docker';
+import { createModule, createModuleProfile } from '../common/config-helpers';
+import {
+    InterpolatedDockerEnv,
+    InterpolatedDockerCommand,
+    InterpolatedDockerVolumes,
+    DockerPorts,
+    DockerImage,
+} from '../common/docker';
+import { interpolated } from '../common/interpolated-string';
 
-const rootProps = t.union([
-    t.type({
-        sourceModule: ModulePath,
-    }),
-    t.type({
-        sourceImage: DockerImage,
-    }),
-]);
-const profileProps = t.intersection([
-    t.partial({
-        // TODO: environment variables
-        // TODO: command
-        // TODO: volumes
-        // TODO: ports
+const rootProps = t.type({});
+const partialProps = {
+    env: InterpolatedDockerEnv,
+    command: InterpolatedDockerCommand,
+    setEntrypoint: t.boolean,
+    volumes: InterpolatedDockerVolumes,
+    ports: DockerPorts,
 
-        async: t.boolean,
-        proxy: t.boolean,
-        overrideEntrypoint: t.boolean,
-    }),
-    t.type({
-    }),
-]);
+    proxy: t.boolean,
+};
+const requiredProps = {
+    source: interpolated(DockerImage),
+};
+
+export const deferredContainerStepKind = 'step/deferred-container';
 
 export type DeferredContainerStep = t.TypeOf<typeof DeferredContainerStep>;
 export const DeferredContainerStep = createModule(
     'DeferredContainerStep',
-    'step/deferred-container',
+    t.literal(deferredContainerStepKind),
     rootProps,
-    profileProps,
+    t.intersection([t.partial(partialProps), t.partial(requiredProps)]),
+);
+
+export type DeferredContainerStepProfile = t.TypeOf<typeof DeferredContainerStepProfile>;
+export const DeferredContainerStepProfile = createModuleProfile(
+    'DeferredContainerStep',
+    t.intersection([t.partial(partialProps), t.type(requiredProps)]),
 );

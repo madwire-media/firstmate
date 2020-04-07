@@ -1,8 +1,9 @@
 import t from 'io-ts';
 import { map } from './other';
 import { BranchName } from './git';
-import { ProfileName } from './firstmate';
-import { Params, RequiredParams } from './config';
+import {
+    ProfileName, Params, RequiredParams, Dependencies,
+} from './config';
 
 
 export function createBranches<
@@ -18,34 +19,60 @@ export interface ModuleOptions {
     noParams?: boolean;
 }
 
+export function createModuleProfile<PP extends t.Mixed>(
+    typeName: string,
+    profileProps: PP,
+) {
+    return t.intersection([
+        t.partial({
+            steps: Dependencies,
+            defaultParams: Params,
+            requiredParams: RequiredParams,
+        }),
+        profileProps,
+    ], `${typeName}PartialProfile`);
+}
+
+export function createRootModuleProfile<PP extends t.Mixed>(
+    typeName: string,
+    profileProps: PP,
+) {
+    return t.intersection([
+        t.partial({
+            steps: Dependencies,
+        }),
+        profileProps,
+    ], `${typeName}PartialProfile`);
+}
+
 export function createModule<
     K extends string,
     RP extends t.Mixed,
     PP extends t.Mixed,
 >(
     typeName: string,
-    kind: K,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    kind: t.Type<K, any>,
     rootProps: RP,
-    profileProps: PP,
+    profilePartials: PP,
 ) {
     const profileType = t.intersection([
         t.partial({
-            deps: t.unknown, // TODO: do this
+            steps: Dependencies,
             extendsProfile: ProfileName,
+            defaultParams: Params,
+            requiredParams: RequiredParams,
         }),
-        profileProps,
-    ], `${typeName}Profile`);
+        profilePartials,
+    ], `${typeName}PartialProfile`);
 
     return t.intersection([
         t.type({
-            kind: t.literal(kind),
+            kind,
             description: t.string,
         }),
         t.partial({
-            extends: t.string, // TODO: replace this with a TemplatePath
             profiles: map(ProfileName, profileType),
-            defaultParams: Params,
-            requiredParams: RequiredParams,
         }),
         rootProps,
     ], typeName);
@@ -57,25 +84,25 @@ export function createRootModule<
     PP extends t.Mixed,
 >(
     typeName: string,
-    kind: K,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    kind: t.Type<K, any>,
     rootProps: RP,
-    profileProps: PP,
+    profilePartials: PP,
 ) {
     const profileType = t.intersection([
         t.partial({
-            deps: t.unknown, // TODO: do this
+            steps: Dependencies,
             extendsProfile: ProfileName,
         }),
-        profileProps,
-    ], `${typeName}Profile`);
+        profilePartials,
+    ], `${typeName}PartialProfile`);
 
     return t.intersection([
         t.type({
-            kind: t.literal(kind),
+            kind,
             description: t.string,
         }),
         t.partial({
-            extends: t.string, // TODO: replace this with a TemplatePath
             profiles: map(ProfileName, profileType),
         }),
         rootProps,
