@@ -1,0 +1,75 @@
+{
+    kind: template
+    description: pushed Docker image from local source
+
+    mainTemplate: push
+    templates: {
+        build-image: {
+            kind: source/docker-image
+            description: Docker build image source
+
+            profiles: {
+                *: {
+                    $spread: $ref{profile.buildImage}
+                }
+            }
+        }
+
+        build-container: {
+            kind: step/container
+            description: runs local Docker image
+
+            profiles: {
+                *: {
+                    steps: {
+                        build-image: build-image
+                    }
+
+                    source: ${steps.build-image.image}
+
+                    $spread: $ref{profile.buildContainer}
+                }
+            }
+        }
+
+        image: {
+            kind: source/docker-image
+            description: Docker image source
+
+            profiles: {
+                *: {
+                    steps: {
+                        build-container: build-container
+                    }
+
+                    $spread: $input{profile.image}
+                }
+            }
+        }
+
+        push: {
+            kind: step/docker-push
+            description: pushes local Docker image
+
+            profiles: {
+                *: {
+                    steps: {
+                        image: image
+                    }
+
+                    source: ${steps.image.image}
+
+                    $spread: $input{profile.push}
+                }
+            }
+        }
+    }
+
+    outputs: {
+        $spreadFrom: [
+            push
+        ]
+
+        image: $output{push.url}
+    }
+}

@@ -1,0 +1,43 @@
+{
+    kind: template
+    description: pushed Docker image from local source
+
+    mainTemplate: push
+    templates: {
+        .: {
+            kind: source/docker-image
+            description: Docker image source
+
+            profiles: {
+                *: {
+                    $spread: $input{profile.image}
+                }
+            }
+        }
+
+        push: {
+            kind: step/docker-push
+            description: pushes local Docker image
+
+            profiles: {
+                *: {
+                    steps: {
+                        image: .
+                    }
+
+                    source: ${steps.image.image}
+
+                    $spread: $input{profile.push}
+                }
+            }
+        }
+    }
+
+    outputs: {
+        $spreadFrom: [
+            push
+        ]
+
+        image: $output{push.url}
+    }
+}

@@ -1,0 +1,47 @@
+{
+    kind: template
+    description: root service template with dev, stage, and prod profiles pre-configured
+
+    templates: {
+        .: {
+            kind: service/main
+            description: computed service
+
+            $spread: true
+
+            profiles: {
+                *: {
+                    $spread: true
+                }
+
+                dev: {
+                    $spread: true
+
+                    overrideVersion: dev-${git.branch}-${env.uniqueId}
+                    allowedBranches: [
+                        !stage
+                        !master
+                    ]
+                }
+
+                stage: {
+                    $spread: true
+
+                    overrideVersion: stage-${env.uniqueId}
+                    allowedBranches: [
+                        stage
+                    ]
+                }
+
+                prod: {
+                    $spread: true
+
+                    versionLocked: true
+                    allowedBranches: [
+                        master
+                    ]
+                }
+            }
+        }
+    }
+}

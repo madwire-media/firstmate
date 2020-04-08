@@ -4,8 +4,10 @@
 
     profiles: {
         *: {
-            registry: my.private.registry
-            path: examples/multi-deploy-templated/image-1
+            push: {
+                registry: my.private.registry
+                imageName: examples/multi-deploy-templated/image-1
+            }
         }
     }
 }

@@ -1,0 +1,41 @@
+{
+    kind: template
+    description: deferred container from local image
+
+    mainTemplate: container
+    templates: {
+        .: {
+            kind: source/docker-image
+            description: Docker image source
+
+            profiles: {
+                *: {
+                    $spread: $ref{profile.image}
+                }
+            }
+        }
+
+        container: {
+            kind: step/deferred-container
+            description: computed local development container
+
+            profiles: {
+                *: {
+                    steps: {
+                        image: .
+                    }
+
+                    source: ${steps.image.image}
+
+                    $spread: $ref{profile.container}
+                }
+            }
+        }
+    }
+
+    outputs: {
+        $spreadFrom: [
+            container
+        ]
+    }
+}

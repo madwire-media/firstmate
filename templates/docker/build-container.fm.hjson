@@ -1,0 +1,41 @@
+{
+    kind: template
+    description: build container from local Docker image
+
+    mainTemplate: container
+    templates: {
+        .: {
+            kind: source/docker-image
+            description: Docker image source
+
+            profiles: {
+                *: {
+                    $spread: $ref{profile.image}
+                }
+            }
+        }
+
+        container: {
+            kind: step/container
+            description: runs local Docker image
+
+            profiles: {
+                *: {
+                    steps: {
+                        image: .
+                    }
+
+                    source: ${steps.image.image}
+
+                    $spread: $ref{profile.container}
+                }
+            }
+        }
+    }
+
+    outputs: {
+        $spreadFrom: [
+            container
+        ]
+    }
+}
