@@ -40,12 +40,17 @@ Notes
 ## For later (aka today)
 
 * [ ] Templates
-* [ ] Git integration
-    * [ ] `fm revert`
+    * [ ] Engine handling
+    * [ ] Template resolution
 * [ ] Lockfiles
+    * [ ] Auto version incrementing
+    * [ ] Lockfile generation and history
     * [ ] `fm publish`
     * [ ] `fm checkout`
     * [ ] `fm show versions`
+* [ ] Git integration
+    * [ ] `.git` locking
+    * [ ] `fm revert`
 * [ ] Bases
     * [ ] `fm add source`
     * [ ] `fm add step`
