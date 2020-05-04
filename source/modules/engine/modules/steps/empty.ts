@@ -1,5 +1,5 @@
 import { Injectable } from '@madwire-media/di-container';
-import { PromiseResult, Result } from '@madwire-media/result';
+import { Result } from '@madwire-media/result';
 import { EngineModuleImpl, EngineHandle, MapModuleOutput } from '../..';
 import {
     EmptyStepTypes, EmptyStep, EmptyStepProfile, emptyStepKind,
@@ -20,11 +20,11 @@ export class EmptyStepImpl
 
     public readonly isSource = false;
 
-    public async run(
+    public runParams(
         _module: EmptyStep,
         profile: EmptyStepProfile,
         handle: EngineHandle,
-    ): PromiseResult<MapModuleOutput, Error> {
+    ): Result<MapModuleOutput, Error> {
         const interpolationContext = handle.getInterpolationContext();
 
         const outputs = new Map();
@@ -38,11 +38,11 @@ export class EmptyStepImpl
         return Result.Ok(outputs);
     }
 
-    public async destroy(
+    public destroyParams(
         _module: EmptyStep,
         profile: EmptyStepProfile,
         handle: EngineHandle,
-    ): PromiseResult<MapModuleOutput, Error> {
+    ): Result<MapModuleOutput, Error> {
         const interpolationContext = handle.getInterpolationContext();
 
         const outputs = new Map();

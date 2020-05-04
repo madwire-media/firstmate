@@ -1,6 +1,6 @@
 import { Injectable } from '@madwire-media/di-container';
-import { Result, PromiseResult } from '@madwire-media/result';
-import { EngineModuleImpl, ModuleOutput } from '../..';
+import { Result } from '@madwire-media/result';
+import { EngineModuleImpl } from '../..';
 import {
     ChildServiceTypes, childServiceKind, ChildService, ChildServiceProfile,
 } from '../../../config/types/services/child';
@@ -21,14 +21,6 @@ export class ChildServiceImpl
     public readonly profileType = ChildServiceProfile;
 
     public readonly isSource = false;
-
-    public async run(): PromiseResult<ModuleOutput, Error> {
-        return Result.Ok({});
-    }
-
-    public async destroy(): PromiseResult<ModuleOutput, Error> {
-        return Result.Ok({});
-    }
 
     public setVersion(
         module: ChildService,

@@ -166,7 +166,7 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
         execution: ModuleExecution,
         tmpFilesSession: TmpFilesSession,
     ): PromiseResult<EngineDeferredRun[], Error> {
-        const { git, generate } = this[context];
+        const { git, generate, logger } = this[context];
 
         const session: EngineSession = {
             gitBranch: (await git.getCurrentBranch()).try(),
@@ -178,6 +178,26 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
         };
 
         const deferrals: EngineDeferredRun[] = [];
+
+        switch (execution.type) {
+            case 'publish': {
+                logger.info`Publishing service ${lt.module(config.rootModule.path)}:${lt.environment(config.profile)}`;
+                logger.info``;
+                break;
+            }
+
+            case 'run': {
+                logger.info`Running service ${lt.module(config.rootModule.path)}:${lt.environment(config.profile)}`;
+                logger.info``;
+                break;
+            }
+
+            case 'destroy': {
+                logger.info`Destroying service ${lt.module(config.rootModule.path)}:${lt.environment(config.profile)}`;
+                logger.info``;
+                break;
+            }
+        }
 
         (await this.executeConfigInternal(
             config.rootModule,
@@ -435,29 +455,59 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
             }
 
             case 'run': {
-                const interpolatedProfile = getInterpolated(
-                    loadedModule.profile,
-                    interpolationContext,
-                );
+                if (impl.run !== undefined) {
+                    const interpolatedProfile = getInterpolated(
+                        loadedModule.profile,
+                        interpolationContext,
+                    );
 
-                logger.info`Running module ${lt.module(loadedModule.path)} (${lt.config(loadedModule.module.kind)})`;
-                logger.info`params = ${lt.config(params)}`;
-                logger.info`profile = ${lt.config(interpolatedProfile)}`;
-                logger.info``;
+                    logger.info`Running module ${lt.module(loadedModule.path)} (${lt.config(loadedModule.module.kind)})`;
+                    logger.info`params = ${lt.config(params)}`;
+                    logger.info`profile = ${lt.config(interpolatedProfile)}`;
+                    logger.info``;
 
-                return impl.run(
-                    loadedModule.module,
-                    loadedModule.profile,
-                    handle,
-                );
+                    return impl.run(
+                        loadedModule.module,
+                        loadedModule.profile,
+                        handle,
+                    );
+                } else if (impl.runParams !== undefined) {
+                    return impl.runParams(
+                        loadedModule.module,
+                        loadedModule.profile,
+                        handle,
+                    );
+                } else {
+                    return Result.Ok({});
+                }
             }
 
             case 'destroy': {
-                return impl.destroy(
-                    loadedModule.module,
-                    loadedModule.profile,
-                    handle,
-                );
+                if (impl.destroy !== undefined) {
+                    const interpolatedProfile = getInterpolated(
+                        loadedModule.profile,
+                        interpolationContext,
+                    );
+
+                    logger.info`Destroying module ${lt.module(loadedModule.path)} (${lt.config(loadedModule.module.kind)})`;
+                    logger.info`params = ${lt.config(params)}`;
+                    logger.info`profile = ${lt.config(interpolatedProfile)}`;
+                    logger.info``;
+
+                    return impl.destroy(
+                        loadedModule.module,
+                        loadedModule.profile,
+                        handle,
+                    );
+                } else if (impl.destroyParams !== undefined) {
+                    return impl.destroyParams(
+                        loadedModule.module,
+                        loadedModule.profile,
+                        handle,
+                    );
+                } else {
+                    return Result.Ok({});
+                }
             }
         }
     }

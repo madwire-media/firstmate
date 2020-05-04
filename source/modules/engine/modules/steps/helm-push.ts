@@ -176,11 +176,11 @@ export class HelmPushStepImpl
         }
     }
 
-    public async destroy(
+    public destroyParams(
         _module: HelmPushStep,
         profile: HelmPushStepProfile,
         handle: EngineHandle,
-    ): PromiseResult<ModuleOutput, Error> {
+    ): Result<ModuleOutput, Error> {
         const interpolationContext = handle.getInterpolationContext();
         const version = handle.getContextualVersion();
 

@@ -90,7 +90,9 @@ export class HelmChartSourceImpl
         });
     }
 
-    public async destroy(): PromiseResult<ModuleOutput, Error> {
-        return Result.Ok({});
+    public destroyParams(): Result<ModuleOutput, Error> {
+        return Result.Ok({
+            chart: '[generated]',
+        });
     }
 }

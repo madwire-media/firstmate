@@ -131,16 +131,26 @@ export interface EngineModuleImpl<T extends AnyModuleTypes> {
     readonly profileType: t.Type<T['profileType'], any>;
     readonly isSource: T['isSource'];
 
-    run(
+    run?(
         module: T['moduleType'],
         profile: T['profileType'],
         handle: EngineHandle,
     ): PromiseResult<ModuleOutput | MapModuleOutput, Error>;
-    destroy(
+    runParams?(
+        module: T['moduleType'],
+        profile: T['profileType'],
+        handle: EngineHandle,
+    ): Result<ModuleOutput | MapModuleOutput, Error>;
+    destroy?(
         module: T['moduleType'],
         profile: T['profileType'],
         handle: EngineHandle,
     ): PromiseResult<ModuleOutput | MapModuleOutput, Error>;
+    destroyParams?(
+        module: T['moduleType'],
+        profile: T['profileType'],
+        handle: EngineHandle,
+    ): Result<ModuleOutput | MapModuleOutput, Error>;
     runDeferred?(
         module: T['moduleType'],
         profile: T['profileType'],

@@ -73,11 +73,11 @@ export class DockerPushStepImpl
         });
     }
 
-    public async destroy(
+    public destroyParams(
         _module: DockerPushStep,
         profile: DockerPushStepProfile,
         handle: EngineHandle,
-    ): PromiseResult<ModuleOutput, Error> {
+    ): Result<ModuleOutput, Error> {
         const interpolationContext = handle.getInterpolationContext();
         const version = handle.getContextualVersion();
 

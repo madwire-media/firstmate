@@ -86,10 +86,29 @@ export class CliApi implements Api {
     }
 
     public async destroy(
-    // service: ModulePath,
-    // profile: ProfileName,
+        service: ModulePath,
+        profile: ProfileName,
     ): PromiseResult<void, Error> {
-        throw new Error('unimplemented');
+        const loader = this.projectConfig.loadModule.bind(this.projectConfig);
+
+        const preloaded = (await this.engine.preloadConfig(
+            service,
+            profile,
+            loader,
+        )).try();
+
+        const tmpFilesSession = (await this.tmpFiles.createSession()).try();
+
+        (await this.engine.executeConfig(
+            preloaded,
+            this.projectConfig.projectRoot,
+            { type: 'destroy' },
+            tmpFilesSession,
+        )).try();
+
+        (await tmpFilesSession.cleanup()).try();
+
+        return Result.voidOk;
     }
 }
 

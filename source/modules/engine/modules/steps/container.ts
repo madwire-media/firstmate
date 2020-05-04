@@ -83,8 +83,4 @@ export class ContainerStepImpl
 
         return Result.Ok({});
     }
-
-    public async destroy(): PromiseResult<ModuleOutput, Error> {
-        return Result.Ok({});
-    }
 }

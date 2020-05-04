@@ -65,6 +65,23 @@ program
         (await api.run(service, profile)).unwrapRaw();
     });
 
+program
+    .command('destroy <service> <profile>')
+    .usage('[options] <service> :<profile>')
+    .description('Destroy all running artifacts from a service')
+    .action(async (rawService: string, rawProfile: string) => {
+        if (!rawProfile.startsWith(':')) {
+            throw new Error("Profile does not start with a ':'");
+        }
+
+        const service = as(ModulePath, rawService);
+        const profile = as(ProfileName, rawProfile.slice(1));
+
+        const api = (await getApi()).unwrapRaw();
+
+        (await api.destroy(service, profile)).unwrapRaw();
+    });
+
 program.parseAsync(process.argv)
     .catch((error) => {
         console.error(error);

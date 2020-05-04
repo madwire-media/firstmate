@@ -1,6 +1,6 @@
 import { Injectable } from '@madwire-media/di-container';
-import { PromiseResult, Result } from '@madwire-media/result';
-import { EngineModuleImpl, ModuleOutput } from '../..';
+import { Result } from '@madwire-media/result';
+import { EngineModuleImpl } from '../..';
 import {
     MainServiceTypes, MainService, MainServiceProfile, mainServiceKind,
 } from '../../../config/types/services/main';
@@ -21,14 +21,6 @@ export class MainServiceImpl
     public readonly profileType = MainServiceProfile;
 
     public readonly isSource = false;
-
-    public async run(): PromiseResult<ModuleOutput, Error> {
-        return Result.Ok({});
-    }
-
-    public async destroy(): PromiseResult<ModuleOutput, Error> {
-        return Result.Ok({});
-    }
 
     public setVersion(
         module: MainService,

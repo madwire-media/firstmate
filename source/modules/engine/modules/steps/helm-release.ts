@@ -40,7 +40,7 @@ export class HelmReleaseStepImpl
         const cwd = handle.getCwd();
 
         const cluster = profile.cluster.interpolate(interpolationContext).try();
-        const namespace = profile.cluster.interpolate(interpolationContext).try();
+        const namespace = profile.namespace.interpolate(interpolationContext).try();
         const release = profile.releaseName.interpolate(interpolationContext).try();
 
         let chartSource;
