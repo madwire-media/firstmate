@@ -426,17 +426,19 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
             loadedModule.path,
         );
 
-        await fs.mkdirp(Path.dirname(tmpConfigFilePath));
-        await fs.copyFile(sourceConfigFilePath, tmpConfigFilePath, {
-            clobber: true,
-        });
-
-        if (impl.isSource) {
-            await fs.mkdirp(tmpModulePath);
-            await fs.copy(sourceModulePath, tmpModulePath, {
-                ...defaultWalkOptions,
+        if (execution.type !== 'destroy') {
+            await fs.mkdirp(Path.dirname(tmpConfigFilePath));
+            await fs.copyFile(sourceConfigFilePath, tmpConfigFilePath, {
                 clobber: true,
             });
+
+            if (impl.isSource) {
+                await fs.mkdirp(tmpModulePath);
+                await fs.copy(sourceModulePath, tmpModulePath, {
+                    ...defaultWalkOptions,
+                    clobber: true,
+                });
+            }
         }
 
         const handle = new DefaultEngineHandle(
