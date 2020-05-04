@@ -1,13 +1,13 @@
 # Features
 
 ## Config
-* [ ] Split into multiple files
+* [X] Split into multiple files
 * [ ] Round-trip parsing
 * Formats
     * [ ] Hjson
     * [ ] JSONC
     * [ ] JSON
-* [ ] Value interpolation
+* [X] Value interpolation
 * [ ] Automatic versioning
 
 ## Git
@@ -16,20 +16,20 @@
 * [ ] Automatic tagging?
 
 ## Monorepo
-* [ ] Can run anywhere inside a monorepo
+* [X] Can run anywhere inside a monorepo
 
-## Modules
-* [ ] Docker image
-* [ ] Helm chart
+## Sources
+* [X] Docker image
+* [X] Helm chart
 
 ## Services
-* [ ] Docker image
-* [ ] Container
-* [ ] Helm chart
-* [ ] Helm release
-    * [ ] Checks for certain annotations before publishing
+* [X] Docker image
+* [X] Container
+* [X] Helm chart
+* [X] Helm release
+    * [ ] Checks for certain annotations before publishing (not sure what I was thinking here)
 
 ## Misc
-* `fm rum`
-* Command to get status of deployment
-* Log timestamps?
+* [X] `fm rum`
+* [ ] Command to get status of deployment
+* [ ] Log timestamps?
