@@ -37,12 +37,21 @@ export class DefaultTmpFiles
             const lockFilePath = Path.join(sessionPath, 'lock');
 
             // eslint-disable-next-line no-await-in-loop
-            const statsResult = await fs.stat(lockFilePath);
+            const dirStats = await fs.stat(sessionPath);
+            // eslint-disable-next-line no-await-in-loop
+            const lockStats = await fs.stat(lockFilePath);
 
-            if (
-                statsResult.isErr()
-                || statsResult.value.getMtime() < timeCutoff
-            ) {
+            let shouldDelete = false;
+
+            if (!dirStats.isErr()) {
+                if (lockStats.isErr()) {
+                    shouldDelete = dirStats.value.getMtime() < timeCutoff;
+                } else {
+                    shouldDelete = lockStats.value.getMtime() < timeCutoff;
+                }
+            }
+
+            if (shouldDelete) {
                 logger.trace`Cleaning up old session ${lt.path(sessionPath)}`;
                 logged = true;
 
