@@ -7,11 +7,18 @@
     profileTemplates: {
         base: {
             steps: {
-                image-1: ./image-1
-                image-2: ./image-2
+                image-1: {
+                    path: ./image-1
+                    versionLockedFilter: publish
+                }
+                image-2: {
+                    path: ./image-2
+                    versionLockedFilter: publish
+                }
 
                 release: {
                     path: ./release
+                    versionLockedFilter: run
                     params: {
                         image-1: ${steps.image-1.image}
                         image-2: ${steps.image-2.image}

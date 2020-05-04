@@ -18,12 +18,9 @@
         ]
     },
     "include": [
-        "**/*.ts"
+        "source/**/*.ts"
     ],
     "exclude": [
-        "**/*.test.ts",
-        "**/*.d.ts",
-        "dist",
-        "node_modules"
+        "source/**/*.test.ts",
     ]
 }

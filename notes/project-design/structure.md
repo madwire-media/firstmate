@@ -107,6 +107,8 @@ Since we won't have Firstmate services adjacent to code, and they will all live 
 * steps
     * (step name)
         * (step output) - step output
+* service
+    * version - parent service's version
 * git
     * branch - current git branch
 * session
@@ -193,7 +195,7 @@ Top-level `firstmate.lock` (locks the lock files):
             }
         }
     },
-    "environment": {
+    "session": {
         "[key]": {
             "[other key]": "[value]"
         }
@@ -205,7 +207,7 @@ Algorithm for locking a version:
 * Require clean git before starting
 * Update service version if necessary
 * Hash all of the build artifacts and steps
-* Create a lock file with the current version, hashes, and environment
+* Create a lock file with the current version, hashes, and session info
 * Commit the lock file and changes:
     * Git add [service file] [lock file]
     * Git commit -m "Publish [service]@[version]"

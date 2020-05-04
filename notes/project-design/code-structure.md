@@ -18,3 +18,6 @@ Code structure is pretty loose, but based on the following principles:
         * `[impl name].ts` with simple implementation
 * `mocks/` folder to contain fakes, mocks, and stubs
     * `[mock name].ts` with fake, mock, or stub implementation
+* Other common folders as needed, ex.
+    * `types/`
+    * `helpers/`

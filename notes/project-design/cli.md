@@ -6,6 +6,9 @@ Initializes a new Firstmate project
 ## `fm import project <project name>`
 Imports an existing Git repository as a Firstmate project
 
+## `fm convert project <project name>`
+Converts a Firstmate v1 project into a Firstmate v2 project
+
 ## `fm augment <module> <augmentation>`
 Modifies a module to inject a feature
 
@@ -64,6 +67,8 @@ List the dependency tree of a service or module
 
 ## `fm repair lockfiles`
 Traverses the Git history to try and find where the service lock files went, and updates the history files and root lock file
+
+This is important because when the Git history is edited, like if someone deletes a file from the history or makes a squash commit, the git hashes referencing that edited or collapsed history will become invalid.
 
 ## `fm rum`
 Serves you some ascii rum and a snarky message, suggests you run `fm run` and returns error code 1

@@ -10,7 +10,7 @@
 
             profiles: {
                 *: {
-                    $spread: $ref{profile.buildImage}
+                    $spread: $input{profile.buildImage}
                 }
             }
         }
@@ -27,7 +27,7 @@
 
                     source: ${steps.build-image.image}
 
-                    $spread: $ref{profile.buildContainer}
+                    $spread: $input{profile.buildContainer}
                 }
             }
         }
