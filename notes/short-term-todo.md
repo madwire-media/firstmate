@@ -28,7 +28,7 @@
         * [X] Helm Release
 * [ ] Root API
     * [X] `fm run`
-    * [ ] `fm destroy`
+    * [X] `fm destroy`
     * [ ] `fm status` (not the most important)
     * [ ] `fm show dependencies` (not the most important)
     * [X] `fm rum` ('cause why not? :D)
