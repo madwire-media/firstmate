@@ -1,9 +1,7 @@
 import Path from 'path';
 import { Injectable, context } from '@madwire-media/di-container';
 import { PromiseResult, Result } from '@madwire-media/result';
-import { RequiresFs, defaultWalkOptions } from '@madwire-media/fs';
-import { isLeft } from 'fp-ts/lib/Either';
-import { isOnlyObject } from '@madwire-media/magic-object/utils';
+import { RequiresFs } from '@madwire-media/fs';
 import {
     ModuleEngine,
     EngineModuleImpl,
@@ -18,28 +16,29 @@ import {
     MapModuleOutput,
     ModuleExecution,
     AnyModuleImpl,
+    paramNames,
 } from '../..';
 import { AnyNonTemplateModuleTypes } from '../../../config/types/any-module';
 import {
     ModulePath, ProfileName, VersionName, ParamName,
 } from '../../../config/types/common/config-names';
-import { joinModulePaths } from '../../../config/helpers/join-path';
-import { isString } from '../../../config/helpers/is';
 import { Params } from '../../../config/types/common/config';
 import { mainServiceKind, MainServiceTypes } from '../../../config/types/services/main';
 import { RequiresGit } from '../../../git';
 import { RequiresGenerate } from '../../../generate';
 import { computeProfile } from '../../../config/helpers/compute-profile';
-import { ExpressionContext, InterpolatedString } from '../../../config/types/common/interpolated-string';
+import { ExpressionContext } from '../../../config/types/common/interpolated-string';
 import { DefaultEngineHandle } from './handle';
-import { DefaultDeferredEngineHandle } from './deferred-handle';
 import { TmpFilesSession } from '../../../tmp-files';
 import { RequiresCommandRunner } from '../../../commands';
 import { RequiresLogger } from '../../../logger';
-import { lt } from '../../../logger/types';
-import { ValidationError } from '../../../common/validationError';
+import { DefaultModuleEnginePrivate } from './engine-private';
 
-function mapifyModuleOutput(input: ModuleOutput): ExpressionContext {
+function mapifyModuleOutput(input: ModuleOutput | ExpressionContext): ExpressionContext {
+    if (input instanceof Map) {
+        return input;
+    }
+
     const output: ExpressionContext = new Map();
 
     for (const [key, value] of Object.entries(input)) {
@@ -57,60 +56,6 @@ function mapifyModuleOutput(input: ModuleOutput): ExpressionContext {
     return output;
 }
 
-function getInterpolated(input: unknown, interpolationContext: ExpressionContext): unknown {
-    if (input instanceof InterpolatedString) {
-        const result = input.interpolateRaw(interpolationContext);
-
-        if (result.isOk()) {
-            return result.value;
-        } else {
-            return '[interpolation error]';
-        }
-    } else if (input instanceof Map) {
-        const output = new Map();
-
-        for (const [key, value] of input) {
-            output.set(
-                getInterpolated(key, interpolationContext),
-                getInterpolated(value, interpolationContext),
-            );
-        }
-
-        return output;
-    } else if (input instanceof Array) {
-        const output = [];
-
-        for (const value of input) {
-            output.push(getInterpolated(value, interpolationContext));
-        }
-
-        return output;
-    } else if (isOnlyObject(input)) {
-        const output: {[key: string]: unknown} = {};
-
-        for (const [key, value] of Object.entries(input as object)) {
-            output[key] = getInterpolated(value, interpolationContext);
-        }
-
-        return output;
-    } else {
-        return input;
-    }
-}
-
-const paramNames = {
-    params: 'params' as ParamName,
-    steps: 'steps' as ParamName,
-    service: 'service' as ParamName,
-    version: 'version' as ParamName,
-    git: 'git' as ParamName,
-    branch: 'branch' as ParamName,
-    session: 'session' as ParamName,
-    unixTime: 'unixTime' as ParamName,
-    uniqueId: 'uniqueId' as ParamName,
-    profile: 'profile' as ParamName,
-};
-
 type Dependencies =
     & RequiresGit
     & RequiresGenerate
@@ -123,6 +68,14 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
 
     // TODO: implement templates
     private templateImpl?: EngineTemplateImpl;
+
+    private priv: DefaultModuleEnginePrivate;
+
+    constructor(deps: Dependencies, priv?: DefaultModuleEnginePrivate) {
+        super(deps);
+
+        this.priv = priv ?? new DefaultModuleEnginePrivate(deps);
+    }
 
     public registerModuleImpl(impl: AnyModuleImpl) {
         this.moduleImpls.set(impl.kind, impl as EngineModuleImpl<AnyNonTemplateModuleTypes>);
@@ -166,7 +119,7 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
         execution: ModuleExecution,
         tmpFilesSession: TmpFilesSession,
     ): PromiseResult<EngineDeferredRun[], Error> {
-        const { git, generate, logger } = this[context];
+        const { git, generate } = this[context];
 
         const session: EngineSession = {
             gitBranch: (await git.getCurrentBranch()).try(),
@@ -179,25 +132,11 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
 
         const deferrals: EngineDeferredRun[] = [];
 
-        switch (execution.type) {
-            case 'publish': {
-                logger.info`Publishing service ${lt.module(config.rootModule.path)}:${lt.environment(config.profile)}`;
-                logger.info``;
-                break;
-            }
-
-            case 'run': {
-                logger.info`Running service ${lt.module(config.rootModule.path)}:${lt.environment(config.profile)}`;
-                logger.info``;
-                break;
-            }
-
-            case 'destroy': {
-                logger.info`Destroying service ${lt.module(config.rootModule.path)}:${lt.environment(config.profile)}`;
-                logger.info``;
-                break;
-            }
-        }
+        this.priv.logExecution(
+            execution.type,
+            config.rootModule.path,
+            config.profile,
+        );
 
         (await this.executeConfigInternal(
             config.rootModule,
@@ -220,11 +159,7 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
     ): PromiseResult<PreloadedModule, Error> {
         const config = (await loader(module)).try();
 
-        if (parents.length > 0 && config.parsed.kind === mainServiceKind) {
-            return Result.Err(new Error(
-                `Module ${module} cannot be a main service and a dependency simultaneously`,
-            ));
-        }
+        this.priv.assertDependencyIsNotMainService(parents, config.parsed.kind).try();
 
         const impl = this.moduleImpls.get(config.parsed.kind);
 
@@ -235,81 +170,44 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
         }
 
         const computedProfile = computeProfile(config.parsed, profile).try();
+
+        const parsedSteps = this.priv.parseSteps(
+            computedProfile,
+            parents,
+            module,
+            config.filePath,
+        ).try();
+
         const dependencies: PreloadedDependency[] = [];
 
-        if (computedProfile?.steps !== undefined) {
-            const parentsForChild = parents.concat([module]);
+        for (const step of parsedSteps) {
+            // eslint-disable-next-line no-await-in-loop
+            const dependency = (await this.preloadConfigInternal(
+                step.module,
+                profile,
+                loader,
+                step.parents,
+            )).try();
 
-            for (const [stepName, step] of computedProfile.steps) {
-                let stepPath;
-
-                if (isString(step)) {
-                    stepPath = step;
-                } else {
-                    stepPath = step.module;
-                }
-
-                const fullPath = joinModulePaths(
-                    Path.dirname(config.filePath) as ModulePath,
-                    stepPath,
-                );
-
-                if (parents.includes(fullPath)) {
-                    return Result.Err(new Error(
-                        `Encountered module dependency loop starting from '${fullPath}' and looping at '${module}'`,
-                    ));
-                }
-
-                // eslint-disable-next-line no-await-in-loop
-                const dependency = (await this.preloadConfigInternal(
-                    fullPath,
-                    profile,
-                    loader,
-                    parentsForChild,
-                )).try();
-
-                dependencies.push({
-                    name: stepName,
-                    module: dependency,
-                    raw: step,
-                });
-            }
+            dependencies.push({
+                name: step.name,
+                module: dependency,
+                raw: step.raw,
+            });
         }
 
-        const moduleParseResult = impl.moduleType.decode(config.parsed);
-        if (isLeft(moduleParseResult)) {
-            return Result.Err(new ValidationError(
-                `Module at ${module} is not a valid '${config.parsed.kind}' module`,
-                moduleParseResult.left,
-            ));
-        }
-
-        let profileParseResult;
-
-        if (config.parsed.profiles === undefined) {
-            profileParseResult = impl.profileType.decode({});
-
-            if (isLeft(profileParseResult)) {
-                return Result.Err(new ValidationError(
-                    `Missing config for profile ${profile} on module ${module}, but at least one property is required`,
-                    profileParseResult.left,
-                ));
-            }
-        } else {
-            profileParseResult = impl.profileType.decode(computedProfile);
-
-            if (isLeft(profileParseResult)) {
-                return Result.Err(new ValidationError(
-                    `Computed config for profile ${profile} on module ${module} is invalid`,
-                    profileParseResult.left,
-                ));
-            }
-        }
+        const parsedModule = this.priv.parseModule(impl, config.parsed).try();
+        const parsedProfile = this.priv.parseProfile(
+            impl,
+            config.parsed,
+            profile,
+            computedProfile,
+        ).try();
 
         return Result.Ok({
             dependencies,
-            module: moduleParseResult.right,
-            profile: profileParseResult.right,
+            module: parsedModule,
+            profile: parsedProfile,
             impl,
             path: module,
             filePath: config.filePath,
@@ -325,9 +223,6 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
         tmpFilesSession: TmpFilesSession,
         deferrals: EngineDeferredRun[],
     ): PromiseResult<ModuleOutput | MapModuleOutput, Error> {
-        const { fs, logger } = this[context];
-
-        let version = parentVersion;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const impl = this.moduleImpls.get(loadedModule.module.kind)!;
 
@@ -347,36 +242,19 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
             ])],
         ]);
 
-        // TODO: use locked version for versionLocked executions
-        if (version !== undefined) {
-            serviceContext.set(paramNames.version, version);
-        }
-
-        if (impl.setVersion !== undefined) {
-            version = impl.setVersion(
-                loadedModule.module,
-                loadedModule.profile,
-                interpolationContext,
-            ).try();
-
-            serviceContext.set(paramNames.version, version);
-        } else if (version === undefined) {
-            throw new Error('Expected root module to set a version');
-        }
+        const version = this.priv.computeVersion<T>(
+            loadedModule,
+            parentVersion,
+            impl,
+            serviceContext,
+            interpolationContext,
+        ).try();
 
         for (const dependency of loadedModule.dependencies) {
-            let subParams: Params | undefined;
-
-            if (!isString(dependency.raw) && dependency.raw.params !== undefined) {
-                subParams = new Map();
-
-                for (const [paramName, paramValueRaw] of dependency.raw.params) {
-                    // TODO LATER: add path messaging to error
-                    const paramValue = paramValueRaw.interpolate(interpolationContext).try();
-
-                    subParams.set(paramName, paramValue);
-                }
-            }
+            const subParams = this.priv.computeSubParams(
+                dependency,
+                interpolationContext,
+            ).try();
 
             // eslint-disable-next-line no-await-in-loop
             const output = (await this.executeConfigInternal(
@@ -389,57 +267,19 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
                 deferrals,
             )).try();
 
-            if (output instanceof Map) {
-                stepsContext.set(dependency.name, output);
-            } else {
-                stepsContext.set(dependency.name, mapifyModuleOutput(output));
-            }
+            stepsContext.set(dependency.name, mapifyModuleOutput(output));
         }
 
-        if (impl.runDeferred !== undefined) {
-            const deferredHandle = new DefaultDeferredEngineHandle(this[context]);
+        this.priv.handleDeferral(loadedModule, impl, deferrals);
 
-            deferrals.push({
-                impl,
-                module: loadedModule.module,
-                profile: loadedModule.profile,
-                handle: deferredHandle,
-            });
-        }
-
-        const sourceConfigFilePath = Path.join(
-            session.projectRoot,
-            'fm',
-            loadedModule.filePath,
-        );
-        const sourceModulePath = Path.join(
-            session.projectRoot,
-            'fm',
+        (await this.priv.copyModuleFiles(
+            execution.type,
             loadedModule.path,
-        );
-        const tmpConfigFilePath = Path.join(
-            tmpFilesSession.mainDir,
             loadedModule.filePath,
-        );
-        const tmpModulePath = Path.join(
+            session.projectRoot,
             tmpFilesSession.mainDir,
-            loadedModule.path,
-        );
-
-        if (execution.type !== 'destroy') {
-            await fs.mkdirp(Path.dirname(tmpConfigFilePath));
-            await fs.copyFile(sourceConfigFilePath, tmpConfigFilePath, {
-                clobber: true,
-            });
-
-            if (impl.isSource) {
-                await fs.mkdirp(tmpModulePath);
-                await fs.copy(sourceModulePath, tmpModulePath, {
-                    ...defaultWalkOptions,
-                    clobber: true,
-                });
-            }
-        }
+            impl,
+        )).try();
 
         const handle = new DefaultEngineHandle(
             this[context],
@@ -451,66 +291,13 @@ export class DefaultModuleEngine extends Injectable<Dependencies> implements Mod
             tmpFilesSession,
         );
 
-        switch (execution.type) {
-            case 'publish': {
-                throw new Error('Publish-type executions not yet implemented');
-            }
-
-            case 'run': {
-                if (impl.run !== undefined) {
-                    const interpolatedProfile = getInterpolated(
-                        loadedModule.profile,
-                        interpolationContext,
-                    );
-
-                    logger.info`Running module ${lt.module(loadedModule.path)} (${lt.config(loadedModule.module.kind)})`;
-                    logger.info`params = ${lt.config(params)}`;
-                    logger.info`profile = ${lt.config(interpolatedProfile)}`;
-                    logger.info``;
-
-                    return impl.run(
-                        loadedModule.module,
-                        loadedModule.profile,
-                        handle,
-                    );
-                } else if (impl.runParams !== undefined) {
-                    return impl.runParams(
-                        loadedModule.module,
-                        loadedModule.profile,
-                        handle,
-                    );
-                } else {
-                    return Result.Ok({});
-                }
-            }
-
-            case 'destroy': {
-                if (impl.destroy !== undefined) {
-                    const interpolatedProfile = getInterpolated(
-                        loadedModule.profile,
-                        interpolationContext,
-                    );
-
-                    logger.info`Destroying module ${lt.module(loadedModule.path)} (${lt.config(loadedModule.module.kind)})`;
-                    logger.info`params = ${lt.config(params)}`;
-                    logger.info`profile = ${lt.config(interpolatedProfile)}`;
-                    logger.info``;
-
-                    return impl.destroy(
-                        loadedModule.module,
-                        loadedModule.profile,
-                        handle,
-                    );
-                } else if (impl.destroyParams !== undefined) {
-                    return impl.destroyParams(
-                        loadedModule.module,
-                        loadedModule.profile,
-                        handle,
-                    );
-                } else {
-                    return Result.Ok({});
-                }
-            }
-        }
+        return this.priv.executeModule<T>(
+            loadedModule,
+            execution.type,
+            params,
+            interpolationContext,
+            impl,
+            handle,
+        );
     }
 }

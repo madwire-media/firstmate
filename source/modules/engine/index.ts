@@ -179,3 +179,16 @@ export interface CompiledEngineTemplate {
     renderTemplate(input: ModuleInput): Map<string, AnyNonTemplateModuleTypes>;
     computeOutput(childOutputs: Map<string, MapModuleOutput>): ModuleOutput | MapModuleOutput;
 }
+
+export const paramNames = {
+    params: 'params' as ParamName,
+    steps: 'steps' as ParamName,
+    service: 'service' as ParamName,
+    version: 'version' as ParamName,
+    git: 'git' as ParamName,
+    branch: 'branch' as ParamName,
+    session: 'session' as ParamName,
+    unixTime: 'unixTime' as ParamName,
+    uniqueId: 'uniqueId' as ParamName,
+    profile: 'profile' as ParamName,
+};
