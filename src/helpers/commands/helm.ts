@@ -43,6 +43,7 @@ export interface HelmContext {
         recreatePods?: boolean,
         version?: string,
         helmVersion?: 2 | 3;
+        noEnv?: boolean;
     };
     env: string;
     dockerImages?: {[container: string]: string};
@@ -160,7 +161,9 @@ export function parseHelmInstallArgs(context: HelmContext, valuesFile?: string):
         }
     }
 
-    args.push('--set', `env=${context.env}`);
+    if (!context.branch.noEnv) {
+        args.push('--set', `env=${context.env}`);
+    }
 
     args.push('--kube-context', context.branch.cluster);
     args.push('--namespace', context.branch.namespace);

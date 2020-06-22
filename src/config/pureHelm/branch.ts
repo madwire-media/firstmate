@@ -21,6 +21,7 @@ export namespace env {
             helmArgFiles?: LocalFilePath[];
             chartmuseum?: ChartMuseum;
             helmVersion?: HelmVersion;
+            noEnv?: boolean;
         }
 
         // tslint:disable-next-line:no-empty-interface
@@ -53,6 +54,7 @@ export namespace env {
             helmArgFiles: t.array(LocalFilePath),
             chartmuseum: t.union([ChartMuseum, t.undefined]), // force partial
             helmVersion: t.union([HelmVersion, t.undefined]), // force partial
+            noEnv: t.boolean,
         });
 
         export const _devReq = t.type({});
@@ -188,6 +190,7 @@ export namespace env {
                 helmArgFiles: [],
                 chartmuseum: context.chartmuseum,
                 noHelmDeploy: false,
+                noEnv: false,
             });
         }
 
