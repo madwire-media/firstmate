@@ -11,6 +11,8 @@
 
 Firstmate is a tool to quicken and simplify your software development workflow on Kubernetes. With just a few commands you could create a new node.js or Apache project and get it running on Kubernetes.
 
+If you want to try out V2 alpha, try the [v2 branch](https://github.com/madwire-media/firstmate/tree/v2).
+
 
 ## Install
 In the future there could be binary releases for Firstmate, but for now just use NPM
