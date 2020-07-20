@@ -82,6 +82,8 @@ function helpOnError(self: any, context: any) {
     }
 }
 
+export let helmCommand = 'helm';
+
 // tslint:disable-next-line:no-var-requires
 const sywac = require('sywac');
 
@@ -159,16 +161,25 @@ class TypeVersion extends require('sywac/types/string') {
 }
 sywac.registerFactory('version', (opts: any) => new TypeVersion(opts));
 
+function procCommonArgv(argv: {[arg: string]: any}) {
+    helmCommand = argv['helm-exe'] || helmCommand;
+}
+
 sywac
     .configure({name: 'fm'})
     .style(styleHooks)
     .preface(logo)
+    .string('--helm-exe', {
+        desc: 'Sets the helm executable',
+    })
     .command('new <projectName>', {
         desc: 'Creates a new empty Firstmate project',
         paramsDesc: [
             'Name of new project',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             await newProject(argv.projectName);
         },
     })
@@ -184,6 +195,8 @@ sywac
             'Name of new service',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             const result = await addService(context, argv.service, argv.type, argv.template, argv['no-source']);
 
             if (result === false) {
@@ -202,6 +215,8 @@ sywac
             'Filter templates by a specific type',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             templates(argv.type);
         },
     })
@@ -216,12 +231,16 @@ sywac
             'Service to copy files for',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             await runService(copyFilesCmd, copyFilesCmdReqs, undefined, context, argv, argv.service, {});
         },
     })
     .command('clean', {
         desc: 'Clean up any dangling files if Firstmate crashed',
-        async run() {
+        async run(argv: {[arg: string]: any}) {
+            procCommonArgv(argv);
+
             await uncopyFiles();
         },
     })
@@ -243,6 +262,8 @@ sywac
             'Run only telepresence?',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             switch (argv.mode) {
                 case 'dev':
                     const devService = argv.dry ? dryDev : runDev;
@@ -281,6 +302,8 @@ sywac
             'Semver version change or tag to publish',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             switch (argv.mode) {
                 case 'prod':
                     await runService(publishProd, publishProdReqs, publishProdConfig, context, argv, argv.service);
@@ -309,6 +332,8 @@ sywac
             'Service to clean up',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             switch (argv.mode) {
                 case 'dev':
                     await runService(purgeDev, purgeDevReqs, undefined, context, argv, argv.service, {});
@@ -346,6 +371,8 @@ sywac
             'Container to debug in service (only if service is a Docker Deployment)',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             switch (argv.mode) {
                 default:
                     context.cliMessage(`Unimplemented debug mode ${argv.mode}`);
@@ -371,6 +398,8 @@ sywac
             'Semver version change or tag to publish',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             await runService(setVersion, setVersionReqs, setVersionConfig, context, argv, argv.service, {});
         },
     })
@@ -380,6 +409,8 @@ sywac
             'Service to validate (validates all by default)',
         ],
         async run(argv: {[arg: string]: any}, context: any) {
+            procCommonArgv(argv);
+
             if (!await validate(argv, argv.service)) {
                 context.code++;
             }

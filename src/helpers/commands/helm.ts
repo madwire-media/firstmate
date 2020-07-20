@@ -3,6 +3,7 @@ import * as fs from 'fs';
 
 import { HelmArgs, HelmVersion } from '../../config/types/helm';
 import { LocalFilePath } from '../../config/types/strings';
+import { helmCommand } from '../../main';
 import { a, fmt } from '../cli';
 
 export function hasRelease(
@@ -18,7 +19,7 @@ export function hasRelease(
     }
 
     const result = ChildProcess.spawnSync(
-        'helm', ['status', ...nsArgs, '--kube-context', cluster, release],
+        helmCommand, ['status', ...nsArgs, '--kube-context', cluster, release],
     );
 
     if (result.error) {
@@ -102,7 +103,7 @@ export function install(context: HelmContext, release: string, service: string, 
     console.log();
     console.log(a`\{lb,u helm ${actionText} ${argsText}\}`);
     const result = ChildProcess.spawnSync(
-        'helm', action.concat(args),
+        helmCommand, action.concat(args),
         {
             stdio: 'inherit',
         },
@@ -201,7 +202,7 @@ export function del(context: HelmContext, release: string, purge = false): boole
     console.log();
     console.log(a`\{lb,u helm delete ${argsText} ${release}\}`);
     const result = ChildProcess.spawnSync(
-        'helm', ['delete'].concat(args).concat([release]),
+        helmCommand, ['delete'].concat(args).concat([release]),
         {
             stdio: 'inherit',
         },
@@ -261,7 +262,7 @@ export function push(context: HelmContextProd, service: string): boolean {
     console.log();
     console.log(a`\{lb,u helm push ${argsText}\}`);
     const result = ChildProcess.spawnSync(
-        'helm', ['push'].concat(args),
+        helmCommand, ['push'].concat(args),
         {
             stdio: 'inherit',
         },
@@ -300,7 +301,7 @@ export function pkg(context: HelmContext, service: string, version: string): str
     console.log();
     console.log(a`\{lb,u helm package ${argsText}\}`);
     const result = ChildProcess.spawnSync(
-        'helm', ['package'].concat(args),
+        helmCommand, ['package'].concat(args),
         {
             stdio: 'inherit',
         },
