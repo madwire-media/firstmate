@@ -191,6 +191,7 @@ export namespace env {
                 chartmuseum: context.chartmuseum,
                 noHelmDeploy: false,
                 noEnv: false,
+                helmVersion: context.helmVersion,
             });
         }
 
