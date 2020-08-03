@@ -152,14 +152,14 @@ export function parseHelmInstallArgs(context: HelmContext, valuesFile?: string):
         }
     }
 
-    if (valuesFile !== undefined) {
-        args.push('-f', valuesFile);
-    }
-
     if (context.branch.helmArgFiles) {
         for (const file of context.branch.helmArgFiles) {
             args.push('-f', file);
         }
+    }
+
+    if (valuesFile !== undefined) {
+        args.push('-f', valuesFile);
     }
 
     if (!context.branch.noEnv) {
