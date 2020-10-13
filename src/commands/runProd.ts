@@ -135,7 +135,13 @@ export async function runProd(
         for (const index in containers) {
             const dirname = containers[index];
             const prefix = branch.imageNamePrefix || serviceName;
-            const image = `${config.project}/${prefix}-${dirname}`;
+            let image;
+
+            if (branch.noProjectPrefix) {
+                image = `${prefix}-${dirname}`;
+            } else {
+                image = `${config.project}/${prefix}-${dirname}`;
+            }
 
             dockerImages[dirname] = `${image}:${branch.version}`;
 

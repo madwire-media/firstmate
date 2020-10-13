@@ -17,6 +17,7 @@ export namespace env {
         export interface AllOpt {
             registry?: Registry;
             imageNamePrefix?: ImageName;
+            noProjectPrefix?: boolean;
             containers?: Containers;
         }
 
@@ -44,6 +45,7 @@ export namespace env {
         export const _allOpt = t.partial({
             registry: t.union([Registry, t.undefined]),
             imageNamePrefix: ImageName,
+            noProjectPrefix: t.boolean,
             containers: Containers,
         });
 
@@ -189,6 +191,7 @@ export namespace env {
                 registry: context.registry,
                 imageNamePrefix: context.service,
                 containers: {},
+                noProjectPrefix: false,
             });
         }
 

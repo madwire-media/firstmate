@@ -176,8 +176,14 @@ export async function runDev(
                 const dirname = containers[index];
                 const dir = containerDirs[index];
                 const prefix = branch.imageNamePrefix || serviceName;
-                const image = `${config.project}/${prefix}-${dirname}`;
+                let image;
                 let args;
+
+                if (branch.noProjectPrefix) {
+                    image = `${prefix}-${dirname}`;
+                } else {
+                    image = `${config.project}/${prefix}-${dirname}`;
+                }
 
                 dockerImages[dirname] = `${image}:dev`;
 

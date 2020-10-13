@@ -46,7 +46,7 @@ export const AbsoluteFilePath = refineRgx(
 );
 
 // --------------------------------- Docker --------------------------------- //
-export const rgxImageName = /^\w[\w.-]+$/;
+export const rgxImageName = /^\w[\w.-]+(\/\w[\w.-]+)*$/;
 export type ImageName = string;
 export const ImageName = refineRgx(
     rgxImageName,
