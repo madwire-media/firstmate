@@ -114,7 +114,13 @@ export async function runDev(
     }
 
     if (tagged(branch, 'dockerImage')) {
-        const image = `${config.project}/${branch.imageName}`;
+        let image;
+
+        if (branch.noProjectPrefix) {
+            image = `${branch.imageName}`;
+        } else {
+            image = `${config.project}/${branch.imageName}`;
+        }
 
         if (debugContainer !== undefined) {
             console.log(a`\{ly Warn:\} ignoring 'debug' parameter`);

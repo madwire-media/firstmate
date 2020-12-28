@@ -96,8 +96,16 @@ export async function runProd(
     }
 
     if (tagged(branch, 'dockerImage')) {
+        let image;
+
+        if (branch.noProjectPrefix) {
+            image = `${branch.imageName}`;
+        } else {
+            image = `${config.project}/${branch.imageName}`;
+        }
+
         // Docker pull
-        if (!docker.pull(branch.registry, `${config.project}/${branch.imageName}`, branch.version)) {
+        if (!docker.pull(branch.registry, image, branch.version)) {
             return false;
         }
     } else if (tagged(branch, 'pureHelm')) {

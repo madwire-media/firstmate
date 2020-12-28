@@ -96,7 +96,13 @@ export async function runStage(
     }
 
     if (tagged(branch, 'dockerImage')) {
-        const image = `${config.project}/${branch.imageName}`;
+        let image;
+
+        if (branch.noProjectPrefix) {
+            image = `${branch.imageName}`;
+        } else {
+            image = `${config.project}/${branch.imageName}`;
+        }
 
         // Docker build
         if (!docker.build(serviceFolder, image, undefined, branch.dockerArgs)) {

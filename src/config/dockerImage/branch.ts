@@ -17,6 +17,7 @@ export namespace env {
         export interface AllOpt {
             registry?: Registry;
             dockerArgs?: DockerArgs;
+            noProjectPrefix?: boolean;
         }
 
         // tslint:disable-next-line:no-empty-interface
@@ -44,6 +45,7 @@ export namespace env {
         export const _allOpt = t.partial({
             registry: t.union([Registry, t.undefined]),
             dockerArgs: DockerArgs,
+            noProjectPrefix: t.boolean,
         });
 
         export const _devReq = t.type({});
@@ -175,6 +177,7 @@ export namespace env {
             return setDefault(input, {
                 registry: context.registry,
                 dockerArgs: {},
+                noProjectPrefix: false,
             });
         }
 
