@@ -23,7 +23,7 @@
     },
     "dependencies": {
         "ajv": "^6.7.0",
-        "dockerfile-ast": "0.0.12",
+        "dockerfile-ast": "0.1.0",
         "fp-ts": "^1.13.0",
         "hjson": "git+https://github.com/dqsully/hjson-js.git",
         "io-ts": "^1.7.0",
