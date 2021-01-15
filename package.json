@@ -24,7 +24,7 @@
     "dependencies": {
         "ajv": "^6.7.0",
         "dockerfile-ast": "0.0.12",
-        "fp-ts": "^1.13.0",
+        "fp-ts": "^1.19.5",
         "hjson": "git+https://github.com/dqsully/hjson-js.git",
         "io-ts": "^1.7.0",
         "leven": "^2.1.0",
