@@ -22,7 +22,7 @@
         "test": "jest"
     },
     "dependencies": {
-        "ajv": "^6.7.0",
+        "ajv": "^6.12.6",
         "dockerfile-ast": "0.0.12",
         "fp-ts": "^1.13.0",
         "hjson": "git+https://github.com/dqsully/hjson-js.git",
